@@ -5,6 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "prisma:generate": "prisma generate",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:connector": "tsx src/connectors/wellfound/test-connector.ts",
     "test:yc": "tsx src/connectors/yc/test-connector.ts",
