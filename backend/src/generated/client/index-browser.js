@@ -120,13 +120,15 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.JobScalarFieldEnum = {
   id: 'id',
   source: 'source',
+  externalId: 'externalId',
   title: 'title',
   company: 'company',
   location: 'location',
   salary: 'salary',
   applyUrl: 'applyUrl',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  lastSeenAt: 'lastSeenAt'
 };
 
 exports.Prisma.SortOrder = {

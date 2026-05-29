@@ -9,16 +9,19 @@ generator client {
 }
 
 model Job {
-  id        String   @id @default(cuid())
-  source    String   // e.g. "wellfound"
-  title     String
-  company   String
-  location  String
-  salary    String?
-  applyUrl  String   @unique // Prevents duplicate listings
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  source     String   // e.g. "wellfound", "yc", "linkedin"
+  externalId String   @map("external_id")
+  title      String
+  company    String
+  location   String
+  salary     String?
+  applyUrl   String   @unique @map("apply_url")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
 
+  @@unique([source, externalId])
   @@index([source])
   @@index([company])
 }

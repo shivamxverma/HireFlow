@@ -879,6 +879,7 @@ export namespace Prisma {
   export type JobMinAggregateOutputType = {
     id: string | null
     source: string | null
+    externalId: string | null
     title: string | null
     company: string | null
     location: string | null
@@ -886,11 +887,13 @@ export namespace Prisma {
     applyUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    lastSeenAt: Date | null
   }
 
   export type JobMaxAggregateOutputType = {
     id: string | null
     source: string | null
+    externalId: string | null
     title: string | null
     company: string | null
     location: string | null
@@ -898,11 +901,13 @@ export namespace Prisma {
     applyUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    lastSeenAt: Date | null
   }
 
   export type JobCountAggregateOutputType = {
     id: number
     source: number
+    externalId: number
     title: number
     company: number
     location: number
@@ -910,6 +915,7 @@ export namespace Prisma {
     applyUrl: number
     createdAt: number
     updatedAt: number
+    lastSeenAt: number
     _all: number
   }
 
@@ -917,6 +923,7 @@ export namespace Prisma {
   export type JobMinAggregateInputType = {
     id?: true
     source?: true
+    externalId?: true
     title?: true
     company?: true
     location?: true
@@ -924,11 +931,13 @@ export namespace Prisma {
     applyUrl?: true
     createdAt?: true
     updatedAt?: true
+    lastSeenAt?: true
   }
 
   export type JobMaxAggregateInputType = {
     id?: true
     source?: true
+    externalId?: true
     title?: true
     company?: true
     location?: true
@@ -936,11 +945,13 @@ export namespace Prisma {
     applyUrl?: true
     createdAt?: true
     updatedAt?: true
+    lastSeenAt?: true
   }
 
   export type JobCountAggregateInputType = {
     id?: true
     source?: true
+    externalId?: true
     title?: true
     company?: true
     location?: true
@@ -948,6 +959,7 @@ export namespace Prisma {
     applyUrl?: true
     createdAt?: true
     updatedAt?: true
+    lastSeenAt?: true
     _all?: true
   }
 
@@ -1026,6 +1038,7 @@ export namespace Prisma {
   export type JobGroupByOutputType = {
     id: string
     source: string
+    externalId: string
     title: string
     company: string
     location: string
@@ -1033,6 +1046,7 @@ export namespace Prisma {
     applyUrl: string
     createdAt: Date
     updatedAt: Date
+    lastSeenAt: Date
     _count: JobCountAggregateOutputType | null
     _min: JobMinAggregateOutputType | null
     _max: JobMaxAggregateOutputType | null
@@ -1055,6 +1069,7 @@ export namespace Prisma {
   export type JobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     source?: boolean
+    externalId?: boolean
     title?: boolean
     company?: boolean
     location?: boolean
@@ -1062,11 +1077,13 @@ export namespace Prisma {
     applyUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    lastSeenAt?: boolean
   }, ExtArgs["result"]["job"]>
 
   export type JobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     source?: boolean
+    externalId?: boolean
     title?: boolean
     company?: boolean
     location?: boolean
@@ -1074,11 +1091,13 @@ export namespace Prisma {
     applyUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    lastSeenAt?: boolean
   }, ExtArgs["result"]["job"]>
 
   export type JobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     source?: boolean
+    externalId?: boolean
     title?: boolean
     company?: boolean
     location?: boolean
@@ -1086,11 +1105,13 @@ export namespace Prisma {
     applyUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    lastSeenAt?: boolean
   }, ExtArgs["result"]["job"]>
 
   export type JobSelectScalar = {
     id?: boolean
     source?: boolean
+    externalId?: boolean
     title?: boolean
     company?: boolean
     location?: boolean
@@ -1098,9 +1119,10 @@ export namespace Prisma {
     applyUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    lastSeenAt?: boolean
   }
 
-  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "title" | "company" | "location" | "salary" | "applyUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
+  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "externalId" | "title" | "company" | "location" | "salary" | "applyUrl" | "createdAt" | "updatedAt" | "lastSeenAt", ExtArgs["result"]["job"]>
 
   export type $JobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Job"
@@ -1108,6 +1130,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       source: string
+      externalId: string
       title: string
       company: string
       location: string
@@ -1115,6 +1138,7 @@ export namespace Prisma {
       applyUrl: string
       createdAt: Date
       updatedAt: Date
+      lastSeenAt: Date
     }, ExtArgs["result"]["job"]>
     composites: {}
   }
@@ -1540,6 +1564,7 @@ export namespace Prisma {
   interface JobFieldRefs {
     readonly id: FieldRef<"Job", 'String'>
     readonly source: FieldRef<"Job", 'String'>
+    readonly externalId: FieldRef<"Job", 'String'>
     readonly title: FieldRef<"Job", 'String'>
     readonly company: FieldRef<"Job", 'String'>
     readonly location: FieldRef<"Job", 'String'>
@@ -1547,6 +1572,7 @@ export namespace Prisma {
     readonly applyUrl: FieldRef<"Job", 'String'>
     readonly createdAt: FieldRef<"Job", 'DateTime'>
     readonly updatedAt: FieldRef<"Job", 'DateTime'>
+    readonly lastSeenAt: FieldRef<"Job", 'DateTime'>
   }
     
 
@@ -1918,13 +1944,15 @@ export namespace Prisma {
   export const JobScalarFieldEnum: {
     id: 'id',
     source: 'source',
+    externalId: 'externalId',
     title: 'title',
     company: 'company',
     location: 'location',
     salary: 'salary',
     applyUrl: 'applyUrl',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    lastSeenAt: 'lastSeenAt'
   };
 
   export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
@@ -2010,6 +2038,7 @@ export namespace Prisma {
     NOT?: JobWhereInput | JobWhereInput[]
     id?: StringFilter<"Job"> | string
     source?: StringFilter<"Job"> | string
+    externalId?: StringFilter<"Job"> | string
     title?: StringFilter<"Job"> | string
     company?: StringFilter<"Job"> | string
     location?: StringFilter<"Job"> | string
@@ -2017,11 +2046,13 @@ export namespace Prisma {
     applyUrl?: StringFilter<"Job"> | string
     createdAt?: DateTimeFilter<"Job"> | Date | string
     updatedAt?: DateTimeFilter<"Job"> | Date | string
+    lastSeenAt?: DateTimeFilter<"Job"> | Date | string
   }
 
   export type JobOrderByWithRelationInput = {
     id?: SortOrder
     source?: SortOrder
+    externalId?: SortOrder
     title?: SortOrder
     company?: SortOrder
     location?: SortOrder
@@ -2029,26 +2060,31 @@ export namespace Prisma {
     applyUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    lastSeenAt?: SortOrder
   }
 
   export type JobWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     applyUrl?: string
+    source_externalId?: JobSourceExternalIdCompoundUniqueInput
     AND?: JobWhereInput | JobWhereInput[]
     OR?: JobWhereInput[]
     NOT?: JobWhereInput | JobWhereInput[]
     source?: StringFilter<"Job"> | string
+    externalId?: StringFilter<"Job"> | string
     title?: StringFilter<"Job"> | string
     company?: StringFilter<"Job"> | string
     location?: StringFilter<"Job"> | string
     salary?: StringNullableFilter<"Job"> | string | null
     createdAt?: DateTimeFilter<"Job"> | Date | string
     updatedAt?: DateTimeFilter<"Job"> | Date | string
-  }, "id" | "applyUrl">
+    lastSeenAt?: DateTimeFilter<"Job"> | Date | string
+  }, "id" | "applyUrl" | "source_externalId">
 
   export type JobOrderByWithAggregationInput = {
     id?: SortOrder
     source?: SortOrder
+    externalId?: SortOrder
     title?: SortOrder
     company?: SortOrder
     location?: SortOrder
@@ -2056,6 +2092,7 @@ export namespace Prisma {
     applyUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    lastSeenAt?: SortOrder
     _count?: JobCountOrderByAggregateInput
     _max?: JobMaxOrderByAggregateInput
     _min?: JobMinOrderByAggregateInput
@@ -2067,6 +2104,7 @@ export namespace Prisma {
     NOT?: JobScalarWhereWithAggregatesInput | JobScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Job"> | string
     source?: StringWithAggregatesFilter<"Job"> | string
+    externalId?: StringWithAggregatesFilter<"Job"> | string
     title?: StringWithAggregatesFilter<"Job"> | string
     company?: StringWithAggregatesFilter<"Job"> | string
     location?: StringWithAggregatesFilter<"Job"> | string
@@ -2074,11 +2112,13 @@ export namespace Prisma {
     applyUrl?: StringWithAggregatesFilter<"Job"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Job"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Job"> | Date | string
+    lastSeenAt?: DateTimeWithAggregatesFilter<"Job"> | Date | string
   }
 
   export type JobCreateInput = {
     id?: string
     source: string
+    externalId: string
     title: string
     company: string
     location: string
@@ -2086,11 +2126,13 @@ export namespace Prisma {
     applyUrl: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    lastSeenAt?: Date | string
   }
 
   export type JobUncheckedCreateInput = {
     id?: string
     source: string
+    externalId: string
     title: string
     company: string
     location: string
@@ -2098,11 +2140,13 @@ export namespace Prisma {
     applyUrl: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    lastSeenAt?: Date | string
   }
 
   export type JobUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -2110,11 +2154,13 @@ export namespace Prisma {
     applyUrl?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastSeenAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type JobUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -2122,11 +2168,13 @@ export namespace Prisma {
     applyUrl?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastSeenAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type JobCreateManyInput = {
     id?: string
     source: string
+    externalId: string
     title: string
     company: string
     location: string
@@ -2134,11 +2182,13 @@ export namespace Prisma {
     applyUrl: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    lastSeenAt?: Date | string
   }
 
   export type JobUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -2146,11 +2196,13 @@ export namespace Prisma {
     applyUrl?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastSeenAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type JobUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    externalId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     company?: StringFieldUpdateOperationsInput | string
     location?: StringFieldUpdateOperationsInput | string
@@ -2158,6 +2210,7 @@ export namespace Prisma {
     applyUrl?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastSeenAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -2206,9 +2259,15 @@ export namespace Prisma {
     nulls?: NullsOrder
   }
 
+  export type JobSourceExternalIdCompoundUniqueInput = {
+    source: string
+    externalId: string
+  }
+
   export type JobCountOrderByAggregateInput = {
     id?: SortOrder
     source?: SortOrder
+    externalId?: SortOrder
     title?: SortOrder
     company?: SortOrder
     location?: SortOrder
@@ -2216,11 +2275,13 @@ export namespace Prisma {
     applyUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    lastSeenAt?: SortOrder
   }
 
   export type JobMaxOrderByAggregateInput = {
     id?: SortOrder
     source?: SortOrder
+    externalId?: SortOrder
     title?: SortOrder
     company?: SortOrder
     location?: SortOrder
@@ -2228,11 +2289,13 @@ export namespace Prisma {
     applyUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    lastSeenAt?: SortOrder
   }
 
   export type JobMinOrderByAggregateInput = {
     id?: SortOrder
     source?: SortOrder
+    externalId?: SortOrder
     title?: SortOrder
     company?: SortOrder
     location?: SortOrder
@@ -2240,6 +2303,7 @@ export namespace Prisma {
     applyUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    lastSeenAt?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {

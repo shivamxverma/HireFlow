@@ -48,14 +48,37 @@ async function runTests() {
   }
 
   if (process.env.LINKEDIN_LIVE_TEST === "true") {
-    const liveJobs = await searchLinkedinJobs({
-      keywords: "Backend Engineer",
-      location: "Bengaluru",
-      experienceLevel: "entry",
-    });
+    const { upsertJobs } = await import("../../services/job-store.service.js");
+    const { prisma } = await import("../../services/prisma.js");
 
-    console.log(`Live LinkedIn connector returned ${liveJobs.length} jobs.`);
-    console.log("Sample:", JSON.stringify(liveJobs[0], null, 2));
+    try {
+      const liveJobs = await searchLinkedinJobs({
+        keywords: "Backend Engineer",
+        location: "Bengaluru",
+        experienceLevel: "entry",
+      });
+
+      console.log(`Live LinkedIn connector returned ${liveJobs.length} jobs.`);
+      
+      if (liveJobs.length > 0) {
+        console.log("Sample:", JSON.stringify(liveJobs[0], null, 2));
+        
+        // Store/Persist in Neon PostgreSQL
+        const storeResult = await upsertJobs(liveJobs);
+        console.log(`[Neon Database] Store complete: ${storeResult.upserted} LinkedIn jobs written/updated in database.`);
+
+        // Query database count
+        const dbCount = await prisma.job.count();
+        console.log(`[Neon Database] Total jobs currently in Neon PostgreSQL: ${dbCount}`);
+      } else {
+        console.log("⚠️ Live fetch returned 0 jobs. Check cookies or search query.");
+      }
+    } catch (error) {
+      console.error("❌ Live LinkedIn integration test failed:", error);
+    } finally {
+      await prisma.$disconnect();
+      console.log("[Neon Database] Disconnected pool cleanly.");
+    }
   } else {
     console.log("Skipping live LinkedIn request. Run pnpm save-session:linkedin, then set LINKEDIN_LIVE_TEST=true.");
   }
