@@ -258,6 +258,44 @@ a {
   line-height: 1.6;
 }
 
+.jobs-toolbar-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.checkbox-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: var(--surface-strong);
+  padding: 0.72rem 1.05rem;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: all 180ms ease;
+  font-family: inherit;
+}
+
+.checkbox-filter:hover {
+  border-color: rgba(123, 51, 10, 0.24);
+  background: rgba(255, 253, 248, 1);
+}
+
+.checkbox-filter input {
+  cursor: pointer;
+  accent-color: var(--accent);
+  width: 17px;
+  height: 17px;
+  margin: 0;
+}
+
 @media (max-width: 920px) {
   .jobs-grid {
     grid-template-columns: 1fr;

@@ -41,5 +41,8 @@ export function buildLinkedinSearchUrl(config: LinkedinSearchConfig): string {
     url.searchParams.set("start", String((config.page - 1) * 25));
   }
 
+  // Only retrieve jobs posted within the past 24 hours (1 day)
+  url.searchParams.set("f_TPR", "r86400");
+
   return url.toString();
 }
