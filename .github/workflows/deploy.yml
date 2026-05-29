@@ -1,0 +1,39 @@
+name: Deploy Backend to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    name: Deploying to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Execute remote SSH commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            # Navigate to the backend folder on EC2
+            cd ~/HireFlow/backend
+            
+            # Clean local untracked/generated files to prevent git pull conflicts
+            rm -rf src/generated/
+            git checkout -- src/generated/ || true
+            
+            # Pull latest changes from git
+            git pull origin main
+            
+            # Install packages and compile TypeScript
+            pnpm install
+            pnpm run build
+            
+            # Restart backend with PM2
+            pm2 restart job-scraper-backend
