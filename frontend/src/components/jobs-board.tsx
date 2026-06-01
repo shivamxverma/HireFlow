@@ -7,7 +7,7 @@ import type { Job } from "@/types/job";
 import { GmailOutreach } from "@/components/gmail-outreach";
 import { LinkedinOutreach } from "@/components/linkedin-outreach";
 import { Button } from "@/components/ui/button";
-import { Plus, ExternalLink, ChevronDown, Pencil, Wand2 } from "lucide-react";
+import { Plus, ExternalLink, ChevronDown, Pencil, Wand2, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface ResumeVersion {
@@ -672,220 +672,178 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore" }: JobsBoa
 
       {/* ==================== AUTO-APPLY LIVE QUEUE TAB ==================== */}
       {activeTab === "queue" && (
-        <section className="flex flex-col gap-6" style={{ minHeight: "60vh" }}>
-          <div className="bg-card text-card-foreground border rounded-xl shadow-sm p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex flex-col">
-              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111827", margin: "0" }}>Auto-Apply Live Queue</h2>
-              <p className="text-sm text-muted-foreground" style={{ margin: "4px 0 0" }}>
-                Tracks live tailoring (Gemini/OpenAI) and background browser execution (Playwright)
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-              <button 
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto whitespace-nowrap" 
-                onClick={fetchApplications}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: "42px",
-                  padding: "0.65rem 1.15rem",
+        <section className="flex flex-col gap-8" style={{ minHeight: "70vh", position: "relative", overflow: "hidden", padding: "1rem 0" }}>
+          {/* Floating animated blobs */}
+          <div style={{ position: "absolute", top: "10%", left: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(182, 95, 42, 0.08) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float1 15s ease-in-out infinite alternate", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "10%", right: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(217, 119, 6, 0.06) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float2 18s ease-in-out infinite alternate", pointerEvents: "none" }} />
+
+          {/* Header Dashboard Deck */}
+          <div className="bg-card text-card-foreground border rounded-xl shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10" style={{ background: "rgba(255, 253, 248, 0.6)", backdropFilter: "blur(12px)" }}>
+            <div>
+              <span 
+                style={{ 
+                  fontSize: "0.68rem", 
+                  fontWeight: 700, 
+                  background: "rgba(182, 95, 42, 0.1)", 
+                  color: "#b65f2a", 
+                  padding: "0.25rem 0.65rem", 
                   borderRadius: "999px",
-                  background: "var(--primary)",
-                  color: "white",
-                  fontSize: "0.92rem",
-                  fontWeight: 500,
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "all 180ms ease"
+                  border: "1px solid rgba(182, 95, 42, 0.2)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  display: "inline-block",
+                  marginBottom: "0.5rem"
                 }}
               >
-                🔄 Refresh Queue
-              </button>
+                Version 2.0 Roadmap Preview 🚀
+              </span>
+              <h2 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text)", margin: "0", letterSpacing: "-0.025em" }}>
+                AI Auto-Apply Live Queue
+              </h2>
+              <p className="text-sm text-muted-foreground" style={{ margin: "6px 0 0" }}>
+                Autonomous Playwright form-filling and real-time Gemini resume optimization.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                🔒 Stealth Mode Ready
+              </span>
             </div>
           </div>
 
-          {applications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center border-2 border-dashed rounded-xl bg-card text-muted-foreground my-8" style={{ padding: "4rem 2rem", textAlign: "center", backgroundColor: "#f9fafb", borderRadius: "16px", border: "1px dashed var(--border)", marginTop: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 600, color: "#475569", marginBottom: "0.5rem" }}>No applications in queue yet</h3>
-              <p style={{ fontSize: "0.9rem", color: "#6b7280" }}>
-                Go to the &quot;Explore Board&quot;, click on a scraped job card, and click &quot;Auto Apply Now&quot; to launch your first automated application!
-              </p>
+          {/* Feature Deck & Mockup Dashboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+            
+            {/* Left 2 Cols: Pipeline Explanation & Feature list */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
+              
+              <div 
+                style={{ 
+                  background: "rgba(255, 255, 255, 0.5)", 
+                  border: "1px solid var(--border)", 
+                  borderRadius: "20px", 
+                  padding: "2rem",
+                  boxShadow: "var(--shadow)"
+                }}
+              >
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", marginBottom: "1rem" }}>
+                  How the Auto-Apply Pipeline Works
+                </h3>
+                <p style={{ fontSize: "0.88rem", color: "#64748b", lineHeight: "1.6", marginBottom: "1.5rem" }}>
+                  When Version 2.0 launches, you will be able to select any scraped job from your Explore board and trigger a background agent. The system handles the heavy lifting autonomously:
+                </p>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>1</span>
+                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>AI Resume Tailoring</strong>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
+                      Gemini reviews the target job requirements and restructures your master PDF/LaTeX resume dynamically to highlight matching technical skills.
+                    </span>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>2</span>
+                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>LaTeX PDF Compilation</strong>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
+                      The customized LaTeX codebase is compiled directly on the server into a high-fidelity PDF, ensuring zero formatting bugs.
+                    </span>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>3</span>
+                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>Playwright Automation</strong>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
+                      Stealth background browser instances launch on your backend to navigate forms, input tailored fields, and upload PDFs directly.
+                    </span>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>4</span>
+                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>Kanban Status Sync</strong>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
+                      Successful applications are automatically moved to &quot;Applied&quot; inside your Tracker board, storing generated PDF versions for review.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
             </div>
-          ) : (
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden overflow-x-auto" style={{ marginTop: "1.5rem", border: "1px solid var(--border)", borderRadius: "12px", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-              <table className="w-full caption-bottom text-sm" style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ background: "#f9fafb", borderBottom: "1px solid var(--border)", textAlign: "left" }}>
-                    <th style={{ padding: "1rem 1.25rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Job & Company</th>
-                    <th style={{ padding: "1rem 1.25rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Platform</th>
-                    <th style={{ padding: "1rem 1.25rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Triggered At</th>
-                    <th style={{ padding: "1rem 1.25rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Queue Status</th>
-                    <th style={{ padding: "1rem 1.25rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Optimized Resume</th>
-                    <th style={{ padding: "1rem 1.25rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Details / Error Logs</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.map((app) => {
-                    const triggeredDate = new Intl.DateTimeFormat("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit"
-                    }).format(new Date(app.createdAt));
 
-                    // Status Badge Helper
-                    let statusBg = "#f1f5f9";
-                    let statusColor = "#475569";
-                    let statusLabel = app.status;
-                    let isGlowing = false;
+            {/* Right Col: Live Progress Simulator / Roadmap widget */}
+            <div className="flex flex-col gap-6">
+              
+              <div 
+                style={{ 
+                  background: "linear-gradient(135deg, #1e1b4b 0%, #311042 100%)", 
+                  borderRadius: "20px", 
+                  padding: "1.75rem", 
+                  color: "white",
+                  boxShadow: "0 12px 30px rgba(49, 16, 66, 0.2)"
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+                  <div>
+                    <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0", color: "#e0e7ff" }}>Pipeline Simulator</h3>
+                    <p style={{ fontSize: "0.78rem", color: "#c7d2fe", margin: "2px 0 0" }}>Interactive mockup of Version 2.0</p>
+                  </div>
+                  <Sparkles className="w-5 h-5 text-indigo-300 animate-pulse" />
+                </div>
 
-                    switch (app.status) {
-                      case "QUEUED":
-                        statusBg = "#e2e8f0";
-                        statusColor = "#475569";
-                        statusLabel = "Queued";
-                        break;
-                      case "GENERATING_RESUME":
-                        statusBg = "#f3e8ff";
-                        statusColor = "#7e22ce";
-                        statusLabel = "Tailoring Resume...";
-                        isGlowing = true;
-                        break;
-                      case "READY_TO_APPLY":
-                        statusBg = "#e0e7ff";
-                        statusColor = "#4338ca";
-                        statusLabel = "Resume Compiled";
-                        isGlowing = true;
-                        break;
-                      case "APPLYING":
-                        statusBg = "#ffedd5";
-                        statusColor = "#c2410c";
-                        statusLabel = "Applying via Playwright...";
-                        isGlowing = true;
-                        break;
-                      case "APPLIED":
-                        statusBg = "#d1fae5";
-                        statusColor = "#047857";
-                        statusLabel = "Applied ✓";
-                        break;
-                      case "FAILED":
-                        statusBg = "#fee2e2";
-                        statusColor = "#b91c1c";
-                        statusLabel = "Failed ⚠️";
-                        break;
-                    }
+                {/* Progress steps mock */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: "rgba(255,255,255,0.08)", padding: "0.75rem", borderRadius: "10px" }}>
+                    <div className="spinner" style={{
+                      width: "16px",
+                      height: "16px",
+                      border: "2px solid rgba(255, 255, 255, 0.25)",
+                      borderTopColor: "white",
+                      borderRadius: "50%",
+                      animation: "spin 1.2s linear infinite"
+                    }} />
+                    <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Playwright active: Navigating forms...</span>
+                  </div>
 
-                    return (
-                      <tr key={app.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted" style={{ borderBottom: "1px solid var(--border)", transition: "background 150ms ease" }}>
-                        <td style={{ padding: "1rem 1.25rem" }}>
-                          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                            <strong style={{ fontSize: "0.95rem", color: "#111827" }}>{app.job.title}</strong>
-                            <span style={{ fontSize: "0.85rem", color: "#6b7280" }}>{app.job.company}</span>
-                          </div>
-                        </td>
-                        <td style={{ padding: "1rem 1.25rem" }}>
-                          <span className={`platform-pill tag-${app.job.source}`} style={{ fontSize: "0.78rem" }}>
-                            {app.job.source}
-                          </span>
-                        </td>
-                        <td style={{ padding: "1rem 1.25rem", fontSize: "0.88rem", color: "#4b5563" }}>
-                          {triggeredDate}
-                        </td>
-                        <td style={{ padding: "1rem 1.25rem" }}>
-                          <span
-                            style={{
-                              background: statusBg,
-                              color: statusColor,
-                              padding: "0.25rem 0.65rem",
-                              borderRadius: "999px",
-                              fontWeight: 600,
-                              fontSize: "0.75rem",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                              animation: isGlowing ? "pulseGlow 1.5s infinite alternate" : "none"
-                            }}
-                          >
-                            {isGlowing && (
-                              <span style={{
-                                width: "6px",
-                                height: "6px",
-                                backgroundColor: statusColor,
-                                borderRadius: "50%",
-                                display: "inline-block"
-                              }} />
-                            )}
-                            {statusLabel}
-                          </span>
-                        </td>
-                        <td style={{ padding: "1rem 1.25rem" }}>
-                          {app.resumeVersion ? (
-                            <div style={{ display: "flex", gap: "0.5rem" }}>
-                              <a
-                                href={`/api/v1/applications/${app.id}/download?type=pdf`}
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{
-                                  padding: "0.35rem 0.65rem",
-                                  backgroundColor: "#4338ca",
-                                  borderRadius: "6px",
-                                  color: "white",
-                                  fontSize: "0.78rem",
-                                  fontWeight: 500,
-                                  textDecoration: "none",
-                                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
-                                }}
-                              >
-                                PDF
-                              </a>
-                              <a
-                                href={`/api/v1/applications/${app.id}/download?type=latex`}
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{
-                                  padding: "0.35rem 0.65rem",
-                                  backgroundColor: "#f3f4f6",
-                                  borderRadius: "6px",
-                                  color: "#374151",
-                                  fontSize: "0.78rem",
-                                  fontWeight: 500,
-                                  textDecoration: "none",
-                                  border: "1px solid #d1d5db"
-                                }}
-                              >
-                                .tex
-                              </a>
-                            </div>
-                          ) : (
-                            <span style={{ fontSize: "0.85rem", color: "#9ca3af", fontStyle: "italic" }}>
-                              {app.status === "FAILED" ? "Not Created" : "Compiling..."}
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ padding: "1rem 1.25rem", fontSize: "0.85rem", maxWidth: "250px" }}>
-                          {app.status === "FAILED" ? (
-                            <span style={{ color: "#ef4444", fontWeight: 500, wordBreak: "break-word" }}>
-                              {app.errorMessage || "Submission failed"}
-                            </span>
-                          ) : app.status === "APPLIED" ? (
-                            <span style={{ color: "#10b981", fontWeight: 500 }}>
-                              Submitted successfully via Playwright!
-                            </span>
-                          ) : (
-                            <span style={{ color: "#6b7280", fontStyle: "italic" }}>
-                              Processing background task...
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.8rem", color: "#cbd5e1", paddingLeft: "0.25rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{ color: "#10b981", fontWeight: 700 }}>✓</span>
+                      <span>Optimize Resume using OpenAI</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{ color: "#10b981", fontWeight: 700 }}>✓</span>
+                      <span>Compile tailored LaTeX & PDF resume</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: 0.9 }}>
+                      <span style={{ color: "#a855f7" }}>●</span>
+                      <span>Launch Playwright headed apply flow</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "1rem", textAlign: "center" }}>
+                  <p style={{ fontSize: "0.72rem", color: "#cbd5e1", margin: 0 }}>
+                    Auto-apply backend worker triggers and PDF versioning will connect here dynamically in Version 2.0.
+                  </p>
+                </div>
+              </div>
+
             </div>
-          )}
+
+          </div>
+
+          <style>{`
+            @keyframes float1 {
+              0% { transform: translate(0, 0) scale(1); }
+              100% { transform: translate(25px, 20px) scale(1.08); }
+            }
+            @keyframes float2 {
+              0% { transform: translate(0, 0) scale(1); }
+              100% { transform: translate(-20px, -25px) scale(0.92); }
+            }
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
         </section>
       )}
 

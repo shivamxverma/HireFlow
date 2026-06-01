@@ -59,6 +59,7 @@ export function Navbar() {
 
   const navLinks = [
     { name: "Explore", href: "/", icon: Compass },
+    { name: "Auto-Apply Queue", href: "/queue", icon: ListChecks },
     { name: "Tracker", href: "/tracker", icon: Target },
     { name: "Outreach", href: "/outreach", icon: Megaphone },
     { name: "Gmail", href: "/gmail", icon: Mail },
