@@ -1231,171 +1231,55 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore" }: JobsBoa
                 </div>
               </div>
 
-              {/* AUTO APPLY ACTIONS WIDGET */}
+              {/* AUTO APPLY ACTIONS WIDGET - PREVIEW CARD (TEMPORARILY DISABLED FOR v1) */}
               <div 
                 style={{
-                  background: "linear-gradient(135deg, #1e1b4b 0%, #311042 100%)",
+                  background: "linear-gradient(135deg, rgba(30, 27, 75, 0.45) 0%, rgba(49, 16, 66, 0.45) 100%)",
                   borderRadius: "16px",
-                  padding: "1.75rem 2rem",
+                  padding: "1.5rem 1.75rem",
                   color: "white",
                   marginBottom: "2rem",
-                  boxShadow: "0 8px 30px rgba(49, 16, 66, 0.25)",
+                  border: "1px dashed rgba(182, 95, 42, 0.3)",
+                  boxShadow: "0 8px 30px rgba(49, 16, 66, 0.08)",
+                  position: "relative",
+                  overflow: "hidden"
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "0.85rem" }}>
                   <div>
-                    <h3 style={{ fontSize: "1.2rem", fontWeight: 600, margin: "0", color: "#e0e7ff" }}>AI Auto Apply Pipeline</h3>
-                    <p style={{ fontSize: "0.82rem", color: "#c7d2fe", margin: "4px 0 0" }}>Tailors resume + submits via Playwright</p>
-                  </div>
-                  <Wand2 className="w-7 h-7 text-indigo-300" />
-                </div>
-
-                {pollingStatus === "IDLE" && (
-                  <button
-                    onClick={() => handleAutoApply(selectedJobDetails.id)}
-                    style={{
-                      width: "100%",
-                      padding: "0.9rem",
-                      borderRadius: "12px",
-                      background: "linear-gradient(90deg, #6366f1 0%, #a855f7 100%)",
-                      color: "white",
-                      fontSize: "1.05rem",
-                      fontWeight: 600,
-                      border: "none",
-                      cursor: "pointer",
-                      boxShadow: "0 4px 15px rgba(168, 85, 247, 0.4)",
-                      transition: "transform 150ms ease, opacity 150ms ease",
-                    }}
-                    onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.98)"}
-                    onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
-                    className="auto-apply-btn"
-                  >
-                    🚀 Auto Apply Now
-                  </button>
-                )}
-
-                {pollingStatus === "POLLING" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {/* Glowing progress steps */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: "rgba(255,255,255,0.08)", padding: "0.75rem 1rem", borderRadius: "10px" }}>
-                      <div className="spinner" style={{
-                        width: "18px",
-                        height: "18px",
-                        border: "2px solid rgba(255, 255, 255, 0.25)",
-                        borderTopColor: "white",
-                        borderRadius: "50%",
-                        animation: "spin 1s linear infinite"
-                      }} />
-                      <span style={{ fontSize: "0.92rem", fontWeight: 500 }}>
-                        {activeApplication?.status === "QUEUED" && "Queuing pipeline task..."}
-                        {activeApplication?.status === "GENERATING_RESUME" && "Tailoring resume with OpenAI..."}
-                        {activeApplication?.status === "READY_TO_APPLY" && "Compiling high-fidelity PDF resume..."}
-                        {activeApplication?.status === "APPLYING" && "Playwright active: Navigating forms..."}
-                        {!activeApplication?.status && "Initializing AI optimization..."}
-                      </span>
-                    </div>
-
-                    {/* Progress visual list */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.82rem", color: "#cbd5e1", paddingLeft: "0.5rem" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: activeApplication?.status ? 1 : 0.5 }}>
-                        <span>{activeApplication?.status !== "QUEUED" ? "✓" : "●"}</span>
-                        <span style={{ marginLeft: "6px" }}>Optimize Resume using OpenAI</span>
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: ["READY_TO_APPLY", "APPLYING", "APPLIED"].includes(activeApplication?.status || "") ? 1 : 0.5 }}>
-                        <span>{["READY_TO_APPLY", "APPLYING", "APPLIED"].includes(activeApplication?.status || "") ? "✓" : "○"}</span>
-                        <span style={{ marginLeft: "6px" }}>Compile tailored LaTeX & PDF resume</span>
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: ["APPLYING", "APPLIED"].includes(activeApplication?.status || "") ? 1 : 0.5 }}>
-                        <span>{activeApplication?.status === "APPLIED" ? "✓" : activeApplication?.status === "APPLYING" ? "●" : "○"}</span>
-                        <span style={{ marginLeft: "6px" }}>Launch Playwright headed apply flow</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {pollingStatus === "SUCCESS" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: "rgba(16, 185, 129, 0.2)", padding: "0.75rem 1rem", borderRadius: "10px", border: "1px solid rgba(16, 185, 129, 0.3)" }}>
-                      <span style={{ fontSize: "1.2rem", color: "#10b981" }}>✓</span>
-                      <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#a7f3d0" }}>Successfully Applied!</span>
-                    </div>
-
-                    {activeApplication?.resumeVersion && (
-                      <div style={{ display: "flex", gap: "0.75rem", marginTop: "4px" }}>
-                        <a
-                          href={`/api/v1/applications/${activeApplication.id}/download?type=pdf`}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{
-                            flex: 1,
-                            padding: "0.6rem 0.8rem",
-                            backgroundColor: "rgba(255, 255, 255, 0.1)",
-                            borderRadius: "8px",
-                            color: "white",
-                            fontSize: "0.85rem",
-                            fontWeight: 500,
-                            textAlign: "center",
-                            textDecoration: "none",
-                            border: "1px solid rgba(255,255,255,0.15)",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "6px"
-                          }}
-                        >
-                          📥 Download Tailored PDF
-                        </a>
-                        <a
-                          href={`/api/v1/applications/${activeApplication.id}/download?type=latex`}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{
-                            padding: "0.6rem 0.8rem",
-                            backgroundColor: "transparent",
-                            borderRadius: "8px",
-                            color: "#cbd5e1",
-                            fontSize: "0.85rem",
-                            fontWeight: 500,
-                            textAlign: "center",
-                            textDecoration: "none",
-                            border: "1px solid rgba(255,255,255,0.1)",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center"
-                          }}
-                        >
-                          Source (.tex)
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {pollingStatus === "FAILED" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", background: "rgba(239, 68, 68, 0.15)", padding: "0.75rem 1rem", borderRadius: "10px", border: "1px solid rgba(239, 68, 68, 0.3)" }}>
-                      <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fca5a5" }}>⚠️ Pipeline Failed</span>
-                      <span style={{ fontSize: "0.78rem", color: "#fecaca", wordBreak: "break-word" }}>{activeApplication?.errorMessage || "An unexpected error occurred during submission."}</span>
-                    </div>
-
-                    <button
-                      onClick={() => handleAutoApply(selectedJobDetails.id)}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        borderRadius: "10px",
-                        background: "rgba(255,255,255,0.1)",
-                        color: "white",
-                        fontSize: "0.9rem",
-                        fontWeight: 600,
-                        border: "1px solid rgba(255,255,255,0.2)",
-                        cursor: "pointer",
+                    <span 
+                      style={{ 
+                        fontSize: "0.68rem", 
+                        fontWeight: 700, 
+                        background: "rgba(182, 95, 42, 0.15)", 
+                        color: "#b65f2a", 
+                        padding: "0.2rem 0.55rem", 
+                        borderRadius: "999px",
+                        border: "1px solid rgba(182, 95, 42, 0.25)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        display: "inline-block",
+                        marginBottom: "0.5rem"
                       }}
                     >
-                      🔄 Retry Application
-                    </button>
+                      Coming in Version 2.0 ⚡
+                    </span>
+                    <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0", color: "#f3f4f6", letterSpacing: "-0.01em" }}>
+                      AI Auto Apply Pipeline
+                    </h3>
                   </div>
-                )}
+                  <Wand2 className="w-6 h-6 text-orange-300" style={{ opacity: 0.6 }} />
+                </div>
+                
+                <p style={{ fontSize: "0.8rem", color: "#a1a1aa", lineHeight: "1.4", margin: 0 }}>
+                  Our upcoming Version 2.0 will feature fully automated, background Playwright form filling and real-time resume tailoring via Gemini!
+                </p>
+                
+                <div style={{ marginTop: "1rem", borderTop: "1px solid rgba(255, 255, 255, 0.05)", paddingTop: "0.85rem", fontSize: "0.78rem", color: "#a1a1aa", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                  <span>✓ 1-Click Tailored PDF Generation</span>
+                  <span>✓ Background Form Automated Delivery</span>
+                  <span>✓ Live Playwright Browser Status Monitoring</span>
+                </div>
               </div>
 
               {/* Full JD Panel */}
