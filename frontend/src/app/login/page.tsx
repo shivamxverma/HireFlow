@@ -41,6 +41,11 @@ function LoginContent() {
       const json = await res.json();
 
       if (res.ok && json.success) {
+        if (json.data?.redirectUrl) {
+          window.location.href = json.data.redirectUrl;
+          return;
+        }
+
         // Fetch session tokens and cache key in local storage to preserve compatibility with outreach routes
         localStorage.setItem("outreach_api_key", json.data.user.sessionToken);
         

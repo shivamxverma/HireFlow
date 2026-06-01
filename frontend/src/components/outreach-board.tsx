@@ -1443,7 +1443,7 @@ export function OutreachBoard() {
               }}
               style={{
                 padding: "0.6rem 1.25rem",
-                background: "var(--accent)",
+                background: "var(--legacy-accent)",
                 color: "white",
                 border: "none",
                 borderRadius: "10px",

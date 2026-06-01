@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import { prisma } from "./services/prisma.js";
 import { startFetchScheduler, triggerFetchJob } from "./scheduler/fetch.scheduler.js";
 import { startCleanupScheduler, triggerCleanupJob } from "./scheduler/cleanup.scheduler.js";
@@ -8,15 +9,22 @@ import { outreachWorker } from "./queues/outreach.worker.js";
 import { outreachRouter } from "./routes/outreach.routes.js";
 import { outreachFlowRouter } from "./routes/outreach-flow.routes.js";
 import { linkedinOutreachRouter } from "./routes/linkedin-outreach.routes.js";
+import authRouter from "./routes/auth.routes.js";
 import { requireAuth } from "./routes/auth.middleware.js";
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable CORS for frontend API calls
+// Enable CORS for frontend API calls and support secure HTTP-only cookies (credentials)
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-Key, bypass-tunnel-reminder");
   res.setHeader("Access-Control-Allow-Private-Network", "true");
@@ -32,11 +40,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use("/api/v1/auth", authRouter);
 app.use(outreachRouter);
 app.use(outreachFlowRouter);
 app.use(linkedinOutreachRouter);
+
 
 
 /**

@@ -1,9 +1,10 @@
 import { Router, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { prisma } from "../services/prisma.js";
 import { GeminiService } from "../services/gemini.service.js";
 import { EmailService } from "../services/email.service.js";
 import { GmailService } from "../services/gmail.service.js";
-import { requireAuth, requireSendAuth } from "./auth.middleware.js";
+import { requireAuth, requireSendAuth, AuthenticatedRequest } from "./auth.middleware.js";
 
 export const outreachRouter = Router();
 outreachRouter.use(requireAuth);
@@ -34,11 +35,25 @@ outreachRouter.get("/outreach/auth/google", (req: Request, res: Response) => {
 
 outreachRouter.get("/api/auth/callback/google", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { code } = req.query as { code?: string };
+    const { code, state } = req.query as { code?: string; state?: string };
     if (!code) {
       res.status(400).send("Authorization code is missing.");
       return;
     }
+
+    // Intercept: If state is a valid JWT signed by our key, this is the User Authentication flow!
+    if (state) {
+      try {
+        const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "hireflow_jwt_access_secret_2026_x18";
+        jwt.verify(state, ACCESS_TOKEN_SECRET);
+        // Valid JWT user auth session, redirect to the real User Auth callback endpoint
+        res.redirect(`/api/v1/auth/google/callback?code=${code}&state=${state}`);
+        return;
+      } catch (jwtErr) {
+        // Not a user auth JWT state, continue to legacy Gmail callback flow
+      }
+    }
+
     const redirectUri = `${req.protocol}://${req.headers.host}/api/auth/callback/google`;
     await gmailService.exchangeCodeForTokens(code, redirectUri);
     
@@ -89,9 +104,10 @@ outreachRouter.get("/outreach/auth/google/status", async (req: Request, res: Res
  * 1. Add Recruiter Leads (Single or Bulk)
  * POST /outreach/leads
  */
-outreachRouter.post("/outreach/leads", async (req: Request, res: Response): Promise<void> => {
+outreachRouter.post("/outreach/leads", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { leads } = req.body; // Expects array of leads or a single lead object
+    const userId = req.user?.id || "default-user";
 
     if (!leads) {
       res.status(400).json({ success: false, message: "Missing leads data." });
@@ -112,6 +128,7 @@ outreachRouter.post("/outreach/leads", async (req: Request, res: Response): Prom
         return;
       }
       validatedLeads.push({
+        userId,
         companyName: companyName.trim(),
         recipientEmail: recipientEmail.trim().toLowerCase(),
         jobDescription: jobDescription.trim(),
@@ -124,6 +141,7 @@ outreachRouter.post("/outreach/leads", async (req: Request, res: Response): Prom
       validatedLeads.map((l) =>
         prisma.lead.create({
           data: {
+            userId: l.userId,
             companyName: l.companyName,
             recipientEmail: l.recipientEmail,
             jobDescription: l.jobDescription,
@@ -185,9 +203,11 @@ outreachRouter.post("/outreach/leads/extract-image", async (req: Request, res: R
  * 2. Get All Leads with Message History
  * GET /outreach/leads
  */
-outreachRouter.get("/outreach/leads", async (req: Request, res: Response) => {
+outreachRouter.get("/outreach/leads", async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const userId = req.user?.id || "default-user";
     const leads = await prisma.lead.findMany({
+      where: { userId },
       include: {
         messages: {
           orderBy: { createdAt: "asc" },
@@ -256,10 +276,12 @@ outreachRouter.patch("/outreach/messages/:id", async (req: Request, res: Respons
  * 5. Generate Cold Emails for All Leads
  * POST /outreach/generate-all
  */
-outreachRouter.post("/outreach/generate-all", async (req: Request, res: Response) => {
+outreachRouter.post("/outreach/generate-all", async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const userId = req.user?.id || "default-user";
     // Find all leads who don't have an INITIAL email message yet
     const leads = await prisma.lead.findMany({
+      where: { userId },
       include: {
         messages: {
           where: { type: "INITIAL" },
@@ -429,11 +451,13 @@ outreachRouter.post("/outreach/send/:id", requireSendAuth, async (req: Request, 
  * 7. Send All READY Initial Emails Sequentially
  * POST /outreach/send-all
  */
-outreachRouter.post("/outreach/send-all", requireSendAuth, async (req: Request, res: Response): Promise<void> => {
+outreachRouter.post("/outreach/send-all", requireSendAuth, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    const userId = req.user?.id || "default-user";
     // Find all leads whose status is READY, and who have an unsent INITIAL email message
     const leads = await prisma.lead.findMany({
       where: {
+        userId,
         status: { in: ["READY", "FAILED"] },
       },
       include: {
