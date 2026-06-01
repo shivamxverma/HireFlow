@@ -1513,7 +1513,7 @@ export function OutreachBoard() {
 
           {genQueueJobs.length === 0 ? (
             <div style={{ padding: "4rem", textAlign: "center", background: "#f8fafc", border: "1px dashed var(--border)", borderRadius: "16px" }}>
-              No background jobs enqueued. Go to the "Target Profiles" tab, select profiles, and dispatch generations.
+              No background jobs enqueued. Go to the &quot;Target Profiles&quot; tab, select profiles, and dispatch generations.
             </div>
           ) : (
             <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", overflow: "hidden", boxShadow: "var(--shadow)" }}>
