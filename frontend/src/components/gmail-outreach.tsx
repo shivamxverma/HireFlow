@@ -510,8 +510,101 @@ export function GmailOutreach() {
 
   return (
     <div style={{ fontFamily: "Inter, system-ui, sans-serif", color: "var(--text)" }}>
-      
-      {/* Google OAuth banner removed as requested */}
+      {/* Google OAuth Connection Banner */}
+      <div 
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "24px",
+          padding: "1.25rem 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "2rem",
+          boxShadow: "var(--shadow)",
+          backdropFilter: "blur(14px)"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1.2rem" }}>
+          <div 
+            style={{ 
+              width: "48px", 
+              height: "48px", 
+              borderRadius: "14px", 
+              background: googleAuth.authenticated ? "rgba(16, 185, 129, 0.08)" : "rgba(182, 95, 42, 0.08)",
+              border: googleAuth.authenticated ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(182, 95, 42, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1.5rem"
+            }}
+          >
+            {googleAuth.authenticated ? "📧" : "🔌"}
+          </div>
+          <div>
+            <h3 style={{ margin: 0, fontSize: "1.05rem", color: "var(--text)", fontWeight: 600 }}>
+              {googleAuth.authenticated ? "Google Account Connected" : "Google Account Connection Required"}
+            </h3>
+            <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
+              {googleAuth.authenticated 
+                ? `Authorized as ${googleAuth.email || "Active User"}. Ready to dispatch cold outreach campaigns.` 
+                : "Connect your Google account to grant secure permission for automated cold email campaigns."}
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <button
+            onClick={checkGoogleAuthStatus}
+            style={{
+              background: "transparent",
+              color: "var(--text)",
+              border: "1px solid var(--border)",
+              padding: "0.5rem 1rem",
+              borderRadius: "10px",
+              fontSize: "0.8rem",
+              cursor: "pointer",
+              fontWeight: 500
+            }}
+          >
+            🔄 Refresh Status
+          </button>
+
+          {googleAuth.authenticated ? (
+            <span 
+              style={{
+                background: "rgba(16, 185, 129, 0.1)",
+                color: "#059669",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
+                padding: "0.5rem 1rem",
+                borderRadius: "10px",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+              }}
+            >
+              Google Active ✅
+            </span>
+          ) : (
+            <button
+              onClick={connectGoogleAccount}
+              style={{
+                background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
+                color: "#fff",
+                border: "none",
+                padding: "0.7rem 1.4rem",
+                borderRadius: "12px",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                cursor: "pointer",
+                boxShadow: "0 8px 20px -6px rgba(182, 95, 42, 0.4)",
+                transition: "all 0.2s ease"
+              }}
+            >
+              🔌 Connect Google Account
+            </button>
+          )}
+        </div>
+      </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr 2fr", gap: "2.5rem", alignItems: "start" }}>
         
