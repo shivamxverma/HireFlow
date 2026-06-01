@@ -158,6 +158,7 @@ export function OutreachBoard() {
   const [passcodeInput, setPasscodeInput] = useState("");
   const [authError, setAuthError] = useState("");
   const [showPasscodeText, setShowPasscodeText] = useState(false);
+  const [showPasscodeSection, setShowPasscodeSection] = useState(false);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -749,119 +750,201 @@ export function OutreachBoard() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: "65vh",
-          background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%)",
+          minHeight: "75vh",
+          backgroundColor: "#f7f4ed",
           borderRadius: "24px",
           padding: "3rem 1.5rem",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.3)",
           position: "relative",
-          overflow: "hidden"
+          overflow: "hidden",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow)"
         }}
       >
-        <div style={{ position: "absolute", top: "-10%", left: "-10%", width: "300px", height: "300px", background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%" }} />
-        <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: "300px", height: "300px", background: "radial-gradient(circle, rgba(168,85,247,0.15) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%" }} />
+        {/* Floating animated blobs */}
+        <div style={{ position: "absolute", top: "-10%", left: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(182, 95, 42, 0.15) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float1 15s ease-in-out infinite alternate" }} />
+        <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float2 18s ease-in-out infinite alternate" }} />
 
         <div 
           style={{
             width: "100%",
             maxWidth: "420px",
-            background: "rgba(255, 255, 255, 0.07)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            border: "1px solid rgba(255, 255, 255, 0.15)",
-            borderRadius: "24px",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+            background: "rgba(255, 253, 248, 0.7)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(182, 95, 42, 0.15)",
+            borderRadius: "28px",
+            boxShadow: "0 20px 50px rgba(42, 27, 10, 0.05)",
             padding: "2.5rem",
             display: "flex",
             flexDirection: "column",
-            gap: "1.75rem",
+            gap: "1.5rem",
             zIndex: 10,
             animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)"
           }}
         >
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "0.75rem", animation: "pulseLock 2s infinite alternate" }}>🔒</div>
-            <h3 style={{ fontSize: "1.6rem", fontWeight: 700, color: "#ffffff", margin: 0, letterSpacing: "-0.025em" }}>Secure Outreach</h3>
-            <p style={{ fontSize: "0.88rem", color: "#94a3b8", marginTop: "0.5rem", lineHeight: 1.5 }}>
-              A secure passcode is required to send emails, manage recruiters, and run Gemini automation.
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+            <div 
+              style={{ 
+                width: "56px", 
+                height: "56px", 
+                borderRadius: "16px", 
+                background: "rgba(182, 95, 42, 0.07)", 
+                border: "1px solid rgba(182, 95, 42, 0.15)", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center",
+                marginBottom: "1rem"
+              }}
+            >
+              <Lock style={{ width: "24px", height: "24px", color: "var(--primary)" }} />
+            </div>
+            <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text)", margin: 0, letterSpacing: "-0.02em" }}>Secure Outreach Portal</h3>
+            <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "0.5rem", lineHeight: 1.5 }}>
+              Your session is locked. Connect using your secure account to manage campaigns, run automation, and send emails.
             </p>
           </div>
 
-          <form onSubmit={handleAuthSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#cbd5e1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Enter Passcode
-              </label>
-              <div style={{ display: "flex", position: "relative" }}>
-                <input
-                  type={showPasscodeText ? "text" : "password"}
-                  placeholder="••••••••••••"
-                  value={passcodeInput}
-                  onChange={(e) => setPasscodeInput(e.target.value)}
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.8rem 2.8rem 0.8rem 1rem",
-                    borderRadius: "12px",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    color: "#ffffff",
-                    fontSize: "1rem",
-                    outline: "none",
-                    transition: "all 150ms ease",
-                    boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.2)"
-                  }}
-                  className="auth-input"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasscodeText(!showPasscodeText)}
-                  style={{
-                    position: "absolute",
-                    right: "12px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "1.2rem",
-                    color: "#94a3b8",
-                    padding: "4px",
-                  }}
-                >
-                  {showPasscodeText ? "👁️" : "👁️‍🗨️"}
-                </button>
-              </div>
-            </div>
-
-            {authError && (
-              <div style={{ color: "#f87171", fontSize: "0.85rem", fontWeight: 500, background: "rgba(239, 68, 68, 0.1)", padding: "0.75rem 1rem", borderRadius: "10px", border: "1px solid rgba(239, 68, 68, 0.2)", lineHeight: 1.4, animation: "shake 0.4s ease-in-out" }}>
-                ⚠️ {authError}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+            {/* Primary sign in via OAuth */}
+            <a 
+              href="/login"
               style={{
-                width: "100%",
-                padding: "0.85rem",
-                background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                padding: "0.8rem 1rem",
+                background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                 color: "white",
                 border: "none",
                 borderRadius: "12px",
-                fontSize: "0.98rem",
-                fontWeight: 600,
+                fontSize: "0.92rem",
+                fontWeight: 700,
                 cursor: "pointer",
-                boxShadow: "0 8px 20px -4px rgba(79, 70, 229, 0.4)",
-                transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
-                opacity: loading ? 0.7 : 1
+                boxShadow: "0 6px 16px rgba(182, 95, 42, 0.25)",
+                textDecoration: "none",
+                transition: "transform 150ms ease"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
+              onMouseLeave={(e) => e.currentTarget.style.transform = "none"}
+            >
+              🚀 Sign In / Register via OAuth
+            </a>
+
+            {/* Passcode toggle button */}
+            <button
+              onClick={() => setShowPasscodeSection(!showPasscodeSection)}
+              style={{
+                background: "transparent",
+                color: "var(--legacy-muted)",
+                border: "none",
+                fontSize: "0.82rem",
+                fontWeight: 650,
+                cursor: "pointer",
+                textDecoration: "underline",
+                marginTop: "0.5rem",
+                transition: "color 150ms ease"
               }}
             >
-              {loading ? "Verifying..." : "Authenticate Session 🚀"}
+              {showPasscodeSection ? "Hide Secure Passcode Entry" : "Use Administrator Passcode Instead"}
             </button>
-          </form>
+          </div>
+
+          {/* Expandable passcode section */}
+          {showPasscodeSection && (
+            <div style={{ borderTop: "1px solid rgba(49, 37, 24, 0.08)", paddingTop: "1.25rem", marginTop: "0.25rem", animation: "slideDown 0.3s ease-out" }}>
+              <form onSubmit={handleAuthSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "var(--muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Admin Passcode
+                  </label>
+                  <div style={{ display: "flex", position: "relative" }}>
+                    <input
+                      type={showPasscodeText ? "text" : "password"}
+                      placeholder="••••••••••••"
+                      value={passcodeInput}
+                      onChange={(e) => setPasscodeInput(e.target.value)}
+                      disabled={loading}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem 2.8rem 0.75rem 1rem",
+                        borderRadius: "10px",
+                        border: "1px solid var(--border)",
+                        background: "#fffdf9",
+                        color: "var(--text)",
+                        fontSize: "0.95rem",
+                        outline: "none",
+                        boxShadow: "inset 0 1px 3px rgba(42, 27, 10, 0.03)"
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasscodeText(!showPasscodeText)}
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "1.1rem",
+                        color: "var(--muted)",
+                        padding: "4px",
+                      }}
+                    >
+                      {showPasscodeText ? "👁️" : "👁️‍🗨️"}
+                    </button>
+                  </div>
+                </div>
+
+                {authError && (
+                  <div style={{ color: "#dc2626", fontSize: "0.8rem", fontWeight: 600, background: "rgba(239, 68, 68, 0.05)", padding: "0.6rem 0.8rem", borderRadius: "10px", border: "1px solid rgba(239, 68, 68, 0.1)", lineHeight: 1.4 }}>
+                    ⚠️ {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    background: "var(--text)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    fontSize: "0.88rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "opacity 150ms ease"
+                  }}
+                >
+                  {loading ? "Verifying..." : "Verify Passcode 🔑"}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
+
+        <style>{`
+          @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 200px; }
+          }
+          @keyframes float1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 30px) scale(1.1); }
+          }
+          @keyframes float2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-30px, -20px) scale(0.9); }
+          }
+        `}</style>
       </div>
     );
   }

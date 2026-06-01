@@ -80,7 +80,7 @@ export function Navbar() {
       <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-6">
           <Link href="/" className="font-bold text-lg text-primary">
-            JobScraper
+            HireFlow
           </Link>
           <div className="hidden md:flex gap-1">
             {navLinks.map((link) => {
