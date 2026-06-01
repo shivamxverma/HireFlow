@@ -28,6 +28,7 @@
     "bullmq": "^5.77.6",
     "cheerio": "^1.2.0",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "google-auth-library": "^10.6.2",
     "ioredis": "^5.11.0",
