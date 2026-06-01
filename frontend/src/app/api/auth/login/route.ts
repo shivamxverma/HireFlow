@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+    const rawApi = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000").replace(/\/+$/, "");
+    const BACKEND_API = rawApi.endsWith("/api/v1") ? rawApi : `${rawApi}/api/v1`;
 
     // Scenario A: If token and user details are supplied, this is a synchronization call from /oauth-success
     if (token && user) {

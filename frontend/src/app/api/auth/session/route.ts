@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+    const rawApi = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000").replace(/\/+$/, "");
+    const BACKEND_API = rawApi.endsWith("/api/v1") ? rawApi : `${rawApi}/api/v1`;
 
     try {
       const meRes = await fetch(`${BACKEND_API}/auth/me`, {
