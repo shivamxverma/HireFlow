@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../services/prisma.js";
-import { requireAuth, requireSendAuth } from "./auth.middleware.js";
+import { requireAuth, requireSendAuth, AuthenticatedRequest } from "./auth.middleware.js";
 import { outreachQueue } from "../queues/queue.js";
 import { EmailService } from "../services/email.service.js";
 import { GeminiService } from "../services/gemini.service.js";
@@ -152,9 +152,11 @@ outreachFlowRouter.delete("/outreach-flow/resumes/:id", async (req: Request, res
 // ==================== 2. PROFILE ROUTES ====================
 
 // List Profiles
-outreachFlowRouter.get("/outreach-flow/profiles", async (req: Request, res: Response) => {
+outreachFlowRouter.get("/outreach-flow/profiles", async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const userId = req.user?.id || "default-user";
     const profiles = await prisma.profile.findMany({
+      where: { userId },
       include: {
         outboundMessages: true,
       },
@@ -167,9 +169,10 @@ outreachFlowRouter.get("/outreach-flow/profiles", async (req: Request, res: Resp
 });
 
 // Create Single or Bulk Profiles
-outreachFlowRouter.post("/outreach-flow/profiles", async (req: Request, res: Response): Promise<void> => {
+outreachFlowRouter.post("/outreach-flow/profiles", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { profiles } = req.body;
+    const userId = req.user?.id || "default-user";
     if (!profiles) {
       res.status(400).json({ success: false, message: "Missing profiles payload." });
       return;
@@ -192,6 +195,7 @@ outreachFlowRouter.post("/outreach-flow/profiles", async (req: Request, res: Res
 
       const profile = await prisma.profile.create({
         data: {
+          userId,
           name: name.trim(),
           role: role.trim(),
           company: company.trim(),

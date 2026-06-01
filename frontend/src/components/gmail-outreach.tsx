@@ -582,7 +582,7 @@ export function GmailOutreach() {
                       transition: "border-color 0.2s"
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "var(--accent)";
+                      e.currentTarget.style.borderColor = "var(--legacy-accent)";
                       e.currentTarget.style.boxShadow = "0 0 0 3px rgba(182, 95, 42, 0.12)";
                     }}
                     onBlur={(e) => {
@@ -609,7 +609,7 @@ export function GmailOutreach() {
                       transition: "border-color 0.2s"
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "var(--accent)";
+                      e.currentTarget.style.borderColor = "var(--legacy-accent)";
                       e.currentTarget.style.boxShadow = "0 0 0 3px rgba(182, 95, 42, 0.12)";
                     }}
                     onBlur={(e) => {
@@ -641,7 +641,7 @@ export function GmailOutreach() {
                     transition: "border-color 0.2s"
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.borderColor = "var(--legacy-accent)";
                     e.currentTarget.style.boxShadow = "0 0 0 3px rgba(182, 95, 42, 0.12)";
                   }}
                   onBlur={(e) => {
@@ -657,7 +657,7 @@ export function GmailOutreach() {
                   disabled={actionLoading === "add-lead"}
                   style={{
                     flex: 1,
-                    background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                     color: "#fff",
                     border: "none",
                     padding: "0.8rem",
@@ -738,7 +738,7 @@ export function GmailOutreach() {
                   onClick={handleBulkAddLeads}
                   disabled={actionLoading === "bulk-add"}
                   style={{
-                    background: "var(--accent)",
+                    background: "var(--legacy-accent)",
                     color: "#fff",
                     border: "none",
                     padding: "0.5rem 1.2rem",
@@ -749,7 +749,7 @@ export function GmailOutreach() {
                     transition: "background 0.2s"
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "var(--accent-dark)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "var(--accent)"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "var(--legacy-accent)"}
                 >
                   {actionLoading === "bulk-add" ? "Importing..." : "Parse & Import ⚡"}
                 </button>
@@ -764,7 +764,7 @@ export function GmailOutreach() {
               <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600, marginTop: "0.2rem" }}>TOTAL CAMPAIGNS</div>
             </div>
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "1rem", borderRadius: "16px", textAlign: "center", boxShadow: "var(--shadow)" }}>
-              <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--accent)" }}>
+              <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--legacy-accent)" }}>
                 {leads.filter(l => l.status === "READY").length}
               </div>
               <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600, marginTop: "0.2rem" }}>READY TO SEND</div>
@@ -950,7 +950,7 @@ export function GmailOutreach() {
                                 transition: "all 0.15s ease"
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = "var(--accent)";
+                                e.currentTarget.style.borderColor = "var(--legacy-accent)";
                                 e.currentTarget.style.background = "var(--surface-strong)";
                               }}
                               onMouseLeave={(e) => {
@@ -1079,7 +1079,7 @@ export function GmailOutreach() {
                   onClick={handleSendFollowUps}
                   disabled={actionLoading !== null || !googleAuth.authenticated}
                   style={{
-                    background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                     color: "#fff",
                     border: "none",
                     padding: "0.55rem 1.1rem",
@@ -1193,7 +1193,7 @@ export function GmailOutreach() {
                 <button
                   type="submit"
                   style={{
-                    background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                     color: "#fff",
                     border: "none",
                     padding: "0.6rem 1.4rem",

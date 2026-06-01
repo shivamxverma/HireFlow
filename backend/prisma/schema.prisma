@@ -75,6 +75,7 @@ model ResumeVersion {
 
 model Lead {
   id             String    @id @default(cuid())
+  userId         String    @default("default-user") @map("user_id")
   companyName    String    @map("company_name")
   recipientEmail String    @map("recipient_email")
   jobDescription String    @map("job_description")
@@ -85,6 +86,7 @@ model Lead {
   messages       Message[]
 
   @@map("leads")
+  @@index([userId])
 }
 
 model Message {
@@ -119,6 +121,7 @@ model Resume {
 
 model Profile {
   id          String   @id @default(cuid())
+  userId      String   @default("default-user") @map("user_id")
   name        String
   role        String
   company     String
@@ -135,6 +138,7 @@ model Profile {
   conversationTracker ConversationTracker?
 
   @@map("profiles")
+  @@index([userId])
 }
 
 model Template {
@@ -212,4 +216,59 @@ model GoogleToken {
 
   @@map("google_tokens")
 }
+
+enum Role {
+  ADMIN
+  AUTHOR
+  USER
+}
+
+enum AuthProvider {
+  GOOGLE_OAUTH
+  GITHUB_OAUTH
+  EMAIL_PASSWORD
+}
+
+model User {
+  id               String       @id @default(cuid())
+  email            String?      @unique
+  displayName      String?      @map("display_name")
+  avatarUrl        String?      @map("avatar_url")
+  username         String       @unique
+  role             Role         @default(USER)
+  is2FaAuthEnabled Boolean      @default(false) @map("is2fa_auth_enabled")
+  isBanned         Boolean      @default(false) @map("is_banned")
+  isEmailVerified  Boolean      @default(false) @map("is_email_verified")
+  verificationToken String?     @map("verification_token")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  authMethods      AuthMethod[]
+
+  @@map("user")
+}
+
+model AuthMethod {
+  id           String       @id @default(cuid())
+  userId       String       @map("user_id")
+  provider     AuthProvider
+  googleSub    String?      @map("google_sub")
+  googleEmail  String?      @map("google_email")
+  githubSub    String?      @map("github_sub")
+  githubEmail  String?      @map("github_email")
+  email        String?
+  passwordHash String?      @map("password_hash")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([googleEmail])
+  @@unique([googleSub])
+  @@unique([githubEmail])
+  @@unique([githubSub])
+  @@unique([userId])
+  @@map("auth_method")
+}
+
 

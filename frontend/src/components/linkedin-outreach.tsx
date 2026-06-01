@@ -630,7 +630,7 @@ export function LinkedinOutreach() {
                 : "A headed browser window will launch on your system to complete secure manual login."}
             </p>
             {connectingStatusText && (
-              <p style={{ margin: "0.3rem 0 0 0", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
+              <p style={{ margin: "0.3rem 0 0 0", fontSize: "0.8rem", color: "var(--legacy-accent)", fontWeight: 500 }}>
                 ℹ️ {connectingStatusText}
               </p>
             )}
@@ -675,7 +675,7 @@ export function LinkedinOutreach() {
                 onClick={connectLinkedinAccount}
                 disabled={connecting || importingCookies}
                 style={{
-                  background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                  background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                   color: "#fff",
                   border: "none",
                   padding: "0.7rem 1.4rem",
@@ -746,7 +746,7 @@ export function LinkedinOutreach() {
             <div
               onDragOver={(e) => {
                 e.preventDefault();
-                e.currentTarget.style.borderColor = "var(--accent)";
+                e.currentTarget.style.borderColor = "var(--legacy-accent)";
                 e.currentTarget.style.background = "rgba(182, 95, 42, 0.04)";
               }}
               onDragLeave={(e) => {
@@ -889,7 +889,7 @@ export function LinkedinOutreach() {
                 type="submit"
                 disabled={addingProfile}
                 style={{
-                  background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                  background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                   color: "#fff",
                   border: "none",
                   padding: "0.8rem",
@@ -1110,7 +1110,7 @@ export function LinkedinOutreach() {
                               🔗 View Profile
                             </a>
                           ) : (
-                            <span style={{ fontSize: "0.75rem", color: "var(--accent)" }}>⚠️ Missing URL</span>
+                            <span style={{ fontSize: "0.75rem", color: "var(--legacy-accent)" }}>⚠️ Missing URL</span>
                           )}
                         </td>
                         <td style={{ padding: "0.75rem" }}>
@@ -1277,7 +1277,7 @@ export function LinkedinOutreach() {
               onClick={handleDispatchCampaign}
               disabled={actionLoading === "sending-bulk" || isCampaignRunning}
               style={{
-                background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                 color: "#fff",
                 border: "none",
                 padding: "0.6rem 1.4rem",
@@ -1386,7 +1386,7 @@ export function LinkedinOutreach() {
                   onClick={handleSaveEdits}
                   disabled={savingEdit || editedContent.length === 0}
                   style={{
-                    background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)",
+                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
                     color: "#fff",
                     border: "none",
                     padding: "0.6rem 1.4rem",
