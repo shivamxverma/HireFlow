@@ -109,8 +109,8 @@ function LoginContent() {
           <h2>{isSignUp ? "Join HireFlow" : "Welcome Back"}</h2>
           <p className="subtitle">
             {isSignUp
-              ? "Get started with HireFlow. Auto-apply to matching jobs, track recruiter follow-ups, and land your next role."
-              : "Sign in to access your saved job tracking, resume matches, and automated application queue."}
+              ? "Get started with HireFlow. Track your job applications, automate recruiter follow-ups, and land your next role."
+              : "Sign in to access your saved job tracking, resume matches, and automated outreach tools."}
           </p>
         </header>
 
