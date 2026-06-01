@@ -79,13 +79,18 @@ export function JobCard({ job, onTrack, onSelect }: JobCardProps) {
           )}
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect?.(job);
+            disabled={true}
+            style={{
+              cursor: "not-allowed",
+              background: "rgba(182, 95, 42, 0.05)",
+              border: "1px dashed rgba(182, 95, 42, 0.25)",
+              color: "#766858",
+              fontSize: "0.8rem",
             }}
-            className="inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium border-none cursor-pointer transition-transform hover:scale-[1.02] shadow-sm ml-2 gap-1.5"
+            className="inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-full font-medium ml-2 gap-1.5 opacity-80"
+            title="AI Auto Apply is coming soon in Version 2.0!"
           >
-            <Zap className="w-3.5 h-3.5 fill-current" /> Auto Apply
+            <Zap className="w-3.5 h-3.5 text-muted-foreground fill-current" /> Auto Apply (Soon)
           </button>
         </div>
 
