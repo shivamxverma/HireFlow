@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Rocket, Lock, BarChart, Users, FileText, Briefcase, Sparkles, Send } from "lucide-react";
+import { Plus, Rocket, Lock, BarChart, Users, FileText, Briefcase, Sparkles, Send, RefreshCw, Trash2, X } from "lucide-react";
+
 
 interface MessageDraft {
   id: string;
@@ -724,182 +725,73 @@ export function OutreachBoard() {
 
   if (isAuthenticated === null) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "65vh" }}>
-        <div className="spinner" style={{
-          width: "40px",
-          height: "40px",
-          border: "4px solid rgba(79, 70, 229, 0.1)",
-          borderTopColor: "#4f46e5",
-          borderRadius: "50%",
-          animation: "spin 1s linear infinite"
-        }} />
-        <p style={{ marginTop: "1rem", color: "#64748b", fontWeight: 500 }}>Verifying connection...</p>
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+        <RefreshCw className="w-6 h-6 text-zinc-400 animate-spin" />
+        <p className="text-xs text-muted-foreground font-mono">Verifying connection...</p>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div 
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "75vh",
-          backgroundColor: "#f7f4ed",
-          borderRadius: "24px",
-          padding: "3rem 1.5rem",
-          position: "relative",
-          overflow: "hidden",
-          border: "1px solid var(--border)",
-          boxShadow: "var(--shadow)"
-        }}
-      >
-        {/* Floating animated blobs */}
-        <div style={{ position: "absolute", top: "-10%", left: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(182, 95, 42, 0.15) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float1 15s ease-in-out infinite alternate" }} />
-        <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float2 18s ease-in-out infinite alternate" }} />
-
-        <div 
-          style={{
-            width: "100%",
-            maxWidth: "420px",
-            background: "rgba(255, 253, 248, 0.7)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(182, 95, 42, 0.15)",
-            borderRadius: "28px",
-            boxShadow: "0 20px 50px rgba(42, 27, 10, 0.05)",
-            padding: "2.5rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.5rem",
-            zIndex: 10,
-            animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)"
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-            <div 
-              style={{ 
-                width: "56px", 
-                height: "56px", 
-                borderRadius: "16px", 
-                background: "rgba(182, 95, 42, 0.07)", 
-                border: "1px solid rgba(182, 95, 42, 0.15)", 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center",
-                marginBottom: "1rem"
-              }}
-            >
-              <Lock style={{ width: "24px", height: "24px", color: "var(--primary)" }} />
+      <div className="flex items-center justify-center min-h-[75vh] bg-background p-6">
+        <div className="border border-border bg-card rounded-md shadow-xs p-8 max-w-sm w-full flex flex-col gap-6 animate-in fade-in duration-200">
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="w-10 h-10 rounded-sm bg-black flex items-center justify-center text-white shrink-0">
+              <Lock className="w-4 h-4" />
             </div>
-            <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text)", margin: 0, letterSpacing: "-0.02em" }}>Secure Outreach Portal</h3>
-            <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "0.5rem", lineHeight: 1.5 }}>
-              Your session is locked. Connect using your secure account to manage campaigns, run automation, and send emails.
-            </p>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-sm font-semibold text-foreground">Secure Outreach Portal.</h3>
+              <p className="text-xs text-muted-foreground leading-normal">
+                Your session is locked. Connect using your secure account to manage campaigns, run automation, and send emails.
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-            {/* Primary sign in via OAuth */}
+          <div className="flex flex-col gap-3">
             <a 
               href="/login"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "0.8rem 1rem",
-                background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "0.92rem",
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow: "0 6px 16px rgba(182, 95, 42, 0.25)",
-                textDecoration: "none",
-                transition: "transform 150ms ease"
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
-              onMouseLeave={(e) => e.currentTarget.style.transform = "none"}
+              className="h-9 inline-flex items-center justify-center gap-2 px-4 rounded-md bg-black text-white text-xs font-semibold hover:bg-black/90 transition-colors text-center cursor-pointer"
             >
               🚀 Sign In / Register via OAuth
             </a>
 
-            {/* Passcode toggle button */}
             <button
               onClick={() => setShowPasscodeSection(!showPasscodeSection)}
-              style={{
-                background: "transparent",
-                color: "var(--legacy-muted)",
-                border: "none",
-                fontSize: "0.82rem",
-                fontWeight: 650,
-                cursor: "pointer",
-                textDecoration: "underline",
-                marginTop: "0.5rem",
-                transition: "color 150ms ease"
-              }}
+              className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground cursor-pointer text-center pt-2"
             >
-              {showPasscodeSection ? "Hide Secure Passcode Entry" : "Use Administrator Passcode Instead"}
+              {showPasscodeSection ? "Hide Passcode Entry" : "Use Admin Passcode Instead"}
             </button>
           </div>
 
-          {/* Expandable passcode section */}
           {showPasscodeSection && (
-            <div style={{ borderTop: "1px solid rgba(49, 37, 24, 0.08)", paddingTop: "1.25rem", marginTop: "0.25rem", animation: "slideDown 0.3s ease-out" }}>
-              <form onSubmit={handleAuthSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "var(--muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            <div className="border-t border-border pt-4 mt-2 animate-in fade-in duration-200">
+              <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                     Admin Passcode
                   </label>
-                  <div style={{ display: "flex", position: "relative" }}>
+                  <div className="relative flex items-center">
                     <input
                       type={showPasscodeText ? "text" : "password"}
                       placeholder="••••••••••••"
                       value={passcodeInput}
                       onChange={(e) => setPasscodeInput(e.target.value)}
                       disabled={loading}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem 2.8rem 0.75rem 1rem",
-                        borderRadius: "10px",
-                        border: "1px solid var(--border)",
-                        background: "#fffdf9",
-                        color: "var(--text)",
-                        fontSize: "0.95rem",
-                        outline: "none",
-                        boxShadow: "inset 0 1px 3px rgba(42, 27, 10, 0.03)"
-                      }}
+                      className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md pl-3 pr-10 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black w-full"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPasscodeText(!showPasscodeText)}
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "transparent",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "1.1rem",
-                        color: "var(--muted)",
-                        padding: "4px",
-                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-xs text-muted-foreground hover:text-foreground p-1"
                     >
-                      {showPasscodeText ? "👁️" : "👁️‍🗨️"}
+                      {showPasscodeText ? "Hide" : "Show"}
                     </button>
                   </div>
                 </div>
 
                 {authError && (
-                  <div style={{ color: "#dc2626", fontSize: "0.8rem", fontWeight: 600, background: "rgba(239, 68, 68, 0.05)", padding: "0.6rem 0.8rem", borderRadius: "10px", border: "1px solid rgba(239, 68, 68, 0.1)", lineHeight: 1.4 }}>
+                  <div className="text-[10px] text-red-600 bg-red-50 border border-red-200 rounded-md p-2.5 font-medium leading-normal">
                     ⚠️ {authError}
                   </div>
                 )}
@@ -907,158 +799,80 @@ export function OutreachBoard() {
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    background: "var(--text)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontSize: "0.88rem",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    transition: "opacity 150ms ease"
-                  }}
+                  className="h-9 bg-black text-white text-xs font-semibold hover:bg-black/90 rounded-md transition-colors cursor-pointer w-full disabled:opacity-50"
                 >
-                  {loading ? "Verifying..." : "Verify Passcode 🔑"}
+                  {loading ? "Verifying..." : "Verify Passcode"}
                 </button>
               </form>
             </div>
           )}
         </div>
-
-        <style>{`
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes slideDown {
-            from { opacity: 0; max-height: 0; }
-            to { opacity: 1; max-height: 200px; }
-          }
-          @keyframes float1 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(20px, 30px) scale(1.1); }
-          }
-          @keyframes float2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-30px, -20px) scale(0.9); }
-          }
-        `}</style>
       </div>
     );
   }
 
   return (
-    <div className="outreach-flow-app" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       {/* Header Deck */}
-      <div 
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "1.25rem 2rem",
-          boxShadow: "var(--shadow)"
-        }}
-      >
-        <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#1e293b", margin: 0, letterSpacing: "-0.03em", display: "flex", alignItems: "center", gap: "8px" }}>
-            <Rocket className="w-5 h-5 text-primary" /> <span className="font-bold text-lg">OutreachFlow</span> <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">MVP</span>
-          </h1>
-          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: "0.9rem" }}>Contextual, high-signal referral and networking outreach scale system</p>
+      <div className="border border-border bg-card p-4 rounded-md shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full border border-border bg-zinc-50 flex items-center justify-center text-foreground shrink-0">
+            <Rocket className="w-4 h-4" />
+          </div>
+          <div>
+            <h1 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              OutreachFlow. <span className="text-[9px] uppercase font-mono font-bold tracking-wider px-1.5 py-0.5 rounded-sm bg-black text-white">MVP</span>
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Contextual, high-signal referral and networking outreach scale system</p>
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
           <button 
             onClick={loadAllData} 
             disabled={loading}
-            style={{
-              padding: "0.5rem 1rem",
-              background: "white",
-              border: "1px solid var(--border)",
-              borderRadius: "10px",
-              fontSize: "0.88rem",
-              fontWeight: 500,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px"
-            }}
+            className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-zinc-50 text-foreground px-3 py-2 gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
           >
-            🔄 Sync Data
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Sync Data
           </button>
           <button 
             onClick={handleSignOut}
-            style={{
-              padding: "0.5rem 1rem",
-              background: "#fee2e2",
-              color: "#dc2626",
-              border: "1px solid #fecaca",
-              borderRadius: "10px",
-              fontSize: "0.88rem",
-              fontWeight: 500,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px"
-            }}
+            className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-red-50 border border-red-100 text-red-600 hover:bg-red-100/50 px-3 py-2 gap-1.5 transition-colors cursor-pointer"
           >
-            🔒 Lock
+            <Lock className="w-3.5 h-3.5" /> Lock
           </button>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div 
-        style={{
-          display: "flex",
-          gap: "4px",
-          background: "#f1f5f9",
-          padding: "6px",
-          borderRadius: "14px",
-          border: "1px solid #e2e8f0",
-          overflowX: "auto"
-        }}
-      >
+      <div className="border-b border-border flex gap-1 overflow-x-auto pb-px">
         {[
-          { key: "analytics", label: "Overview", icon: <BarChart className="w-4 h-4 mr-2" /> },
-          { key: "profiles", label: "Target Profiles", icon: <Users className="w-4 h-4 mr-2" /> },
-          { key: "resumes", label: "Resumes", icon: <FileText className="w-4 h-4 mr-2" /> },
-          { key: "jobs", label: "Target Jobs", icon: <Briefcase className="w-4 h-4 mr-2" /> },
-          { key: "templates", label: "📝 Templates" },
-          { key: "generation", label: "Gen Queue", icon: <Sparkles className="w-4 h-4 mr-2" /> },
-          { key: "outbox", label: "Outbox", icon: <Send className="w-4 h-4 mr-2" /> }
+          { key: "analytics", label: "Overview", icon: <BarChart className="w-3.5 h-3.5" /> },
+          { key: "profiles", label: "Target Profiles", icon: <Users className="w-3.5 h-3.5" /> },
+          { key: "resumes", label: "Resumes", icon: <FileText className="w-3.5 h-3.5" /> },
+          { key: "jobs", label: "Target Jobs", icon: <Briefcase className="w-3.5 h-3.5" /> },
+          { key: "templates", label: "Templates", icon: <FileText className="w-3.5 h-3.5" /> },
+          { key: "generation", label: "Gen Queue", icon: <Sparkles className="w-3.5 h-3.5" /> },
+          { key: "outbox", label: "Outbox", icon: <Send className="w-3.5 h-3.5" /> }
         ].map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as "analytics" | "profiles" | "resumes" | "jobs" | "templates" | "generation" | "outbox")}
-              style={{
-                flex: "1 1 auto",
-                padding: "0.65rem 1rem",
-                borderRadius: "10px",
-                border: "none",
-                background: isActive ? "white" : "transparent",
-                color: isActive ? "#4f46e5" : "#475569",
-                fontWeight: isActive ? 600 : 500,
-                fontSize: "0.92rem",
-                cursor: "pointer",
-                boxShadow: isActive ? "0 1px 3px rgba(0,0,0,0.05)" : "none",
-                transition: "all 150ms ease",
-                whiteSpace: "nowrap"
-              }}
+              onClick={() => setActiveTab(tab.key as typeof activeTab)}
+              className={`h-9 px-4 text-xs font-medium border-b-2 transition-colors cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+                isActive 
+                  ? "border-black text-black font-semibold" 
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {tab.icon}{tab.label}
+              {tab.icon}
+              <span>{tab.label}</span>
               {tab.key === "generation" && genQueueJobs.filter(j => j.status === "PENDING" || j.status === "GENERATING").length > 0 && (
-                <span style={{ marginLeft: "6px", width: "8px", height: "8px", background: "#ef4444", borderRadius: "50%", display: "inline-block", animation: "pulseGlow 1s infinite" }} />
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
               )}
               {tab.key === "outbox" && approvalQueue.length > 0 && (
-                <span style={{ marginLeft: "6px", background: "#4f46e5", color: "white", padding: "1px 6px", borderRadius: "999px", fontSize: "0.72rem", fontWeight: 700 }}>
+                <span className="ml-1 bg-black text-white text-[9px] font-bold font-mono px-1.5 py-0.5 rounded-sm">
                   {approvalQueue.length}
                 </span>
               )}
@@ -1067,91 +881,77 @@ export function OutreachBoard() {
         })}
       </div>
 
-      {/* ==================== TAB 1: ANALYTICS OVERVIEW ==================== */}
+      {/* TAB 1: ANALYTICS OVERVIEW */}
       {activeTab === "analytics" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          {/* Main Analytics Cards Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem" }}>
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {[
-              { label: "Target Profiles", val: stats.totalProfiles, color: "#4f46e5" },
-              { label: "AI Generations", val: stats.totalGenerated, color: "#7c3aed" },
-              { label: "Approved Mail", val: stats.approvedCount, color: "#10b981" },
-              { label: "Outbox Sent", val: stats.sentCount, color: "#059669" },
-              { label: "Replies Received", val: stats.repliesCount, color: "#0891b2" },
-              { label: "Referrals Gained", val: stats.referralsReceived, color: "#d97706" },
-              { label: "Interviews Scheduled", val: stats.interviewsScheduled, color: "#ef4444" }
+              { label: "Target Profiles", val: stats.totalProfiles },
+              { label: "AI Generations", val: stats.totalGenerated },
+              { label: "Approved Mail", val: stats.approvedCount },
+              { label: "Outbox Sent", val: stats.sentCount },
+              { label: "Replies Recvd", val: stats.repliesCount },
+              { label: "Referrals Gained", val: stats.referralsReceived },
+              { label: "Interviews", val: stats.interviewsScheduled }
             ].map((card, idx) => (
               <div 
                 key={idx} 
-                style={{
-                  background: "white",
-                  border: "1px solid var(--border)",
-                  borderRadius: "16px",
-                  padding: "1.5rem",
-                  boxShadow: "var(--shadow)",
-                  position: "relative",
-                  overflow: "hidden"
-                }}
+                className="border border-border bg-card p-4 rounded-md shadow-xs flex flex-col gap-1 relative overflow-hidden"
               >
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <span style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.025em" }}>{card.label}</span>
-                  <span style={{ fontSize: "2rem", fontWeight: 800, color: "#1e293b", letterSpacing: "-0.03em" }}>{card.val}</span>
-                </div>
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "4px", background: card.color }} />
+                <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">{card.label}</span>
+                <span className="text-xl font-bold font-mono text-foreground">{card.val}</span>
               </div>
             ))}
           </div>
 
-          {/* Rates charts & Visuals */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-            <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", padding: "2rem", boxShadow: "var(--shadow)", display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#1e293b", fontWeight: 700 }}>Conversion Performance</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col gap-4">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Conversion Performance</h3>
               
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1rem" }}>
+              <div className="flex flex-col gap-4 mt-2">
                 <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#475569" }}>Outreach Reply Rate</span>
-                    <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#4f46e5" }}>{stats.replyRate}%</span>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="font-semibold text-muted-foreground">Outreach Reply Rate</span>
+                    <span className="font-bold font-mono">{stats.replyRate}%</span>
                   </div>
-                  <div style={{ height: "10px", background: "#f1f5f9", borderRadius: "999px", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${stats.replyRate}%`, background: "linear-gradient(to right, #4f46e5, #6366f1)", borderRadius: "999px" }} />
+                  <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-black rounded-full" style={{ width: `${stats.replyRate}%` }} />
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#475569" }}>Positive Response Conversion</span>
-                    <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#10b981" }}>{stats.positiveReplyRate}%</span>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="font-semibold text-muted-foreground">Positive Response Conversion</span>
+                    <span className="font-bold font-mono">{stats.positiveReplyRate}%</span>
                   </div>
-                  <div style={{ height: "10px", background: "#f1f5f9", borderRadius: "999px", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${stats.positiveReplyRate}%`, background: "linear-gradient(to right, #10b981, #34d399)", borderRadius: "999px" }} />
+                  <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${stats.positiveReplyRate}%` }} />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Quickstart tutorial widget */}
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col justify-between gap-6">
+            <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col justify-between gap-4">
               <div>
-                <h3 className="text-xl font-bold tracking-tight">OutreachFlow Campaign Pipeline</h3>
-                <p className="text-sm text-muted-foreground mt-1">Four simple steps to double your referral response rates:</p>
+                <h3 className="text-sm font-semibold text-foreground">OutreachFlow Campaign Pipeline.</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Four simple steps to double your referral response rates:</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-muted/50 p-4 rounded-lg flex flex-col gap-1.5">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold mb-1">1</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="bg-zinc-50 border border-zinc-100 p-4 rounded-md flex flex-col gap-1.5">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-sm bg-black text-white text-[10px] font-mono font-bold">1</span>
                   <span><strong>Upload Resume</strong>: Upload parsed PDFs to extract skill profiles.</span>
                 </div>
-                <div className="bg-muted/50 p-4 rounded-lg flex flex-col gap-1.5">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold mb-1">2</span>
+                <div className="bg-zinc-50 border border-zinc-100 p-4 rounded-md flex flex-col gap-1.5">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-sm bg-black text-white text-[10px] font-mono font-bold">2</span>
                   <span><strong>Import Profiles</strong>: Paste CSV lists of target employees.</span>
                 </div>
-                <div className="bg-muted/50 p-4 rounded-lg flex flex-col gap-1.5">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold mb-1">3</span>
+                <div className="bg-zinc-50 border border-zinc-100 p-4 rounded-md flex flex-col gap-1.5">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-sm bg-black text-white text-[10px] font-mono font-bold">3</span>
                   <span><strong>Approve drafts</strong>: Review contextual AI messages in the approval queue.</span>
                 </div>
-                <div className="bg-muted/50 p-4 rounded-lg flex flex-col gap-1.5">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold mb-1">4</span>
+                <div className="bg-zinc-50 border border-zinc-100 p-4 rounded-md flex flex-col gap-1.5">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-sm bg-black text-white text-[10px] font-mono font-bold">4</span>
                   <span><strong>SMTP Dispatch</strong>: Sequentially send approved emails.</span>
                 </div>
               </div>
@@ -1160,35 +960,35 @@ export function OutreachBoard() {
         </div>
       )}
 
-      {/* ==================== TAB 2: PROFILES MANAGER ==================== */}
+      {/* TAB 2: PROFILES MANAGER */}
       {activeTab === "profiles" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>Target Employees & Profiles</h2>
-              <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#64748b" }}>Manage and import targets from company lists</p>
+              <h2 className="text-sm font-semibold text-foreground">Target Employees & Profiles.</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Manage and import targets from company lists</p>
             </div>
             <button 
               onClick={() => setShowAddProfileModal(true)}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2"
+              className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-black text-white hover:bg-black/90 px-4 transition-colors cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Add Profiles / Bulk Import
+              <Plus className="w-4 h-4 mr-1.5" /> Add Profiles / Bulk Import
             </button>
           </div>
 
           {/* Quick Filter Bar */}
-          <div style={{ display: "flex", gap: "0.75rem" }}>
+          <div className="flex flex-col sm:flex-row gap-3">
             <input 
               type="text" 
               placeholder="Search by name, role, company..." 
               value={profileSearchQuery}
               onChange={(e) => setProfileSearchQuery(e.target.value)}
-              style={{ flex: 1, padding: "0.6rem 1rem", border: "1px solid var(--border)", borderRadius: "10px", outline: "none" }}
+              className="flex-1 h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-muted-foreground outline-hidden focus:ring-1 focus:ring-black"
             />
             <select
               value={profileFilterCompany}
               onChange={(e) => setProfileFilterCompany(e.target.value)}
-              style={{ padding: "0.6rem", border: "1px solid var(--border)", borderRadius: "10px", background: "white" }}
+              className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background cursor-pointer outline-hidden focus:ring-1 focus:ring-black min-w-[150px]"
             >
               <option value="">All Companies</option>
               {uniqueProfileCompanies.map((c) => (
@@ -1199,102 +999,110 @@ export function OutreachBoard() {
 
           {/* Profiles Data Table */}
           {filteredProfiles.length === 0 ? (
-            <div style={{ padding: "4rem", textAlign: "center", background: "#f8fafc", border: "1px dashed var(--border)", borderRadius: "16px" }}>
-              <h3 style={{ color: "#475569" }}>No target profiles imported yet</h3>
-              <p style={{ color: "#64748b", fontSize: "0.9rem" }}>Import single employee details or drag CSV files to start building outreach pipelines.</p>
+            <div className="border border-dashed border-border p-12 text-center rounded-md bg-zinc-50/50 flex flex-col items-center gap-2">
+              <span className="text-xl">👥</span>
+              <h3 className="text-xs font-semibold text-foreground mt-1">No target profiles imported yet.</h3>
+              <p className="text-xs text-muted-foreground max-w-sm">Import single employee details or drag CSV files to start building outreach pipelines.</p>
             </div>
           ) : (
-            <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", overflow: "hidden", boxShadow: "var(--shadow)" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", borderBottom: "1px solid var(--border)", textAlign: "left" }}>
-                    <th style={{ padding: "1rem", width: "40px", textAlign: "center" }}>
-                      <input 
-                        type="checkbox"
-                        checked={selectedProfileIds.size === filteredProfiles.length && filteredProfiles.length > 0}
-                        onChange={toggleSelectAllProfiles}
-                      />
-                    </th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Name</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Role</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Company</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Email / Link</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Source</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Tags</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569", textAlign: "right" }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProfiles.map((p) => (
-                    <tr key={p.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "1rem", textAlign: "center" }}>
+            <div className="border border-border bg-card rounded-md overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-border bg-zinc-50">
+                      <th className="py-2.5 px-3 w-10 text-center">
                         <input 
                           type="checkbox"
-                          checked={selectedProfileIds.has(p.id)}
-                          onChange={() => toggleSelectProfile(p.id)}
+                          checked={selectedProfileIds.size === filteredProfiles.length && filteredProfiles.length > 0}
+                          onChange={toggleSelectAllProfiles}
+                          className="cursor-pointer"
                         />
-                      </td>
-                      <td style={{ padding: "1rem", fontWeight: 700, color: "#1e293b" }}>{p.name}</td>
-                      <td style={{ padding: "1rem" }}>{p.role}</td>
-                      <td style={{ padding: "1rem", fontWeight: 600 }}>{p.company}</td>
-                      <td style={{ padding: "1rem", fontSize: "0.88rem" }}>
-                        <div>{p.email || "-"}</div>
-                        {p.linkedinUrl && <a href={p.linkedinUrl} target="_blank" rel="noreferrer" style={{ fontSize: "0.78rem", color: "#4f46e5" }}>LinkedIn Profile</a>}
-                      </td>
-                      <td style={{ padding: "1rem" }}>
-                        <span style={{ fontSize: "0.75rem", background: p.source === "MANUAL" ? "#eff6ff" : "#f5f5f4", color: p.source === "MANUAL" ? "#1d4ed8" : "#44403c", padding: "2px 8px", borderRadius: "999px", fontWeight: 600 }}>
-                          {p.source}
-                        </span>
-                      </td>
-                      <td style={{ padding: "1rem" }}>
-                        <div style={{ display: "flex", gap: "4px" }}>
-                          {p.tags.map((t) => (
-                            <span key={t} style={{ fontSize: "0.72rem", background: "#f1f5f9", padding: "2px 6px", borderRadius: "6px" }}>{t}</span>
-                          ))}
-                        </div>
-                      </td>
-                      <td style={{ padding: "1rem", textAlign: "right" }}>
-                        <button 
-                          onClick={() => handleDeleteProfile(p.id)}
-                          style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", padding: "4px" }}
-                        >
-                          🗑️
-                        </button>
-                      </td>
+                      </th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Name</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Role</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Company</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Email / Link</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Source</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Tags</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredProfiles.map((p) => (
+                      <tr 
+                        key={p.id} 
+                        className={`border-b border-zinc-100 transition-colors ${
+                          selectedProfileIds.has(p.id) ? "bg-zinc-50/70" : "hover:bg-zinc-50/30"
+                        }`}
+                      >
+                        <td className="py-3 px-3 text-center">
+                          <input 
+                            type="checkbox"
+                            checked={selectedProfileIds.has(p.id)}
+                            onChange={() => toggleSelectProfile(p.id)}
+                            className="cursor-pointer"
+                          />
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-foreground text-xs">{p.name}</td>
+                        <td className="py-3 px-4 text-zinc-600">{p.role}</td>
+                        <td className="py-3 px-4 font-semibold text-foreground">{p.company}</td>
+                        <td className="py-3 px-4">
+                          <div>{p.email || "—"}</div>
+                          {p.linkedinUrl && (
+                            <a 
+                              href={p.linkedinUrl} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="text-[10px] text-zinc-500 hover:text-black hover:underline mt-0.5 inline-block"
+                            >
+                              LinkedIn Profile ↗
+                            </a>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-block px-1.5 py-0.5 rounded-sm text-[9px] font-bold font-mono border ${
+                            p.source === "MANUAL" 
+                              ? "bg-zinc-100 text-zinc-800 border-zinc-200" 
+                              : "bg-blue-50 text-blue-700 border-blue-100"
+                          }`}>
+                            {p.source}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex flex-wrap gap-1">
+                            {p.tags.map((t) => (
+                              <span key={t} className="text-[9px] font-mono bg-zinc-50 border border-zinc-100 text-zinc-600 px-1 py-0.2 rounded-sm">{t}</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button 
+                            onClick={() => handleDeleteProfile(p.id)}
+                            className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
           {/* Action dock when items are selected */}
           {selectedProfileIds.size > 0 && (
-            <div 
-              style={{
-                position: "fixed",
-                bottom: "2rem",
-                left: "50%",
-                transform: "translateX(-50%)",
-                background: "rgba(30, 27, 75, 0.95)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "16px",
-                padding: "1rem 2rem",
-                display: "flex",
-                gap: "1.5rem",
-                alignItems: "center",
-                color: "white",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-                zIndex: 99
-              }}
-            >
-              <span>Selected <strong>{selectedProfileIds.size}</strong> profile(s)</span>
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-4 rounded-md shadow-lg flex flex-col sm:flex-row items-center gap-4 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full max-w-2xl">
+              <div className="text-xs shrink-0">
+                Selected <strong className="font-mono">{selectedProfileIds.size}</strong> profile(s)
+              </div>
               
-              <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+              <div className="flex flex-wrap gap-2 items-center flex-1 justify-end w-full">
                 <select
                   value={selectedTemplateId}
                   onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  style={{ padding: "0.5rem", borderRadius: "8px", background: "white", color: "#1e293b", border: "none" }}
+                  className="h-8 border border-zinc-700 bg-zinc-900 text-white text-xs rounded-md px-2.5 outline-hidden focus:ring-1 focus:ring-white max-w-[180px]"
                 >
                   <option value="">Choose Template...</option>
                   {templates.map((t) => (
@@ -1305,7 +1113,7 @@ export function OutreachBoard() {
                 <select
                   value={selectedJobId}
                   onChange={(e) => setSelectedJobId(e.target.value)}
-                  style={{ padding: "0.5rem", borderRadius: "8px", background: "white", color: "#1e293b", border: "none" }}
+                  className="h-8 border border-zinc-700 bg-zinc-900 text-white text-xs rounded-md px-2.5 outline-hidden focus:ring-1 focus:ring-white max-w-[180px]"
                 >
                   <option value="">Job Context (Optional)...</option>
                   {manualJobs.map((j) => (
@@ -1315,15 +1123,7 @@ export function OutreachBoard() {
 
                 <button 
                   onClick={handleLaunchGeneration}
-                  style={{
-                    background: "linear-gradient(to right, #4f46e5, #7c3aed)",
-                    border: "none",
-                    color: "white",
-                    padding: "0.5rem 1.25rem",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    cursor: "pointer"
-                  }}
+                  className="h-8 inline-flex items-center justify-center px-4 rounded-md bg-white text-black text-xs font-semibold hover:bg-zinc-100 transition-colors cursor-pointer shrink-0"
                 >
                   ✨ Generate bulk outreach
                 </button>
@@ -1333,67 +1133,63 @@ export function OutreachBoard() {
         </div>
       )}
 
-      {/* ==================== TAB 3: RESUME MANAGER ==================== */}
+      {/* TAB 3: RESUME MANAGER */}
       {activeTab === "resumes" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>Resume Manager</h2>
-              <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#64748b" }}>Manage multiple resumes to drive dynamic AI generation context</p>
+              <h2 className="text-sm font-semibold text-foreground">Resume Manager.</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Manage multiple resumes to drive dynamic AI generation context</p>
             </div>
             <button 
               onClick={() => setShowAddResumeModal(true)}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2"
+              className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-black text-white hover:bg-black/90 px-4 transition-colors cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Upload Resume PDF
+              <Plus className="w-4 h-4 mr-1.5" /> Upload Resume PDF
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             {/* List */}
-            <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Master Resumes</h3>
+            <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col gap-4">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Master Resumes</h3>
               
               {resumes.length === 0 ? (
-                <div style={{ padding: "2rem", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "1px dashed var(--border)" }}>
+                <div className="border border-dashed border-border p-8 text-center rounded-md bg-zinc-50/50 text-xs text-muted-foreground">
                   No resumes uploaded. Please upload a PDF to extract ATS parameters.
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div className="flex flex-col gap-3">
                   {resumes.map((r) => {
                     const isActive = activeResumeId === r.id;
                     return (
                       <div 
                         key={r.id}
-                        style={{
-                          border: isActive ? "2px solid #4f46e5" : "1px solid var(--border)",
-                          borderRadius: "12px",
-                          padding: "1rem",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          background: isActive ? "#fefefe" : "white"
-                        }}
+                        className={`border rounded-md p-4 flex justify-between items-center transition-all ${
+                          isActive 
+                            ? "border-black bg-zinc-50" 
+                            : "border-border bg-card hover:bg-zinc-50/50"
+                        }`}
                       >
-                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                        <div className="flex gap-3 items-center">
                           <input 
                             type="radio" 
                             name="active-resume"
                             checked={isActive}
                             onChange={() => setActiveResumeId(r.id)}
-                            style={{ width: "16px", height: "16px" }}
+                            className="w-4 h-4 accent-black cursor-pointer"
                           />
                           <div>
-                            <strong style={{ display: "block" }}>{r.title}</strong>
-                            <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Parsed technical skills: {r.skills.length}</span>
+                            <strong className="block text-xs text-foreground">{r.title}</strong>
+                            <span className="text-[10px] text-muted-foreground font-mono">Parsed technical skills: {r.skills.length}</span>
                           </div>
                         </div>
 
                         <button 
                           onClick={() => handleDeleteResume(r.id)}
-                          style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer" }}
+                          className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
                         >
-                          🗑️
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     );
@@ -1403,30 +1199,31 @@ export function OutreachBoard() {
             </div>
 
             {/* Details Preview */}
-            <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", padding: "1.5rem" }}>
-              <h3 style={{ margin: 0, fontSize: "1.1rem", marginBottom: "1rem" }}>Selected Resume Extracted Context</h3>
+            <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col gap-4">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Selected Resume Context</h3>
               
               {resumes.find(r => r.id === activeResumeId) ? (
                 (() => {
                   const selected = resumes.find(r => r.id === activeResumeId)!;
                   return (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <div className="flex flex-col gap-4 text-xs">
                       <div>
-                        <strong>Resume Title: </strong> {selected.title}
+                        <span className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Resume Title</span>
+                        <span className="font-semibold text-foreground">{selected.title}</span>
                       </div>
 
                       <div>
-                        <strong>Extracted Key Skills Profile:</strong>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "6px" }}>
+                        <span className="text-[10px] font-mono uppercase text-muted-foreground block mb-2">Extracted Key Skills Profile</span>
+                        <div className="flex flex-wrap gap-1.5">
                           {selected.skills.map((s) => (
-                            <span key={s} style={{ fontSize: "0.78rem", background: "#f3f4f6", padding: "4px 10px", borderRadius: "999px", border: "1px solid #e5e7eb", color: "#374151", fontWeight: 600 }}>{s}</span>
+                            <span key={s} className="text-[10px] font-mono font-semibold bg-zinc-100 border border-zinc-200 text-zinc-700 px-2 py-0.5 rounded-sm">{s}</span>
                           ))}
                         </div>
                       </div>
 
                       <div>
-                        <strong>Extracted ATS Text Preview:</strong>
-                        <div style={{ maxHeight: "200px", overflowY: "auto", padding: "0.75rem", background: "#f8fafc", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.82rem", color: "#475569", whiteSpace: "pre-wrap" }}>
+                        <span className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Extracted ATS Text Preview</span>
+                        <div className="max-h-[250px] overflow-y-auto p-3 bg-zinc-50 border border-border rounded-md text-[11px] font-mono text-zinc-600 whitespace-pre-wrap leading-normal">
                           {selected.parsedText}
                         </div>
                       </div>
@@ -1434,70 +1231,66 @@ export function OutreachBoard() {
                   );
                 })()
               ) : (
-                <div style={{ color: "#64748b", fontStyle: "italic" }}>Select a resume from the list to preview parsed parameters.</div>
+                <div className="text-muted-foreground text-xs italic">Select a resume from the list to preview parsed parameters.</div>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* ==================== TAB 4: MANUAL JOBS BOARD ==================== */}
+      {/* TAB 4: MANUAL JOBS BOARD */}
       {activeTab === "jobs" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>Target Job Postings</h2>
-              <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#64748b" }}>Track specific roles to bind as context for AI generations</p>
+              <h2 className="text-sm font-semibold text-foreground">Target Job Postings.</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Track specific roles to bind as context for AI generations</p>
             </div>
             <button 
               onClick={() => setShowAddJobModal(true)}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2"
+              className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-black text-white hover:bg-black/90 px-4 transition-colors cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Add Job Manually
+              <Plus className="w-4 h-4 mr-1.5" /> Add Job Manually
             </button>
           </div>
 
           {manualJobs.length === 0 ? (
-            <div style={{ padding: "4rem", textAlign: "center", background: "#f8fafc", border: "1px dashed var(--border)", borderRadius: "16px" }}>
-              <h3>No tracked jobs listed yet</h3>
-              <p style={{ fontSize: "0.9rem", color: "#64748b" }}>Create manual target postings to dynamically drive context for founder outreach and referral messages.</p>
+            <div className="border border-dashed border-border p-12 text-center rounded-md bg-zinc-50/50 flex flex-col items-center gap-2">
+              <span className="text-xl">💼</span>
+              <h3 className="text-xs font-semibold text-foreground mt-1">No tracked jobs listed yet.</h3>
+              <p className="text-xs text-muted-foreground max-w-sm">Create manual target postings to dynamically drive context for founder outreach and referral messages.</p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {manualJobs.map((j) => (
                 <div 
                   key={j.id}
-                  style={{
-                    background: "white",
-                    border: "1px solid var(--border)",
-                    borderRadius: "16px",
-                    padding: "1.25rem",
-                    boxShadow: "var(--shadow)",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    gap: "1rem"
-                  }}
+                  className="border border-border bg-card p-5 rounded-md shadow-xs flex flex-col justify-between gap-4"
                 >
                   <div>
-                    <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#1e293b", fontWeight: 700 }}>{j.title}</h3>
-                    <strong style={{ display: "block", color: "#64748b", fontSize: "0.9rem", marginTop: "4px" }}>{j.company}</strong>
+                    <h3 className="text-sm font-semibold text-foreground">{j.title}</h3>
+                    <strong className="block text-xs text-muted-foreground mt-0.5">{j.company}</strong>
                     
                     {j.applyUrl && (
-                      <a href={j.applyUrl} target="_blank" rel="noreferrer" style={{ fontSize: "0.78rem", color: "#4f46e5", display: "inline-block", marginTop: "6px" }}>
+                      <a 
+                        href={j.applyUrl} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="inline-flex items-center gap-1 text-[10px] text-zinc-500 hover:text-black hover:underline mt-1.5"
+                      >
                         View Original Posting Link ↗
                       </a>
                     )}
 
-                    <div style={{ fontSize: "0.82rem", color: "#475569", marginTop: "10px", maxHeight: "100px", overflowY: "auto", padding: "6px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #f1f5f9" }}>
+                    <div className="text-[11px] text-zinc-600 mt-3 max-h-[100px] overflow-y-auto p-2 bg-zinc-50 border border-zinc-100 rounded-md whitespace-pre-wrap leading-normal">
                       {j.description || "No JD specified."}
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div className="flex justify-end pt-2 border-t border-border/50">
                     <button 
                       onClick={() => handleDeleteJob(j.id)}
-                      style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer" }}
+                      className="text-[11px] font-semibold text-red-600 hover:text-red-800 cursor-pointer transition-colors"
                     >
                       Delete Role
                     </button>
@@ -1509,13 +1302,13 @@ export function OutreachBoard() {
         </div>
       )}
 
-      {/* ==================== TAB 5: PROMPT TEMPLATES ==================== */}
+      {/* TAB 5: AI Prompt Templates */}
       {activeTab === "templates" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>AI Prompt Templates</h2>
-              <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#64748b" }}>Tune and tweak customized prompting guidelines for outreach styles</p>
+              <h2 className="text-sm font-semibold text-foreground">AI Prompt Templates.</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Tune and tweak customized prompting guidelines for outreach styles</p>
             </div>
             <button 
               onClick={() => {
@@ -1524,49 +1317,30 @@ export function OutreachBoard() {
                 setEditingTemplateId(null);
                 setShowTemplateModal(true);
               }}
-              style={{
-                padding: "0.6rem 1.25rem",
-                background: "var(--legacy-accent)",
-                color: "white",
-                border: "none",
-                borderRadius: "10px",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                cursor: "pointer"
-              }}
+              className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-black text-white hover:bg-black/90 px-4 transition-colors cursor-pointer"
             >
-              ➕ Create Prompt Template
+              <Plus className="w-4 h-4 mr-1.5" /> Create Prompt Template
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.map((t) => (
               <div 
                 key={t.id}
-                style={{
-                  background: "white",
-                  border: "1px solid var(--border)",
-                  borderRadius: "16px",
-                  padding: "1.25rem",
-                  boxShadow: "var(--shadow)",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  gap: "1rem"
-                }}
+                className="border border-border bg-card p-5 rounded-md shadow-xs flex flex-col justify-between gap-4"
               >
                 <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700 }}>{t.name}</h3>
-                    <span style={{ fontSize: "0.68rem", background: "#f3e8ff", color: "#7e22ce", padding: "2px 8px", borderRadius: "999px", fontWeight: 700 }}>{t.type}</span>
+                  <div className="flex justify-between items-center gap-2">
+                    <h3 className="text-xs font-semibold text-foreground">{t.name}</h3>
+                    <span className="text-[9px] font-mono font-bold bg-zinc-100 border border-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded-sm">{t.type}</span>
                   </div>
                   
-                  <div style={{ fontSize: "0.82rem", color: "#475569", marginTop: "10px", height: "120px", overflowY: "auto", padding: "8px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #f1f5f9" }}>
+                  <div className="text-[11px] text-zinc-600 mt-3 h-[120px] overflow-y-auto p-2 bg-zinc-50 border border-zinc-100 rounded-md whitespace-pre-wrap font-mono leading-normal">
                     {t.prompt}
                   </div>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <div className="flex justify-end pt-2 border-t border-border/50">
                   <button 
                     onClick={() => {
                       setTemplateName(t.name);
@@ -1575,7 +1349,7 @@ export function OutreachBoard() {
                       setEditingTemplateId(t.id);
                       setShowTemplateModal(true);
                     }}
-                    style={{ background: "transparent", border: "none", color: "#4f46e5", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600 }}
+                    className="text-[11px] font-semibold text-black hover:underline cursor-pointer"
                   >
                     Edit Guidelines
                   </button>
@@ -1586,124 +1360,88 @@ export function OutreachBoard() {
         </div>
       )}
 
-      {/* ==================== TAB 6: GENERATION QUEUE ==================== */}
+      {/* TAB 6: GENERATION QUEUE */}
       {activeTab === "generation" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div className="flex flex-col gap-6">
           <div>
-            <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>Redis Queue Status (BullMQ)</h2>
-            <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#64748b" }}>Monitor background AI bulk generation tasks</p>
+            <h2 className="text-sm font-semibold text-foreground">Redis Queue Status (BullMQ).</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Monitor background AI bulk generation tasks</p>
           </div>
 
           {genQueueJobs.length === 0 ? (
-            <div style={{ padding: "4rem", textAlign: "center", background: "#f8fafc", border: "1px dashed var(--border)", borderRadius: "16px" }}>
-              No background jobs enqueued. Go to the &quot;Target Profiles&quot; tab, select profiles, and dispatch generations.
+            <div className="border border-dashed border-border p-12 text-center rounded-md bg-zinc-50/50 flex flex-col items-center gap-2">
+              <span className="text-xl">⚡</span>
+              <h3 className="text-xs font-semibold text-foreground mt-1">No background jobs enqueued.</h3>
+              <p className="text-xs text-muted-foreground max-w-sm">Go to the &quot;Target Profiles&quot; tab, select profiles, and dispatch generations.</p>
             </div>
           ) : (
-            <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", overflow: "hidden", boxShadow: "var(--shadow)" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc", borderBottom: "1px solid var(--border)", textAlign: "left" }}>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Target Details</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Template used</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Triggered At</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>BullMQ Status</th>
-                    <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Result Logs / Errors</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {genQueueJobs.map((j) => {
-                    let statusColor = "#475569";
-                    let statusBg = "#f1f5f9";
-                    let glow = false;
-
-                    switch (j.status) {
-                      case "PENDING":
-                        statusColor = "#d97706";
-                        statusBg = "#fef3c7";
-                        break;
-                      case "GENERATING":
-                        statusColor = "#7e22ce";
-                        statusBg = "#f3e8ff";
-                        glow = true;
-                        break;
-                      case "COMPLETED":
-                        statusColor = "#047857";
-                        statusBg = "#d1fae5";
-                        break;
-                      case "FAILED":
-                        statusColor = "#b91c1c";
-                        statusBg = "#fee2e2";
-                        break;
-                    }
-
-                    return (
-                      <tr key={j.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                        <td style={{ padding: "1rem" }}>
-                          <strong style={{ display: "block" }}>{j.profile.name}</strong>
-                          <span style={{ fontSize: "0.78rem", color: "#64748b" }}>{j.profile.role} @ {j.profile.company}</span>
+            <div className="border border-border bg-card rounded-md overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-border bg-zinc-50">
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Target Details</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Template used</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Triggered At</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">BullMQ Status</th>
+                      <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Result Logs / Errors</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {genQueueJobs.map((j) => (
+                      <tr key={j.id} className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                        <td className="py-3 px-4">
+                          <strong className="block text-xs">{j.profile.name}</strong>
+                          <span className="text-[10px] text-muted-foreground mt-0.5 block">{j.profile.role} @ {j.profile.company}</span>
                         </td>
-                        <td style={{ padding: "1rem", fontSize: "0.88rem" }}>{j.template.name}</td>
-                        <td style={{ padding: "1rem", fontSize: "0.85rem", color: "#64748b" }}>
+                        <td className="py-3 px-4">{j.template.name}</td>
+                        <td className="py-3 px-4 text-muted-foreground font-mono">
                           {new Date(j.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </td>
-                        <td style={{ padding: "1rem" }}>
-                          <span
-                            style={{
-                              background: statusBg,
-                              color: statusColor,
-                              padding: "4px 10px",
-                              borderRadius: "999px",
-                              fontSize: "0.75rem",
-                              fontWeight: 700,
-                              animation: glow ? "pulseGlow 1.5s infinite alternate" : "none"
-                            }}
-                          >
+                        <td className="py-3 px-4">
+                          <span className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-bold font-mono border ${
+                            j.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" :
+                            j.status === "FAILED" ? "bg-red-500/10 text-red-700 border-red-500/20" :
+                            j.status === "GENERATING" ? "bg-purple-500/10 text-purple-700 border-purple-500/20 animate-pulse" :
+                            "bg-amber-500/10 text-amber-700 border-amber-500/20"
+                          }`}>
                             {j.status}
                           </span>
                         </td>
-                        <td style={{ padding: "1rem", fontSize: "0.82rem", maxWidth: "250px", wordBreak: "break-word" }}>
+                        <td className="py-3 px-4 max-w-[250px] break-all leading-normal">
                           {j.status === "COMPLETED" ? (
-                            <span style={{ color: "#10b981", fontWeight: 600 }}>Message compiled in draft queue ✓</span>
+                            <span className="text-emerald-700 font-semibold">Message compiled in draft queue ✓</span>
                           ) : j.status === "FAILED" ? (
-                            <span style={{ color: "#ef4444" }}>⚠️ {j.error || "Generation crashed."}</span>
+                            <span className="text-red-600 font-medium">⚠️ {j.error || "Generation crashed."}</span>
                           ) : (
-                            <span style={{ color: "#64748b", fontStyle: "italic" }}>Running background prompt...</span>
+                            <span className="text-muted-foreground italic">Running background prompt...</span>
                           )}
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* ==================== TAB 7: APPROVAL QUEUE & OUTBOX ==================== */}
+      {/* TAB 7: APPROVAL QUEUE & OUTBOX */}
       {activeTab === "outbox" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div className="flex flex-col gap-8">
           {/* Section 1: Approval Workflow Queue */}
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: 0 }}>Human Review / Approval Queue</h2>
-                <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#64748b" }}>Edit and approve generated messages before transmission</p>
+                <h2 className="text-sm font-semibold text-foreground">Human Review / Approval Queue.</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Edit and approve generated messages before transmission</p>
               </div>
 
               {approvalQueue.length > 0 && (
                 <button
                   onClick={handleTriggerSMTPDispatch}
-                  style={{
-                    padding: "0.65rem 1.5rem",
-                    background: "linear-gradient(to right, #059669, #10b981)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(16,185,129,0.2)"
-                  }}
+                  className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-black text-white hover:bg-black/90 px-4 transition-colors cursor-pointer shrink-0"
                 >
                   ✉️ Dispatch Approved Outbox
                 </button>
@@ -1711,117 +1449,111 @@ export function OutreachBoard() {
             </div>
 
             {approvalQueue.length === 0 ? (
-              <div style={{ padding: "3rem", textAlign: "center", background: "#f8fafc", border: "1px dashed var(--border)", borderRadius: "16px", marginBottom: "2rem" }}>
-                <h3 style={{ color: "#475569" }}>Approval Queue is empty</h3>
-                <p style={{ fontSize: "0.9rem", color: "#64748b" }}>All enqueued drafts have been processed or approved. Launch new bulk generations to fill reviews.</p>
+              <div className="border border-dashed border-border p-12 text-center rounded-md bg-zinc-50/50 flex flex-col items-center gap-2">
+                <span className="text-xl">📬</span>
+                <h3 className="text-xs font-semibold text-foreground mt-1">Approval Queue is empty.</h3>
+                <p className="text-xs text-muted-foreground max-w-sm">All enqueued drafts have been processed or approved. Launch new bulk generations to fill reviews.</p>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2.5rem" }}>
+              <div className="flex flex-col gap-6">
                 {approvalQueue.map((draft) => {
                   const isEditing = editingDraftId === draft.id;
                   return (
                     <div 
                       key={draft.id}
-                      style={{
-                        background: "white",
-                        border: "1px solid var(--border)",
-                        borderRadius: "16px",
-                        boxShadow: "var(--shadow)",
-                        overflow: "hidden",
-                        display: "grid",
-                        gridTemplateColumns: "240px 1fr"
-                      }}
+                      className="border border-border bg-card rounded-md shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-[240px_1fr]"
                     >
-                      {/* Left: Profile metadata context info card */}
-                      <div style={{ background: "#f8fafc", padding: "1.5rem", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                      {/* Left: profile metadata */}
+                      <div className="bg-zinc-50 p-5 border-b md:border-b-0 md:border-r border-border flex flex-col gap-4 text-xs">
                         <div>
-                          <span style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#64748b", fontWeight: 700 }}>Recipient</span>
-                          <strong style={{ display: "block", fontSize: "1.1rem", color: "#1e293b", marginTop: "2px" }}>{draft.profile.name}</strong>
-                          <span style={{ fontSize: "0.85rem", color: "#475569" }}>{draft.profile.role}</span>
-                          <span style={{ display: "block", fontSize: "0.85rem", color: "#475569", fontWeight: 600 }}>{draft.profile.company}</span>
+                          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">Recipient</span>
+                          <strong className="block text-sm text-foreground mt-0.5">{draft.profile.name}</strong>
+                          <span className="text-muted-foreground mt-0.5 block">{draft.profile.role}</span>
+                          <span className="font-semibold text-foreground">{draft.profile.company}</span>
                         </div>
 
                         <div>
-                          <span style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#64748b", fontWeight: 700 }}>Email Address</span>
-                          <span style={{ display: "block", fontSize: "0.82rem", wordBreak: "break-all" }}>{draft.profile.email || "No Email Provided"}</span>
+                          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">Email Address</span>
+                          <span className="block font-mono text-[11px] mt-0.5 break-all">{draft.profile.email || "No Email Provided"}</span>
                         </div>
 
                         <div>
-                          <span style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#64748b", fontWeight: 700 }}>Draft Status</span>
-                          <span style={{ display: "inline-block", background: "#fef3c7", color: "#d97706", fontSize: "0.75rem", padding: "2px 8px", borderRadius: "999px", fontWeight: 700, marginTop: "2px" }}>
-                            {draft.status}
+                          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">Draft Status</span>
+                          <span className="block mt-1">
+                            <span className="px-1.5 py-0.5 rounded-sm bg-amber-500/10 text-amber-700 border border-amber-500/20 font-bold font-mono text-[9px]">
+                              {draft.status}
+                            </span>
                           </span>
                         </div>
                       </div>
 
                       {/* Right: Message editor panel */}
-                      <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                      <div className="p-5 flex flex-col gap-4">
                         {isEditing ? (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                          <div className="flex flex-col gap-3">
                             <div>
-                              <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#475569", marginBottom: "4px" }}>Email Subject</label>
+                              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1 block">Email Subject</label>
                               <input 
                                 type="text" 
                                 value={editingSubject} 
                                 onChange={(e) => setEditingSubject(e.target.value)}
-                                style={{ width: "100%", padding: "0.6rem", border: "1px solid var(--border)", borderRadius: "8px", outline: "none", fontSize: "0.95rem" }}
+                                className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background w-full outline-hidden focus:ring-1 focus:ring-black"
                               />
                             </div>
                             <div>
-                              <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#475569", marginBottom: "4px" }}>Email Copy</label>
+                              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1 block">Email Copy</label>
                               <textarea
                                 value={editingContent}
                                 onChange={(e) => setEditingContent(e.target.value)}
                                 rows={8}
-                                style={{ width: "100%", padding: "0.75rem", border: "1px solid var(--border)", borderRadius: "8px", outline: "none", fontSize: "0.92rem", lineHeight: 1.4, fontFamily: "inherit" }}
+                                className="w-full rounded-md border border-input bg-background p-3 text-xs transition-colors focus:border-black focus:outline-hidden focus:ring-1 focus:ring-black resize-y font-mono"
                               />
                             </div>
 
-                            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                            <div className="flex gap-2 justify-end">
                               <button 
                                 onClick={() => setEditingDraftId(null)}
-                                style={{ padding: "0.4rem 1rem", background: "white", border: "1px solid var(--border)", borderRadius: "8px", cursor: "pointer" }}
+                                className="h-8 px-3 text-xs font-semibold border border-border hover:bg-zinc-50 rounded-md transition-colors cursor-pointer"
                               >
                                 Cancel
                               </button>
                               <button 
                                 onClick={() => handleSaveDraftEdits(draft.id)}
-                                style={{ padding: "0.4rem 1.25rem", background: "#4f46e5", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 600 }}
+                                className="h-8 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer"
                               >
                                 Save Changes
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "1rem", height: "100%", justifyContent: "space-between" }}>
+                          <div className="flex flex-col justify-between h-full gap-4">
                             <div>
-                              <div style={{ borderBottom: "1px solid #f1f5f9", paddingBottom: "8px", marginBottom: "8px" }}>
+                              <div className="border-b border-zinc-100 pb-2 mb-2 text-xs">
                                 <strong>Subject:</strong> {draft.subject}
                               </div>
-                              <div style={{ fontSize: "0.92rem", color: "#374151", whiteSpace: "pre-wrap", lineHeight: 1.4 }}>
+                              <div className="text-xs text-zinc-700 whitespace-pre-wrap leading-relaxed font-mono">
                                 {draft.content}
                               </div>
                             </div>
 
-                            {/* Actions block */}
-                            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end", borderTop: "1px solid #f1f5f9", paddingTop: "10px", marginTop: "auto" }}>
+                            <div className="flex gap-2 justify-end pt-3 border-t border-zinc-100 mt-auto">
                               <button 
                                 onClick={() => handleOpenEditDraft(draft)}
-                                style={{ padding: "0.4rem 1rem", background: "white", border: "1px solid var(--border)", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 500 }}
+                                className="h-8 px-3 text-xs font-semibold border border-border hover:bg-zinc-50 text-foreground rounded-md transition-colors cursor-pointer"
                               >
-                                📝 Edit Draft
+                                Edit Draft
                               </button>
                               <button 
                                 onClick={() => handleRejectMessage(draft.id)}
-                                style={{ padding: "0.4rem 1rem", background: "#fee2e2", color: "#ef4444", border: "1px solid #fecaca", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 500 }}
+                                className="h-8 px-3 text-xs font-semibold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100/50 rounded-md transition-colors cursor-pointer"
                               >
-                                ✕ Reject
+                                Reject
                               </button>
                               <button 
                                 onClick={() => handleApproveMessage(draft.id)}
-                                style={{ padding: "0.4rem 1.25rem", background: "#10b981", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600 }}
+                                className="h-8 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer"
                               >
-                                ✓ Approve Draft
+                                Approve Draft
                               </button>
                             </div>
                           </div>
@@ -1835,160 +1567,193 @@ export function OutreachBoard() {
           </div>
 
           {/* Section 2: Outbox History Logs */}
-          <div>
-            <h2 style={{ fontSize: "1.2rem", fontWeight: 700, margin: "0 0 1rem 0" }}>Outbox Logs & Sending Queue</h2>
+          <div className="flex flex-col gap-4">
+            <h2 className="text-sm font-semibold text-foreground">Outbox Logs & Sending Queue.</h2>
             
             {outboxMessages.length === 0 ? (
-              <div style={{ padding: "2rem", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "1px dashed var(--border)" }}>
+              <div className="border border-dashed border-border p-8 text-center rounded-md bg-zinc-50/50 text-xs text-muted-foreground">
                 No sent logs available. Approved emails appear here when transmitted.
               </div>
             ) : (
-              <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "16px", overflow: "hidden", boxShadow: "var(--shadow)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ background: "#f8fafc", borderBottom: "1px solid var(--border)", textAlign: "left" }}>
-                      <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Target Recipient</th>
-                      <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Email Subject</th>
-                      <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Channel</th>
-                      <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Status</th>
-                      <th style={{ padding: "1rem", fontWeight: 600, fontSize: "0.85rem", color: "#475569" }}>Delivered Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {outboxMessages.map((msg) => {
-                      let statusBg = "#f1f5f9";
-                      let statusColor = "#475569";
-                      let glow = false;
-
-                      switch (msg.status) {
-                        case "APPROVED":
-                          statusBg = "#e0e7ff";
-                          statusColor = "#4338ca";
-                          break;
-                        case "SENDING":
-                          statusBg = "#ffedd5";
-                          statusColor = "#c2410c";
-                          glow = true;
-                          break;
-                        case "SENT":
-                          statusBg = "#d1fae5";
-                          statusColor = "#047857";
-                          break;
-                        case "FAILED":
-                          statusBg = "#fee2e2";
-                          statusColor = "#b91c1c";
-                          break;
-                      }
-
-                      return (
-                        <tr key={msg.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                          <td style={{ padding: "1rem" }}>
-                            <strong style={{ display: "block" }}>{msg.profile.name}</strong>
-                            <span style={{ fontSize: "0.78rem", color: "#64748b" }}>{msg.profile.email}</span>
+              <div className="border border-border bg-card rounded-md overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-border bg-zinc-50">
+                        <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Target Recipient</th>
+                        <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Email Subject</th>
+                        <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Channel</th>
+                        <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Status</th>
+                        <th className="py-2.5 px-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Delivered Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {outboxMessages.map((msg) => (
+                        <tr key={msg.id} className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                          <td className="py-3 px-4">
+                            <strong className="block text-xs">{msg.profile.name}</strong>
+                            <span className="text-[10px] text-muted-foreground mt-0.5 block">{msg.profile.email}</span>
                           </td>
-                          <td style={{ padding: "1rem", fontSize: "0.88rem" }}>{msg.subject}</td>
-                          <td style={{ padding: "1rem", fontSize: "0.85rem" }}>
-                            <span style={{ background: "#f1f5f9", padding: "2px 8px", borderRadius: "999px", fontSize: "0.72rem", fontWeight: 600 }}>{msg.channel}</span>
+                          <td className="py-3 px-4">{msg.subject}</td>
+                          <td className="py-3 px-4">
+                            <span className="bg-zinc-100 text-zinc-700 border border-zinc-200 px-1.5 py-0.5 rounded-sm font-mono text-[9px] font-bold">{msg.channel}</span>
                           </td>
-                          <td style={{ padding: "1rem" }}>
-                            <span style={{ background: statusBg, color: statusColor, padding: "4px 10px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 700, animation: glow ? "pulseGlow 1s infinite alternate" : "none" }}>
+                          <td className="py-3 px-4">
+                            <span className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-bold font-mono border ${
+                              msg.status === "SENT" ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" :
+                              msg.status === "FAILED" ? "bg-red-500/10 text-red-700 border-red-500/20" :
+                              msg.status === "SENDING" ? "bg-amber-500/10 text-amber-700 border-amber-500/20 animate-pulse" :
+                              "bg-indigo-500/10 text-indigo-700 border-indigo-500/20"
+                            }`}>
                               {msg.status}
                             </span>
                           </td>
-                          <td style={{ padding: "1rem", fontSize: "0.85rem", color: "#64748b" }}>
-                            {msg.sentAt ? new Date(msg.sentAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}
+                          <td className="py-3 px-4 text-muted-foreground font-mono">
+                            {msg.sentAt ? new Date(msg.sentAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ==================== G. MODALS & DRAWERS DEFINITIONS ==================== */}
+      {/* ==================== DRAWERS & MODALS DEFINITIONS ==================== */}
 
       {/* Add Profile & Importer Modal */}
       {showAddProfileModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15,23,42,0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 }}>
-          <div style={{ width: "560px", background: "white", borderRadius: "20px", padding: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem", boxShadow: "0 20px 25px rgba(0,0,0,0.15)", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700 }}>Import Target Profiles</h3>
-              <button onClick={() => setShowAddProfileModal(false)} style={{ background: "transparent", border: "none", fontSize: "1.5rem", cursor: "pointer" }}>&times;</button>
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200"
+          onClick={() => setShowAddProfileModal(false)}
+        >
+          <div 
+            className="bg-card border border-border rounded-md p-6 w-full max-w-lg shadow-lg flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">Import Target Profiles</h3>
+              <button 
+                onClick={() => setShowAddProfileModal(false)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <form onSubmit={handleAddProfile} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              {/* Selector to switch between Single and Bulk */}
-              <div style={{ display: "flex", gap: "1rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "10px" }}>
+            <form onSubmit={handleAddProfile} className="flex flex-col gap-4">
+              <div className="flex gap-2 border-b border-border pb-2">
                 <button 
                   type="button" 
                   onClick={() => setProfileBulkInput("")}
-                  style={{ background: !profileBulkInput ? "#4f46e5" : "transparent", color: !profileBulkInput ? "white" : "#475569", border: "none", padding: "6px 12px", borderRadius: "8px", cursor: "pointer", fontWeight: 600 }}
+                  className={`h-8 px-3 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+                    !profileBulkInput 
+                      ? "bg-black text-white" 
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   Single Form Add
                 </button>
                 <button 
                   type="button" 
                   onClick={() => setProfileBulkInput("Name,Role,Company,LinkedIn,Email,Notes\nShivam,CTO,Morphie,,shivam@morphie.co,")}
-                  style={{ background: profileBulkInput ? "#4f46e5" : "transparent", color: profileBulkInput ? "white" : "#475569", border: "none", padding: "6px 12px", borderRadius: "8px", cursor: "pointer", fontWeight: 600 }}
+                  className={`h-8 px-3 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+                    profileBulkInput 
+                      ? "bg-black text-white" 
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  }`}
                 >
-                  Bulk CSV/JSON paste
+                  Bulk CSV/JSON Paste
                 </button>
               </div>
 
               {profileBulkInput ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <button type="button" onClick={() => setImportFormat("csv")} style={{ background: importFormat === "csv" ? "#1e293b" : "transparent", color: importFormat === "csv" ? "white" : "#475569", border: "1px solid #cbd5e1", padding: "4px 10px", borderRadius: "6px", cursor: "pointer" }}>CSV Format</button>
-                    <button type="button" onClick={() => setImportFormat("json")} style={{ background: importFormat === "json" ? "#1e293b" : "transparent", color: importFormat === "json" ? "white" : "#475569", border: "1px solid #cbd5e1", padding: "4px 10px", borderRadius: "6px", cursor: "pointer" }}>JSON Array Format</button>
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setImportFormat("csv")} 
+                      className={`h-7 px-3 text-[11px] font-semibold rounded-md border transition-colors cursor-pointer ${
+                        importFormat === "csv" 
+                          ? "bg-black border-black text-white" 
+                          : "border-border bg-background text-zinc-600 hover:bg-zinc-50"
+                      }`}
+                    >
+                      CSV Format
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setImportFormat("json")} 
+                      className={`h-7 px-3 text-[11px] font-semibold rounded-md border transition-colors cursor-pointer ${
+                        importFormat === "json" 
+                          ? "bg-black border-black text-white" 
+                          : "border-border bg-background text-zinc-600 hover:bg-zinc-50"
+                      }`}
+                    >
+                      JSON Array Format
+                    </button>
                   </div>
                   <textarea
                     rows={8}
-                    placeholder={importFormat === "csv" ? "Name,Role,Company,LinkedIn,Email,Notes\nShivam,SDE,Snapmint,,shivam@snapmint.com,Ref by John\n..." : '[\n  { "name": "Shivam", "role": "SDE", "company": "Snapmint", "email": "shivam@snapmint.com" }\n]'}
+                    placeholder={
+                      importFormat === "csv" 
+                        ? "Name,Role,Company,LinkedIn,Email,Notes\nShivam,SDE,Snapmint,,shivam@snapmint.com,Ref by John\n..." 
+                        : '[\n  { "name": "Shivam", "role": "SDE", "company": "Snapmint", "email": "shivam@snapmint.com" }\n]'
+                    }
                     value={profileBulkInput}
                     onChange={(e) => setProfileBulkInput(e.target.value)}
-                    style={{ width: "100%", padding: "0.75rem", border: "1px solid #cbd5e1", borderRadius: "8px", outline: "none", fontSize: "0.88rem", fontFamily: "monospace" }}
+                    className="w-full rounded-md border border-input bg-background p-3 text-xs font-mono transition-colors placeholder:text-zinc-400 focus:border-black focus:outline-hidden focus:ring-1 focus:ring-black resize-y"
                   />
                 </div>
               ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Full Name *</label>
-                    <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Full Name *</label>
+                    <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Target Role / Title *</label>
-                    <input type="text" value={profileRole} onChange={(e) => setProfileRole(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Target Role / Title *</label>
+                    <input type="text" value={profileRole} onChange={(e) => setProfileRole(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Company *</label>
-                    <input type="text" value={profileCompany} onChange={(e) => setProfileCompany(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company *</label>
+                    <input type="text" value={profileCompany} onChange={(e) => setProfileCompany(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Email Address</label>
-                    <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Email Address</label>
+                    <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", gridColumn: "span 2" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>LinkedIn URL</label>
-                    <input type="url" value={profileLinkedin} onChange={(e) => setProfileLinkedin(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+                  <div className="flex flex-col gap-1.5 sm:col-span-2">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">LinkedIn URL</label>
+                    <input type="url" value={profileLinkedin} onChange={(e) => setProfileLinkedin(e.target.value)} className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", gridColumn: "span 2" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Skills / Focus Tags (comma separated)</label>
-                    <input type="text" placeholder="e.g. Backend, React, Fintech" value={profileTagsInput} onChange={(e) => setProfileTagsInput(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+                  <div className="flex flex-col gap-1.5 sm:col-span-2">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Skills / Focus Tags (comma separated)</label>
+                    <input type="text" placeholder="e.g. Backend, React, Fintech" value={profileTagsInput} onChange={(e) => setProfileTagsInput(e.target.value)} className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", gridColumn: "span 2" }}>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Notes & Context</label>
-                    <textarea rows={3} placeholder="e.g. Previously worked at Coinbase, active on open source..." value={profileNotes} onChange={(e) => setProfileNotes(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px", outline: "none" }} />
+                  <div className="flex flex-col gap-1.5 sm:col-span-2">
+                    <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Notes & Context</label>
+                    <textarea rows={3} placeholder="e.g. Previously worked at Coinbase, active on open source..." value={profileNotes} onChange={(e) => setProfileNotes(e.target.value)} className="w-full rounded-md border border-input bg-background p-3 text-xs transition-colors focus:border-black focus:outline-hidden" />
                   </div>
                 </div>
               )}
 
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setShowAddProfileModal(false)} style={{ flex: 1, padding: "0.6rem", background: "white", border: "1px solid #cbd5e1", borderRadius: "10px", cursor: "pointer" }}>Cancel</button>
-                <button type="submit" disabled={loading} style={{ flex: 1, padding: "0.6rem", background: "#4f46e5", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: 600 }}>
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddProfileModal(false)} 
+                  className="flex-1 h-9 px-4 text-xs font-medium border border-border hover:bg-zinc-50 rounded-md transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="flex-1 h-9 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                >
                   {loading ? "Importing..." : "Save Target Profiles"}
                 </button>
               </div>
@@ -1999,32 +1764,54 @@ export function OutreachBoard() {
 
       {/* Add Resume Modal */}
       {showAddResumeModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15,23,42,0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 }}>
-          <div style={{ width: "420px", background: "white", borderRadius: "20px", padding: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem", boxShadow: "0 20px 25px rgba(0,0,0,0.15)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>Upload Resume PDF</h3>
-              <button onClick={() => setShowAddResumeModal(false)} style={{ background: "transparent", border: "none", fontSize: "1.5rem", cursor: "pointer" }}>&times;</button>
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200"
+          onClick={() => setShowAddResumeModal(false)}
+        >
+          <div 
+            className="bg-card border border-border rounded-md p-6 w-full max-w-sm shadow-lg flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">Upload Resume PDF</h3>
+              <button 
+                onClick={() => setShowAddResumeModal(false)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <form onSubmit={handleUploadResume} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Resume Label / Title *</label>
-                <input type="text" placeholder="e.g. Backend SDE Resume, AI Intern Resume" value={resumeTitle} onChange={(e) => setResumeTitle(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+            <form onSubmit={handleUploadResume} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Resume Label / Title *</label>
+                <input type="text" placeholder="e.g. Backend SDE Resume" value={resumeTitle} onChange={(e) => setResumeTitle(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>PDF File *</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">PDF File *</label>
                 <input 
                   type="file" 
                   accept="application/pdf" 
                   onChange={(e) => setResumeFile(e.target.files?.[0] || null)} 
-                  style={{ padding: "0.5rem", border: "1px dashed #cbd5e1", borderRadius: "8px", background: "#f8fafc" }} 
+                  required
+                  className="h-9 border border-input focus:border-zinc-400 text-xs transition-colors rounded-md px-3 bg-background py-1.5 cursor-pointer file:hidden border-dashed"
                 />
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setShowAddResumeModal(false)} style={{ flex: 1, padding: "0.6rem", background: "white", border: "1px solid #cbd5e1", borderRadius: "10px", cursor: "pointer" }}>Cancel</button>
-                <button type="submit" disabled={loading} style={{ flex: 1, padding: "0.6rem", background: "#4f46e5", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: 600 }}>
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddResumeModal(false)} 
+                  className="flex-1 h-9 px-4 text-xs font-medium border border-border hover:bg-zinc-50 rounded-md transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="flex-1 h-9 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                >
                   {loading ? "Parsing PDF..." : "Upload & Parse Context"}
                 </button>
               </div>
@@ -2035,38 +1822,59 @@ export function OutreachBoard() {
 
       {/* Add Job Modal */}
       {showAddJobModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15,23,42,0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 }}>
-          <div style={{ width: "460px", background: "white", borderRadius: "20px", padding: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem", boxShadow: "0 20px 25px rgba(0,0,0,0.15)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>Add Manual Target Job</h3>
-              <button onClick={() => setShowAddJobModal(false)} style={{ background: "transparent", border: "none", fontSize: "1.5rem", cursor: "pointer" }}>&times;</button>
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200"
+          onClick={() => setShowAddJobModal(false)}
+        >
+          <div 
+            className="bg-card border border-border rounded-md p-6 w-full max-w-sm shadow-lg flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">Add Manual Target Job</h3>
+              <button 
+                onClick={() => setShowAddJobModal(false)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <form onSubmit={handleAddJob} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Job Title *</label>
-                <input type="text" placeholder="e.g. Backend Engineer Intern" value={jobTitleInput} onChange={(e) => setJobTitleInput(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+            <form onSubmit={handleAddJob} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Job Title *</label>
+                <input type="text" placeholder="e.g. Backend Engineer Intern" value={jobTitleInput} onChange={(e) => setJobTitleInput(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Company Name *</label>
-                <input type="text" placeholder="e.g. Stripe" value={jobCompanyInput} onChange={(e) => setJobCompanyInput(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company Name *</label>
+                <input type="text" placeholder="e.g. Stripe" value={jobCompanyInput} onChange={(e) => setJobCompanyInput(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Original Posting URL</label>
-                <input type="url" placeholder="https://stripe.com/careers/jobs/..." value={jobLinkInput} onChange={(e) => setJobLinkInput(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Original Posting URL</label>
+                <input type="url" placeholder="https://stripe.com/careers/jobs/..." value={jobLinkInput} onChange={(e) => setJobLinkInput(e.target.value)} className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Job Description Details</label>
-                <textarea rows={4} placeholder="Requirements, key stacks, experience expectations..." value={jobDescriptionInput} onChange={(e) => setJobDescriptionInput(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px", outline: "none" }} />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Job Description Details</label>
+                <textarea rows={4} placeholder="Requirements, key stacks, experience expectations..." value={jobDescriptionInput} onChange={(e) => setJobDescriptionInput(e.target.value)} className="w-full rounded-md border border-input bg-background p-3 text-xs transition-colors focus:border-black focus:outline-hidden resize-y" />
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setShowAddJobModal(false)} style={{ flex: 1, padding: "0.6rem", background: "white", border: "1px solid #cbd5e1", borderRadius: "10px", cursor: "pointer" }}>Cancel</button>
-                <button type="submit" disabled={loading} style={{ flex: 1, padding: "0.6rem", background: "#4f46e5", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: 600 }}>
-                  Save Job spec
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddJobModal(false)} 
+                  className="flex-1 h-9 px-4 text-xs font-medium border border-border hover:bg-zinc-50 rounded-md transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="flex-1 h-9 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer"
+                >
+                  Save Job Spec
                 </button>
               </div>
             </form>
@@ -2076,25 +1884,38 @@ export function OutreachBoard() {
 
       {/* Edit/Create Templates Modal */}
       {showTemplateModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15,23,42,0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 }}>
-          <div style={{ width: "500px", background: "white", borderRadius: "20px", padding: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem", boxShadow: "0 20px 25px rgba(0,0,0,0.15)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>{editingTemplateId ? "Edit Prompt Guidelines" : "Create Prompt Template"}</h3>
-              <button onClick={() => setShowTemplateModal(false)} style={{ background: "transparent", border: "none", fontSize: "1.5rem", cursor: "pointer" }}>&times;</button>
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200"
+          onClick={() => setShowTemplateModal(false)}
+        >
+          <div 
+            className="bg-card border border-border rounded-md p-6 w-full max-w-md shadow-lg flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">
+                {editingTemplateId ? "Edit Prompt Guidelines" : "Create Prompt Template"}
+              </h3>
+              <button 
+                onClick={() => setShowTemplateModal(false)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <form onSubmit={handleSaveTemplate} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Template Label</label>
-                <input type="text" placeholder="e.g. SDE Referral Pitch" value={templateName} onChange={(e) => setTemplateName(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+            <form onSubmit={handleSaveTemplate} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Template Label</label>
+                <input type="text" placeholder="e.g. SDE Referral Pitch" value={templateName} onChange={(e) => setTemplateName(e.target.value)} required className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background" />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>Outreach Objective / Type</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Outreach Objective / Type</label>
                 <select
                   value={templateType}
                   onChange={(e) => setTemplateType(e.target.value)}
-                  style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px" }}
+                  className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background cursor-pointer outline-hidden focus:ring-1 focus:ring-black"
                 >
                   <option value="REFERRAL">Referral Request</option>
                   <option value="NETWORKING">Networking Connect</option>
@@ -2103,14 +1924,24 @@ export function OutreachBoard() {
                 </select>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "0.82rem", fontWeight: 600 }}>AI Guidelines & Instructions</label>
-                <textarea rows={6} placeholder="Instruct the LLM on writing style, formatting, constraints, mapping keys..." value={templatePrompt} onChange={(e) => setTemplatePrompt(e.target.value)} style={{ padding: "0.5rem", border: "1px solid #cbd5e1", borderRadius: "8px", outline: "none", fontSize: "0.88rem" }} />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">AI Guidelines & Instructions</label>
+                <textarea rows={6} placeholder="Instruct the LLM on writing style, formatting, constraints..." value={templatePrompt} onChange={(e) => setTemplatePrompt(e.target.value)} required className="w-full rounded-md border border-input bg-background p-3 text-xs transition-colors focus:border-black focus:outline-hidden font-mono" />
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
-                <button type="button" onClick={() => setShowTemplateModal(false)} style={{ flex: 1, padding: "0.6rem", background: "white", border: "1px solid #cbd5e1", borderRadius: "10px", cursor: "pointer" }}>Cancel</button>
-                <button type="submit" disabled={loading} style={{ flex: 1, padding: "0.6rem", background: "#4f46e5", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: 600 }}>
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowTemplateModal(false)} 
+                  className="flex-1 h-9 px-4 text-xs font-medium border border-border hover:bg-zinc-50 rounded-md transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="flex-1 h-9 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer"
+                >
                   Save Prompt
                 </button>
               </div>
@@ -2118,23 +1949,6 @@ export function OutreachBoard() {
           </div>
         </div>
       )}
-
-      {/* Global CSS Styles Injection */}
-      <style>{`
-        @keyframes pulseGlow {
-          from {
-            opacity: 0.8;
-            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
-          }
-          to {
-            opacity: 1;
-            box-shadow: 0 0 12px 6px rgba(79, 70, 229, 0.15);
-          }
-        }
-        .outreach-flow-app {
-          animation: fadeInUp 0.4s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function ProfileCompletion() {
   const percentage = Math.round((completedCount / sections.length) * 100);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 shadow-lg backdrop-blur-sm">
+    <div className="bg-card border border-border rounded-xl p-5 shadow-lg backdrop-blur-xs">
       <div className="flex justify-between items-end mb-3">
         <h3 className="text-sm font-medium text-foreground">Profile Completion</h3>
         <span className="text-2xl font-bold text-foreground">{percentage}%</span>

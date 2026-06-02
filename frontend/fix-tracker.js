@@ -42,8 +42,8 @@ content = content.replace(/<button\s*className="edit-notes-icon-btn"/g, '<button
 // Dropdowns inside table
 content = content.replace(/className="status-select-container"/g, 'className="relative"');
 content = content.replace(/className="status-dropdown-trigger"/g, 'className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold shadow-sm text-[0.68rem] transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"');
-content = content.replace(/className="status-floating-menu"/g, 'className="absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md top-full mt-1 left-0 flex flex-col p-1 animate-in fade-in-0 zoom-in-95"');
-content = content.replace(/<button\s*onClick={\(\) => {/g, '<button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => {');
+content = content.replace(/className="status-floating-menu"/g, 'className="absolute z-50 min-w-32 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md top-full mt-1 left-0 flex flex-col p-1 animate-in fade-in-0 zoom-in-95"');
+content = content.replace(/<button\s*onClick={\(\) => {/g, '<button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50" onClick={() => {');
 
 // Fix TH
 content = content.replace(/<th>/g, '<th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">');

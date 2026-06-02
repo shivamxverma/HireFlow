@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Link2, RefreshCw, Check, Plus, Trash2, Inbox, Layers, Lock, Camera, CheckCircle, XCircle, AlertTriangle, X, Play, TrendingUp, MessageSquare, Send, FileText } from "lucide-react";
 
 interface OutboundMessage {
   id: string;
@@ -586,358 +587,196 @@ export function LinkedinOutreach() {
   };
 
   return (
-    <div style={{ fontFamily: "Inter, system-ui, sans-serif", color: "var(--text)" }}>
+    <div className="flex flex-col gap-6 font-sans">
       
       {/* 1. LINKEDIN SESSION STATUS & HEADING */}
-      <div 
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "24px",
-          padding: "1.25rem 2rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "2rem",
-          boxShadow: "var(--shadow)",
-          backdropFilter: "blur(14px)"
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "1.2rem" }}>
-          <div 
-            style={{ 
-              width: "48px", 
-              height: "48px", 
-              borderRadius: "14px", 
-              background: linkedinAuth.authenticated ? "rgba(16, 185, 129, 0.08)" : "rgba(182, 95, 42, 0.08)",
-              border: linkedinAuth.authenticated ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(182, 95, 42, 0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.5rem"
-            }}
-          >
-            {linkedinAuth.authenticated ? "🔗" : "🔌"}
+      <div className="border border-border bg-card p-4 rounded-md shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-sm shrink-0 ${linkedinAuth.authenticated ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" : "bg-amber-500/10 border-amber-500/20 text-amber-600"}`}>
+            {linkedinAuth.authenticated ? <Link2 className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: "1.05rem", color: "var(--text)", fontWeight: 600 }}>
+            <h3 className="text-sm font-semibold text-foreground">
               {linkedinAuth.authenticated ? "LinkedIn Session Cache Active" : "LinkedIn Session Connection Required"}
             </h3>
-            <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {linkedinAuth.authenticated 
                 ? "Stealth browser session authenticated using cached cookies." 
                 : "A headed browser window will launch on your system to complete secure manual login."}
             </p>
             {connectingStatusText && (
-              <p style={{ margin: "0.3rem 0 0 0", fontSize: "0.8rem", color: "var(--legacy-accent)", fontWeight: 500 }}>
-                ℹ️ {connectingStatusText}
+              <p className="text-xs text-zinc-500 mt-1 font-mono">
+                ℹ {connectingStatusText}
               </p>
             )}
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
           <button
             onClick={checkLinkedinAuthStatus}
             disabled={checkingAuth || connecting}
-            style={{
-              background: "transparent",
-              color: "var(--text)",
-              border: "1px solid var(--border)",
-              padding: "0.5rem 1rem",
-              borderRadius: "10px",
-              fontSize: "0.8rem",
-              cursor: "pointer",
-              fontWeight: 500
-            }}
+            className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-3 py-2 gap-1.5 transition-colors cursor-pointer"
           >
-            {checkingAuth ? "Checking..." : "🔄 Refresh"}
+            <RefreshCw className={`w-3.5 h-3.5 ${checkingAuth ? "animate-spin" : ""}`} /> Refresh Status
           </button>
 
           {linkedinAuth.authenticated ? (
-            <span 
-              style={{
-                background: "rgba(16, 185, 129, 0.1)",
-                color: "#059669",
-                border: "1px solid rgba(16, 185, 129, 0.2)",
-                padding: "0.5rem 1rem",
-                borderRadius: "10px",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-              }}
-            >
-              Session Live ✅
+            <span className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 h-9 px-3 py-2 gap-1">
+              <Check className="w-3.5 h-3.5" /> Session Live
             </span>
           ) : (
-            <div style={{ display: "flex", gap: "0.8rem", alignItems: "center" }}>
+            <div className="flex gap-2 w-full sm:w-auto">
               <button
                 onClick={connectLinkedinAccount}
                 disabled={connecting || importingCookies}
-                style={{
-                  background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                  color: "#fff",
-                  border: "none",
-                  padding: "0.7rem 1.4rem",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: (connecting || importingCookies) ? "not-allowed" : "pointer",
-                  boxShadow: "0 8px 20px -6px rgba(182, 95, 42, 0.4)",
-                  transition: "all 0.2s ease"
-                }}
+                className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-3 py-2 transition-colors cursor-pointer disabled:opacity-50"
               >
-                {connecting ? "Opening Session..." : "🔌 Connect LinkedIn Session"}
+                {connecting ? "Opening Session..." : "Connect Session"}
               </button>
 
-              <label
-                style={{
-                  background: "#ffffff",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                  padding: "0.7rem 1.2rem",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: (connecting || importingCookies) ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                  transition: "background-color 0.2s"
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(49, 37, 24, 0.03)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "#ffffff")}
-              >
+              <label className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-3 py-2 transition-colors cursor-pointer disabled:opacity-50">
                 <input
                   type="file"
                   accept=".json"
                   onChange={handleCookieImportSelect}
                   disabled={connecting || importingCookies}
-                  style={{ display: "none" }}
+                  className="hidden"
                 />
-                🔑 {importingCookies ? "Importing..." : "Import Cookies JSON"}
+                {importingCookies ? "Importing..." : "Import Cookies"}
               </label>
             </div>
           )}
         </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1.1fr 2fr", gap: "2.5rem", alignItems: "start" }}>
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_2fr] gap-10 items-start">
         
         {/* 2. ADD RECRUITER FORM SIDE */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+        <div className="flex flex-col gap-6">
           
           {/* Main Manual Import Form */}
-          <div 
-            style={{ 
-              background: "var(--surface)", 
-              border: "1px solid var(--border)", 
-              padding: "2rem", 
-              borderRadius: "24px",
-              boxShadow: "var(--shadow)",
-              backdropFilter: "blur(14px)"
-            }}
-          >
-            <h3 style={{ fontSize: "1.2rem", color: "var(--text)", margin: "0 0 1.5rem 0", fontWeight: 600 }}>
-              ➕ Add LinkedIn Prospect
+          <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col gap-4">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              Add LinkedIn Prospect.
             </h3>
 
             {/* Drag & Drop PDF / Image Upload Zone */}
             <div
               onDragOver={(e) => {
                 e.preventDefault();
-                e.currentTarget.style.borderColor = "var(--legacy-accent)";
-                e.currentTarget.style.background = "rgba(182, 95, 42, 0.04)";
+                e.currentTarget.classList.add("border-black", "bg-zinc-50");
               }}
               onDragLeave={(e) => {
                 e.preventDefault();
-                e.currentTarget.style.borderColor = "var(--border)";
-                e.currentTarget.style.background = "rgba(182, 95, 42, 0.02)";
+                e.currentTarget.classList.remove("border-black", "bg-zinc-50");
               }}
-              onDrop={(e) => handleFileDrop(e)}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove("border-black", "bg-zinc-50");
+                handleFileDrop(e);
+              }}
               onClick={() => document.getElementById("linkedin-profile-file-input")?.click()}
-              style={{
-                border: "2px dashed var(--border)",
-                borderRadius: "16px",
-                padding: "1.5rem",
-                textAlign: "center",
-                cursor: "pointer",
-                background: "rgba(182, 95, 42, 0.02)",
-                transition: "all 0.2s ease",
-                marginBottom: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.5rem"
-              }}
+              className="border-2 border-dashed border-border rounded-md p-6 text-center cursor-pointer bg-zinc-50/50 hover:bg-zinc-50 hover:border-zinc-400 transition-all flex flex-col items-center gap-2"
             >
               <input
                 id="linkedin-profile-file-input"
                 type="file"
                 accept="application/pdf,image/*"
-                onChange={(e) => handleFileSelect(e)}
-                style={{ display: "none" }}
+                onChange={handleFileSelect}
+                className="hidden"
               />
-              <span style={{ fontSize: "2rem" }}>📄</span>
-              <div style={{ fontWeight: 600, fontSize: "0.85rem", color: "var(--text)" }}>
-                {fileExtracting ? "⌛ Extracting details..." : "Drag & Drop Profile PDF or Image"}
+              <FileText className="w-8 h-8 text-zinc-400" />
+              <div className="font-semibold text-xs text-foreground">
+                {fileExtracting ? "Extracting details..." : "Drag & Drop Profile PDF or Image"}
               </div>
-              <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--muted)" }}>
+              <p className="text-[10px] text-muted-foreground leading-normal max-w-[200px]">
                 Drop a PDF or image of a resume or LinkedIn profile to extract details automatically
               </p>
             </div>
 
-            <form onSubmit={handleAddProfile} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Recruiter Name</label>
-                <input type="text" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            <form onSubmit={handleAddProfile} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Recruiter Name</label>
+                <input 
+                  type="text" 
                   placeholder="Jane Doe"
                   value={newProfileName}
                   onChange={(e) => setNewProfileName(e.target.value)}
                   required
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontSize: "0.9rem",
-                  }}
+                  className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black"
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                  <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Role Title</label>
-                  <input type="text" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Role Title</label>
+                  <input 
+                    type="text" 
                     placeholder="Technical Recruiter"
                     value={newProfileRole}
                     onChange={(e) => setNewProfileRole(e.target.value)}
                     required
-                    style={{
-                      padding: "0.7rem 0.9rem",
-                      borderRadius: "10px",
-                      border: "1px solid var(--border)",
-                      background: "#fffdf9",
-                      color: "var(--text)",
-                      outline: "none",
-                      fontSize: "0.9rem",
-                    }}
+                    className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black w-full"
                   />
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                  <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Company</label>
-                  <input type="text" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company</label>
+                  <input 
+                    type="text" 
                     placeholder="Google"
                     value={newProfileCompany}
                     onChange={(e) => setNewProfileCompany(e.target.value)}
                     required
-                    style={{
-                      padding: "0.7rem 0.9rem",
-                      borderRadius: "10px",
-                      border: "1px solid var(--border)",
-                      background: "#fffdf9",
-                      color: "var(--text)",
-                      outline: "none",
-                      fontSize: "0.9rem",
-                    }}
+                    className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black w-full"
                   />
                 </div>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>LinkedIn Profile URL</label>
-                <input type="url" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">LinkedIn Profile URL</label>
+                <input 
+                  type="url" 
                   placeholder="https://www.linkedin.com/in/recruiter-username"
                   value={newProfileLinkedinUrl}
                   onChange={(e) => setNewProfileLinkedinUrl(e.target.value)}
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontSize: "0.9rem",
-                  }}
+                  className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black"
                 />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Notes / Outreach Context</label>
-                <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Notes / Outreach Context</label>
+                <textarea 
                   rows={3}
                   placeholder="E.g., recruiting for the Platform Engineering role or met at tech conference..."
                   value={newProfileNotes}
                   onChange={(e) => setNewProfileNotes(e.target.value)}
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontFamily: "inherit",
-                    fontSize: "0.9rem",
-                    resize: "vertical",
-                  }}
+                  className="w-full rounded-md border border-input bg-background p-3 text-xs transition-colors placeholder:text-zinc-400 focus:border-black focus:outline-hidden focus:ring-1 focus:ring-black resize-y"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={addingProfile}
-                style={{
-                  background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                  color: "#fff",
-                  border: "none",
-                  padding: "0.8rem",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  cursor: addingProfile ? "not-allowed" : "pointer",
-                  boxShadow: "0 4px 12px rgba(182, 95, 42, 0.15)",
-                  transition: "transform 0.2s",
-                  marginTop: "0.5rem"
-                }}
+                className="h-9 w-full bg-black text-white text-xs font-semibold hover:bg-black/90 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
-                {addingProfile ? "Adding Profile..." : "Add Recruiter Target 🎯"}
+                {addingProfile ? "Adding Profile..." : "Add Recruiter Target"}
               </button>
             </form>
           </div>
 
           {/* AI Settings Section */}
-          <div 
-            style={{ 
-              background: "var(--surface)", 
-              border: "1px solid var(--border)", 
-              padding: "1.5rem 2rem", 
-              borderRadius: "24px",
-              boxShadow: "var(--shadow)",
-              backdropFilter: "blur(14px)"
-            }}
-          >
-            <h4 style={{ fontSize: "1.05rem", color: "var(--text)", margin: "0 0 1.2rem 0", fontWeight: 600 }}>
-              ⚙️ AI Generation Parameters
+          <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col gap-4">
+            <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              AI Generation Parameters.
             </h4>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Master Latex Resume</label>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <select className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Master Latex Resume</label>
+                <div className="flex gap-2">
+                  <select 
                     value={selectedResumeId}
                     onChange={(e) => setSelectedResumeId(e.target.value)}
-                    style={{
-                      flex: 1,
-                      padding: "0.7rem 0.9rem",
-                      borderRadius: "10px",
-                      border: "1px solid var(--border)",
-                      background: "#fffdf9",
-                      color: "var(--text)",
-                      outline: "none",
-                      fontSize: "0.9rem",
-                      cursor: "pointer"
-                    }}
+                    className="flex-1 h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background cursor-pointer outline-hidden focus:ring-1 focus:ring-black"
                   >
                     {resumes.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -947,48 +786,24 @@ export function LinkedinOutreach() {
                     {resumes.length === 0 && <option value="">No resumes found</option>}
                   </select>
 
-                  <label
-                    style={{
-                      background: "rgba(182, 95, 42, 0.08)",
-                      color: "var(--accent-dark)",
-                      border: "1px solid rgba(182, 95, 42, 0.2)",
-                      padding: "0.7rem 1rem",
-                      borderRadius: "10px",
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                      whiteSpace: "nowrap"
-                    }}
-                  >
+                  <label className="h-9 inline-flex items-center justify-center rounded-md text-xs font-semibold border border-input bg-background hover:bg-zinc-50 text-foreground px-3 py-2 gap-1.5 transition-colors cursor-pointer whitespace-nowrap">
                     <input
                       type="file"
                       accept="application/pdf"
                       onChange={handleResumeUpload}
-                      style={{ display: "none" }}
+                      className="hidden"
                     />
                     📤 Upload PDF
                   </label>
                 </div>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Target Prompt Template</label>
-                <select className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Target Prompt Template</label>
+                <select 
                   value={selectedTemplateId}
                   onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontSize: "0.9rem",
-                    cursor: "pointer"
-                  }}
+                  className="w-full h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background cursor-pointer outline-hidden focus:ring-1 focus:ring-black"
                 >
                   {templates.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -1003,55 +818,40 @@ export function LinkedinOutreach() {
         </div>
 
         {/* 3. CAMPAIGN TRACKER BOARD */}
-        <div 
-          style={{ 
-            background: "var(--surface)", 
-            border: "1px solid var(--border)", 
-            padding: "2rem", 
-            borderRadius: "24px",
-            boxShadow: "var(--shadow)",
-            backdropFilter: "blur(14px)",
-            minHeight: "550px"
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+        <div className="border border-border bg-card p-6 rounded-md shadow-xs flex flex-col gap-4 min-h-[550px]">
+          <div className="flex justify-between items-center pb-2 border-b border-border">
             <div>
-              <h3 style={{ fontSize: "1.25rem", color: "var(--text)", margin: 0, fontWeight: 600 }}>
-                💼 LinkedIn Campaign Tracker
+              <h3 className="text-sm font-semibold text-foreground">
+                LinkedIn Campaign Tracker.
               </h3>
-              <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Generate Gemini connection request notes under 300 characters and automate sequential messaging.
               </p>
             </div>
             <button 
               onClick={fetchData} 
-              style={{
-                background: "transparent",
-                color: "var(--muted)",
-                border: "none",
-                fontSize: "1.2rem",
-                cursor: "pointer"
-              }}
+              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors p-1"
+              title="Refresh Data"
             >
-              🔄
+              <RefreshCw className="w-4 h-4" />
             </button>
           </div>
 
           {loading ? (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
-              <div style={{ color: "var(--muted)", fontSize: "0.95rem" }}>Loading campaign board...</div>
+            <div className="flex justify-center items-center h-[300px]">
+              <div className="text-muted-foreground text-xs font-mono">Loading campaign board...</div>
             </div>
           ) : profiles.length === 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "300px", gap: "1rem" }}>
-              <span style={{ fontSize: "2rem" }}>🎯</span>
-              <p style={{ color: "var(--muted)", fontSize: "0.9rem", margin: 0 }}>No recruiter prospects registered yet.</p>
+            <div className="flex flex-col justify-center items-center h-[300px] gap-2">
+              <span className="text-2xl">🎯</span>
+              <p className="text-muted-foreground text-xs">No recruiter prospects registered yet.</p>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-xs">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                    <th style={{ padding: "0.75rem 0.5rem", width: "40px" }}>
+                  <tr className="border-b border-border">
+                    <th className="py-2 px-1 w-10 text-center">
                       <input 
                         type="checkbox"
                         checked={
@@ -1060,14 +860,14 @@ export function LinkedinOutreach() {
                           selectedProfileIds.length === profiles.filter(p => p.outboundMessages?.some(m => m.channel === "LINKEDIN")).length
                         }
                         onChange={toggleSelectAll}
-                        style={{ cursor: "pointer" }}
+                        className="cursor-pointer"
                       />
                     </th>
-                    <th style={{ padding: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>Recruiter Target</th>
-                    <th style={{ padding: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>Company</th>
-                    <th style={{ padding: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>LinkedIn Note</th>
-                    <th style={{ padding: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>Status</th>
-                    <th style={{ padding: "0.75rem", color: "var(--muted)", fontWeight: 500, textAlign: "right" }}>Actions</th>
+                    <th className="py-2 px-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Recruiter Target</th>
+                    <th className="py-2 px-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Company</th>
+                    <th className="py-2 px-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">LinkedIn Note</th>
+                    <th className="py-2 px-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-left">Status</th>
+                    <th className="py-2 px-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1078,89 +878,69 @@ export function LinkedinOutreach() {
                     return (
                       <tr 
                         key={profile.id} 
-                        style={{ 
-                          borderBottom: "1px solid var(--border)",
-                          background: selectedProfileIds.includes(profile.id) ? "rgba(182, 95, 42, 0.02)" : "transparent"
-                        }}
+                        className={`border-b border-zinc-100 transition-colors ${
+                          selectedProfileIds.includes(profile.id) ? "bg-zinc-50/70" : "hover:bg-zinc-50/30"
+                        }`}
                       >
-                        <td style={{ padding: "0.75rem 0.5rem" }}>
+                        <td className="py-3 px-1 text-center">
                           {linkedInMsg && (
                             <input 
                               type="checkbox"
                               checked={selectedProfileIds.includes(profile.id)}
                               onChange={() => toggleSelectProfile(profile.id)}
-                              style={{ cursor: "pointer" }}
+                              className="cursor-pointer"
                             />
                           )}
                         </td>
-                        <td style={{ padding: "0.75rem" }}>
-                          <div style={{ fontWeight: 600, color: "var(--text)" }}>{profile.name}</div>
-                          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{profile.role}</div>
+                        <td className="py-3 px-3">
+                          <div className="font-semibold text-xs text-foreground">{profile.name}</div>
+                          <div className="text-[10px] text-muted-foreground">{profile.role}</div>
                         </td>
-                        <td style={{ padding: "0.75rem" }}>
-                          <div style={{ color: "var(--text)", fontWeight: 500 }}>{profile.company}</div>
+                        <td className="py-3 px-3">
+                          <div className="text-xs font-semibold text-foreground">{profile.company}</div>
                           {hasLinkedinUrl ? (
                             <a 
                               href={profile.linkedinUrl!} 
                               target="_blank" 
                               rel="noreferrer" 
-                              style={{ fontSize: "0.75rem", color: "#0077b5", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.2rem", marginTop: "0.15rem" }}
+                              className="inline-flex items-center gap-1 text-[10px] text-zinc-500 hover:text-black hover:underline mt-0.5"
                             >
                               🔗 View Profile
                             </a>
                           ) : (
-                            <span style={{ fontSize: "0.75rem", color: "var(--legacy-accent)" }}>⚠️ Missing URL</span>
+                            <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 font-medium">⚠️ Missing URL</span>
                           )}
                         </td>
-                        <td style={{ padding: "0.75rem" }}>
+                        <td className="py-3 px-3">
                           {linkedInMsg ? (
-                            <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-                              <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text)", fontStyle: "italic", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "160px" }}>
-                               &quot;{linkedInMsg.content}&quot;
+                            <div className="flex flex-col gap-0.5">
+                              <p className="text-[11px] text-foreground italic line-clamp-1 max-w-[160px]" title={linkedInMsg.content}>
+                               &ldquo;{linkedInMsg.content}&rdquo;
                               </p>
-                              <span style={{ fontSize: "0.7rem", color: "var(--muted)" }}>
+                              <span className="text-[9px] font-mono text-muted-foreground">
                                 {linkedInMsg.content.length} chars / 300 max
                               </span>
                             </div>
                           ) : (
-                            <span style={{ fontSize: "0.8rem", color: "var(--muted)", fontStyle: "italic" }}>No message drafted</span>
+                            <span className="text-[10px] text-muted-foreground italic">No message drafted</span>
                           )}
                         </td>
-                        <td style={{ padding: "0.75rem" }}>
+                        <td className="py-3 px-3">
                           {linkedInMsg ? (
-                            <span 
-                              style={{
-                                display: "inline-block",
-                                padding: "0.25rem 0.6rem",
-                                borderRadius: "8px",
-                                fontSize: "0.75rem",
-                                fontWeight: 600,
-                                textTransform: "capitalize",
-                                ...getStatusBadgeStyles(linkedInMsg.status)
-                              }}
-                            >
+                            <span className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-semibold font-mono border ${getStatusBadgeStyles(linkedInMsg.status)}`}>
                               {linkedInMsg.status.toLowerCase()}
                             </span>
                           ) : (
-                            <span style={{ color: "var(--muted)", fontSize: "0.75rem" }}>—</span>
+                            <span className="text-muted-foreground text-[10px]">—</span>
                           )}
                         </td>
-                        <td style={{ padding: "0.75rem", textAlign: "right" }}>
-                          <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                        <td className="py-3 px-3 text-right">
+                          <div className="flex justify-end items-center gap-2">
                             {!linkedInMsg ? (
                               <button
                                 onClick={() => handleGenerateMessage(profile.id)}
                                 disabled={actionLoading === `generate-${profile.id}` || !hasLinkedinUrl}
-                                style={{
-                                  background: "rgba(182, 95, 42, 0.08)",
-                                  color: "var(--accent-dark)",
-                                  border: "1px solid rgba(182, 95, 42, 0.2)",
-                                  padding: "0.4rem 0.8rem",
-                                  borderRadius: "8px",
-                                  fontSize: "0.75rem",
-                                  fontWeight: 600,
-                                  cursor: (actionLoading === `generate-${profile.id}` || !hasLinkedinUrl) ? "not-allowed" : "pointer"
-                                }}
+                                className="h-7 inline-flex items-center justify-center rounded-md px-2.5 text-[11px] font-semibold bg-black text-white hover:bg-black/90 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {actionLoading === `generate-${profile.id}` ? "Drafting..." : "⚡ Generate AI Note"}
                               </button>
@@ -1168,48 +948,26 @@ export function LinkedinOutreach() {
                               <>
                                 <button
                                   onClick={() => handleOpenEdit(linkedInMsg)}
-                                  style={{
-                                    background: "#ffffff",
-                                    color: "var(--text)",
-                                    border: "1px solid var(--border)",
-                                    padding: "0.4rem 0.8rem",
-                                    borderRadius: "8px",
-                                    fontSize: "0.75rem",
-                                    fontWeight: 500,
-                                    cursor: "pointer"
-                                  }}
+                                  className="h-7 inline-flex items-center justify-center rounded-md px-2.5 text-[11px] font-semibold border border-border bg-background hover:bg-zinc-50 text-foreground transition-colors cursor-pointer"
                                 >
-                                  ✏️ Edit Draft
+                                  Edit Draft
                                 </button>
                                 <button
                                   onClick={() => handleGenerateMessage(profile.id)}
                                   disabled={actionLoading === `generate-${profile.id}`}
-                                  style={{
-                                    background: "transparent",
-                                    color: "var(--muted)",
-                                    border: "none",
-                                    padding: "0.4rem",
-                                    cursor: "pointer"
-                                  }}
+                                  className="p-1.5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                                   title="Regenerate Draft message"
                                 >
-                                  🔄
+                                  <RefreshCw className="w-3.5 h-3.5" />
                                 </button>
                               </>
                             )}
                             <button
                               onClick={() => handleDeleteProfile(profile.id)}
-                              style={{
-                                background: "transparent",
-                                color: "#ef4444",
-                                border: "none",
-                                padding: "0.4rem",
-                                cursor: "pointer",
-                                fontSize: "0.9rem"
-                              }}
+                              className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
                               title="Delete profile"
                             >
-                              🗑️
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </td>
@@ -1225,68 +983,30 @@ export function LinkedinOutreach() {
 
       {/* 4. FLOATING GLASS DISPATCH BAR */}
       {selectedProfileIds.length > 0 && (
-        <div 
-          style={{
-            position: "fixed",
-            bottom: "2rem",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "rgba(255, 255, 255, 0.85)",
-            border: "1px solid rgba(182, 95, 42, 0.25)",
-            borderRadius: "20px",
-            padding: "1rem 2rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "2rem",
-            boxShadow: "0 20px 40px -10px rgba(49, 37, 24, 0.15)",
-            backdropFilter: "blur(18px)",
-            zIndex: 100,
-            animation: "slideUp 0.3s ease-out"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-            <span style={{ fontSize: "1.3rem" }}>🚀</span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-4 rounded-md shadow-lg flex items-center justify-between gap-8 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full max-w-xl">
+          <div className="flex items-center gap-3">
+            <Send className="w-5 h-5 text-zinc-400 shrink-0" />
             <div>
-              <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--text)" }}>
-                {selectedProfileIds.length} LinkedIn DMs Selected
-              </div>
-              <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--muted)" }}>
+              <div className="font-semibold text-xs">{selectedProfileIds.length} LinkedIn DMs Selected</div>
+              <p className="text-[10px] text-zinc-400 mt-0.5">
                 Sequential dispatches wait 5-10s randomly to protect account safety.
               </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "1rem" }}>
+          <div className="flex gap-2 shrink-0">
             <button
               onClick={() => setSelectedProfileIds([])}
-              style={{
-                background: "transparent",
-                color: "var(--text)",
-                border: "1px solid var(--border)",
-                padding: "0.6rem 1.2rem",
-                borderRadius: "10px",
-                fontWeight: 500,
-                fontSize: "0.85rem",
-                cursor: "pointer"
-              }}
+              className="h-8 px-3 text-xs font-medium border border-zinc-700 hover:bg-zinc-800 rounded-md transition-colors cursor-pointer text-white"
             >
               Cancel
             </button>
             <button
               onClick={handleDispatchCampaign}
               disabled={actionLoading === "sending-bulk" || isCampaignRunning}
-              style={{
-                background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                color: "#fff",
-                border: "none",
-                padding: "0.6rem 1.4rem",
-                borderRadius: "10px",
-                fontWeight: 600,
-                fontSize: "0.85rem",
-                cursor: (actionLoading === "sending-bulk" || isCampaignRunning) ? "not-allowed" : "pointer"
-              }}
+              className="h-8 px-4 text-xs font-semibold bg-white text-black hover:bg-zinc-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             >
-              {isCampaignRunning ? "Sending sequentially..." : "Send Selected DMs"}
+              {isCampaignRunning ? "Sending..." : "Send Selected DMs"}
             </button>
           </div>
         </div>
@@ -1295,104 +1015,50 @@ export function LinkedinOutreach() {
       {/* 5. EDIT MESSAGE DRAFT MODAL */}
       {editingMessage && (
         <div 
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(49, 37, 24, 0.4)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(4px)"
-          }}
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200"
           onClick={() => setEditingMessage(null)}
         >
           <div 
-            style={{
-              background: "#ffffff",
-              border: "1px solid var(--border)",
-              borderRadius: "24px",
-              padding: "2rem",
-              width: "500px",
-              maxWidth: "90%",
-              boxShadow: "0 24px 64px -12px rgba(49, 37, 24, 0.25)",
-              animation: "scaleUp 0.25s ease-out"
-            }}
+            className="bg-card border border-border rounded-md p-6 w-full max-w-md shadow-lg flex flex-col gap-4 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
-              <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 600, color: "var(--text)" }}>
-                ✏️ Edit Personalized Cold Note
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">
+                Edit Personalized Cold Note
               </h3>
               <button 
                 onClick={() => setEditingMessage(null)}
-                style={{ background: "transparent", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "var(--muted)" }}
+                className="text-muted-foreground hover:text-foreground cursor-pointer p-1"
               >
-                &times;
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Message Content</label>
-                <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Message Content</label>
+                <textarea 
                   rows={6}
                   value={editedContent}
                   onChange={(e) => setEditedContent(e.target.value)}
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontFamily: "inherit",
-                    fontSize: "0.9rem",
-                    resize: "vertical"
-                  }}
+                  className="w-full rounded-md border border-input bg-background p-3 text-xs transition-colors placeholder:text-muted-foreground focus:border-black focus:outline-hidden focus:ring-1 focus:ring-black resize-y"
                 />
-                <span 
-                  style={{ 
-                    fontSize: "0.75rem", 
-                    color: editedContent.length > 300 ? "#ef4444" : "var(--muted)",
-                    alignSelf: "flex-end",
-                    fontWeight: 500
-                  }}
-                >
-                  {editedContent.length} / 300 characters {editedContent.length > 300 && "(Note will be truncated or rejected by LinkedIn)"}
+                <span className={`text-[10px] font-mono self-end ${editedContent.length > 300 ? "text-red-600 font-semibold" : "text-muted-foreground"}`}>
+                  {editedContent.length} / 300 characters {editedContent.length > 300 && "(Truncated by LinkedIn)"}
                 </span>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem", marginTop: "0.5rem" }}>
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={() => setEditingMessage(null)}
-                  style={{
-                    background: "transparent",
-                    color: "var(--text)",
-                    border: "1px solid var(--border)",
-                    padding: "0.6rem 1.2rem",
-                    borderRadius: "10px",
-                    fontWeight: 500,
-                    cursor: "pointer"
-                  }}
+                  className="h-9 px-4 text-xs font-medium border border-border hover:bg-zinc-50 rounded-md transition-colors cursor-pointer"
                 >
                   Close
                 </button>
                 <button
                   onClick={handleSaveEdits}
                   disabled={savingEdit || editedContent.length === 0}
-                  style={{
-                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                    color: "#fff",
-                    border: "none",
-                    padding: "0.6rem 1.4rem",
-                    borderRadius: "10px",
-                    fontWeight: 600,
-                    cursor: (savingEdit || editedContent.length === 0) ? "not-allowed" : "pointer"
-                  }}
+                  className="h-9 px-4 text-xs font-semibold bg-black text-white hover:bg-black/90 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {savingEdit ? "Saving..." : "Save Draft Changes"}
                 </button>
@@ -1401,18 +1067,6 @@ export function LinkedinOutreach() {
           </div>
         </div>
       )}
-
-      {/* Inject custom CSS keyframes dynamically */}
-      <style jsx global>{`
-        @keyframes slideUp {
-          from { transform: translate(-50%, 20px); opacity: 0; }
-          to { transform: translate(-50%, 0); opacity: 1; }
-        }
-        @keyframes scaleUp {
-          from { transform: scale(0.96); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1420,31 +1074,15 @@ export function LinkedinOutreach() {
 function getStatusBadgeStyles(status: string) {
   switch (status.toUpperCase()) {
     case "SENT":
-      return {
-        background: "rgba(16, 185, 129, 0.08)",
-        color: "#059669",
-        border: "1px solid rgba(16, 185, 129, 0.2)",
-      };
+      return "bg-emerald-500/10 text-emerald-700 border-emerald-500/20";
     case "SENDING":
-      return {
-        background: "rgba(59, 130, 246, 0.08)",
-        color: "#2563eb",
-        border: "1px solid rgba(59, 130, 246, 0.2)",
-      };
+      return "bg-blue-500/10 text-blue-700 border-blue-500/20";
     case "FAILED":
-      return {
-        background: "rgba(239, 68, 68, 0.08)",
-        color: "#dc2626",
-        border: "1px solid rgba(239, 68, 68, 0.2)",
-      };
+      return "bg-red-500/10 text-red-700 border-red-500/20";
     case "DRAFT":
     case "EDTIED":
     case "EDITED":
     default:
-      return {
-        background: "rgba(107, 114, 128, 0.08)",
-        color: "#4b5563",
-        border: "1px solid rgba(107, 114, 128, 0.2)",
-      };
+      return "bg-zinc-100 text-zinc-700 border-zinc-200";
   }
 }

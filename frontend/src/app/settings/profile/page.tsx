@@ -27,7 +27,7 @@ export default function ProfilePage() {
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto mb-8 bg-muted/50 p-1 rounded-xl backdrop-blur-sm border border-border">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto mb-8 bg-muted/50 p-1 rounded-xl backdrop-blur-xs border border-border">
           <TabsTrigger value="personal" className="py-2.5 rounded-lg data-[state=active]:bg-muted hover:bg-muted/80 data-[state=active]:text-foreground">Personal</TabsTrigger>
           <TabsTrigger value="professional" className="py-2.5 rounded-lg data-[state=active]:bg-muted hover:bg-muted/80 data-[state=active]:text-foreground">Professional</TabsTrigger>
           <TabsTrigger value="education" className="py-2.5 rounded-lg data-[state=active]:bg-muted hover:bg-muted/80 data-[state=active]:text-foreground">Education</TabsTrigger>
@@ -39,28 +39,28 @@ export default function ProfilePage() {
         </TabsList>
 
         <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-xl shadow-black/50">
-          <TabsContent value="personal" className="mt-0 outline-none">
+          <TabsContent value="personal" className="mt-0 outline-hidden">
             <PersonalInfo />
           </TabsContent>
-          <TabsContent value="professional" className="mt-0 outline-none">
+          <TabsContent value="professional" className="mt-0 outline-hidden">
             <ProfessionalInfo />
           </TabsContent>
-          <TabsContent value="education" className="mt-0 outline-none">
+          <TabsContent value="education" className="mt-0 outline-hidden">
             <EducationList />
           </TabsContent>
-          <TabsContent value="experience" className="mt-0 outline-none">
+          <TabsContent value="experience" className="mt-0 outline-hidden">
             <ExperienceList />
           </TabsContent>
-          <TabsContent value="skills" className="mt-0 outline-none">
+          <TabsContent value="skills" className="mt-0 outline-hidden">
             <SkillTags />
           </TabsContent>
-          <TabsContent value="resume" className="mt-0 outline-none">
+          <TabsContent value="resume" className="mt-0 outline-hidden">
             <ResumeUpload />
           </TabsContent>
-          <TabsContent value="preferences" className="mt-0 outline-none">
+          <TabsContent value="preferences" className="mt-0 outline-hidden">
             <ApplicationPreferences />
           </TabsContent>
-          <TabsContent value="answers" className="mt-0 outline-none">
+          <TabsContent value="answers" className="mt-0 outline-hidden">
             <PredefinedAnswers />
           </TabsContent>
         </div>

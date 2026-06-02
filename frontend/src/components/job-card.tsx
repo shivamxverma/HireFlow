@@ -11,21 +11,21 @@ type JobCardProps = {
 export function getStatusStyle(status: string) {
   switch (status) {
     case "Applied":
-      return { bg: "#fef3c7", text: "#b45309", label: "Applied" };
+      return { bg: "rgba(234, 179, 8, 0.08)", border: "rgba(234, 179, 8, 0.2)", text: "#d97706", label: "Applied" };
     case "Followed Up":
-      return { bg: "#e0e7ff", text: "#4338ca", label: "Followed Up" };
+      return { bg: "rgba(99, 102, 241, 0.08)", border: "rgba(99, 102, 241, 0.2)", text: "#4f46e5", label: "Followed Up" };
     case "Interview Scheduled":
-      return { bg: "#e0f2fe", text: "#0369a1", label: "Interview" };
+      return { bg: "rgba(59, 130, 246, 0.08)", border: "rgba(59, 130, 246, 0.2)", text: "#2563eb", label: "Interview" };
     case "Rejected":
-      return { bg: "#fee2e2", text: "#b91c1c", label: "Rejected" };
+      return { bg: "rgba(239, 68, 68, 0.08)", border: "rgba(239, 68, 68, 0.2)", text: "#dc2626", label: "Rejected" };
     case "Offer":
-      return { bg: "#d1fae5", text: "#047857", label: "Offer" };
+      return { bg: "rgba(16, 185, 129, 0.08)", border: "rgba(16, 185, 129, 0.2)", text: "#059669", label: "Offer" };
     default:
-      return { bg: "#f1f5f9", text: "#475569", label: status };
+      return { bg: "rgba(107, 114, 128, 0.08)", border: "rgba(107, 114, 128, 0.2)", text: "#4b5563", label: status };
   }
 }
 
-function formatPostedDate(value: string) {
+export function formatPostedDate(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -34,49 +34,58 @@ function formatPostedDate(value: string) {
 }
 
 export function JobCard({ job, onTrack, onSelect, onAutoApply }: JobCardProps) {
+  const statusStyle = job.status ? getStatusStyle(job.status) : null;
   return (
     <article 
-      className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 hover:shadow-md transition-shadow relative flex flex-col justify-between"
+      className="group relative flex flex-col justify-between rounded-lg border border-border bg-card p-6 shadow-xs hover:border-foreground/20 hover:shadow-sm transition-all duration-200"
       onClick={() => onSelect?.(job)}
-      style={{ cursor: "pointer", transition: "transform 150ms ease, box-shadow 150ms ease" }}
+      style={{ cursor: "pointer" }}
     >
-      <div className="flex justify-between items-center mb-4">
-        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase text-muted-foreground">{job.source}</span>
-        <div className="flex gap-2 items-center text-xs text-muted-foreground">
-          {job.status && (
-            <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold shadow-sm text-[0.68rem]"
-              style={{
-                background: getStatusStyle(job.status).bg,
-                color: getStatusStyle(job.status).text,
-              }}
-            >
-              {getStatusStyle(job.status).label}
-            </span>
-          )}
-          <span>Updated {formatPostedDate(job.updatedAt)}</span>
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <span className="inline-flex items-center rounded-sm border border-border bg-secondary/50 px-2 py-0.5 text-[10px] font-mono font-medium uppercase text-muted-foreground tracking-wider">{job.source}</span>
+          <div className="flex gap-2 items-center text-[11px] text-muted-foreground font-medium">
+            {statusStyle && (
+              <span
+                className="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-semibold tracking-wide border"
+                style={{
+                  background: statusStyle.bg,
+                  borderColor: statusStyle.border,
+                  color: statusStyle.text,
+                }}
+              >
+                {statusStyle.label}
+              </span>
+            )}
+            <span>Updated {formatPostedDate(job.updatedAt)}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5 mb-4">
+          <h2 className="text-base font-semibold leading-snug tracking-tight text-foreground group-hover:text-foreground/90 transition-colors">{job.title}</h2>
+          <p className="text-xs font-medium text-muted-foreground">{job.company}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-muted-foreground mb-6">
+          <span className="flex items-center gap-1.5 text-muted-foreground/80"><MapPin className="w-3.5 h-3.5 text-muted-foreground/50" /> {job.location}</span>
+          <span className="flex items-center gap-1.5 text-muted-foreground/80"><DollarSign className="w-3.5 h-3.5 text-muted-foreground/50" /> {job.salary ?? "Salary not listed"}</span>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 mb-4">
-        <h2 className="text-lg font-bold leading-tight">{job.title}</h2>
-        <p className="text-sm font-medium text-muted-foreground">{job.company}</p>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-muted-foreground mb-6">
-        <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {job.location}</span>
-        <span className="flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5" /> {job.salary ?? "Salary not listed"}</span>
-      </div>
-
-      <div className="flex items-center justify-between border-t pt-4 mt-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex gap-2 items-center flex-wrap">
+      <div className="flex items-center justify-between border-t border-border pt-4 mt-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex gap-2 items-center">
           {job.applyUrl ? (
-            <a href={job.applyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm text-primary hover:underline gap-1 font-medium">
-              <ExternalLink className="w-3.5 h-3.5" />
-              Apply now
+            <a 
+              href={job.applyUrl} 
+              target="_blank" 
+              rel="noreferrer" 
+              className="inline-flex items-center text-xs font-semibold text-foreground hover:opacity-85 gap-1 transition-opacity"
+            >
+              Apply
+              <ExternalLink className="w-3 h-3 text-muted-foreground" />
             </a>
           ) : (
-            <span className="text-sm text-muted-foreground">No link</span>
+            <span className="text-xs text-muted-foreground/50">No link</span>
           )}
 
           <button
@@ -84,10 +93,11 @@ export function JobCard({ job, onTrack, onSelect, onAutoApply }: JobCardProps) {
               e.stopPropagation();
               onAutoApply?.(job);
             }}
-            className="inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-full text-sm font-medium border border-orange-500/30 bg-orange-500/10 text-orange-600 hover:bg-orange-500/20 transition-colors ml-2 gap-1.5"
+            className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-medium border border-border bg-foreground text-background hover:bg-foreground/90 transition-colors ml-3 gap-1 cursor-pointer"
             title="Start AI Auto Apply"
           >
-            <Zap className="w-3.5 h-3.5 fill-current" /> Auto Apply
+            <Zap className="w-3 h-3 fill-current" />
+            Auto Apply
           </button>
         </div>
 
@@ -96,9 +106,9 @@ export function JobCard({ job, onTrack, onSelect, onAutoApply }: JobCardProps) {
             e.stopPropagation();
             onTrack?.(job);
           }}
-          className="inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-full text-sm font-medium border cursor-pointer transition-colors bg-transparent text-foreground hover:bg-muted gap-1.5"
+          className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-medium border border-border bg-background text-foreground hover:bg-secondary transition-colors cursor-pointer"
         >
-          <Target className="w-3.5 h-3.5" />
+          <Target className="w-3 h-3 mr-1" />
           {job.status ? "Update" : "Track"}
         </button>
       </div>
