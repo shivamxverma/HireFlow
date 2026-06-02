@@ -5,6 +5,7 @@ const REDIS_PORT = parseInt(process.env.REDIS_PORT || "6379");
 
 const globalForQueue = globalThis as unknown as {
   resumeQueue?: Queue;
+  autoApplyQueue?: Queue;
 };
 
 export const redisConnectionOptions = {
@@ -19,6 +20,13 @@ export const resumeQueue =
     connection: redisConnectionOptions,
   });
 
+export const autoApplyQueue =
+  globalForQueue.autoApplyQueue ??
+  new Queue("auto-apply-queue", {
+    connection: redisConnectionOptions,
+  });
+
 if (process.env.NODE_ENV !== "production") {
   globalForQueue.resumeQueue = resumeQueue;
+  globalForQueue.autoApplyQueue = autoApplyQueue;
 }

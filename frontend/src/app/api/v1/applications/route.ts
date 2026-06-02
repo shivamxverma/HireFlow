@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resumeQueue } from "@/lib/queue";
+import { autoApplyQueue } from "@/lib/queue";
 
 export const dynamic = "force-dynamic";
 
@@ -95,11 +95,39 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Fetch user profile from DB (assuming default user for now)
+    const userProfile = await prisma.userProfile.findUnique({
+      where: { userId: "default-user" },
+      include: { user: true }
+    });
+
+    const mockProfile = {
+      fullName: "Shivam Verma",
+      email: "shivam@example.com",
+      phone: "+1 555-0198",
+      location: "San Francisco, CA",
+      linkedinUrl: "https://linkedin.com/in/shivamverma",
+      githubUrl: "https://github.com/shivamverma",
+      portfolioUrl: "https://shivam.dev",
+      resumeUrl: "/Users/shivamverma/Desktop/resume.pdf", 
+    };
+
+    const profileData = userProfile ? {
+      fullName: userProfile.user?.name || mockProfile.fullName,
+      email: userProfile.user?.email || mockProfile.email,
+      phone: userProfile.phone || mockProfile.phone,
+      location: userProfile.location || mockProfile.location,
+      linkedinUrl: userProfile.linkedinUrl || mockProfile.linkedinUrl,
+      githubUrl: userProfile.githubUrl || mockProfile.githubUrl,
+      portfolioUrl: userProfile.portfolioUrl || mockProfile.portfolioUrl,
+      resumeUrl: mockProfile.resumeUrl // Use mock resume for now
+    } : mockProfile;
+
     // 4. Enqueue the task into BullMQ
-    console.log(`[API Applications] Adding Application ID "${newApp.id}" to BullMQ resume queue...`);
-    await resumeQueue.add(
-      "resume-generation-task",
-      { applicationId: newApp.id },
+    console.log(`[API Applications] Adding Application ID "${newApp.id}" to BullMQ auto apply queue...`);
+    await autoApplyQueue.add(
+      "auto-apply-task",
+      { applicationId: newApp.id, url: job.applyUrl || "", profile: profileData },
       {
         attempts: 1,
         removeOnComplete: true,

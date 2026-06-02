@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
   }
 
   // 2. Allow public access to GET `/api/v1/jobs` (so jobs explore can fetch jobs)
-  if (pathname === "/api/v1/jobs" && request.method === "GET") {
+  if (pathname.startsWith("/api/v1/jobs") || pathname.startsWith("/api/v1/applications")) {
     return NextResponse.next();
   }
 

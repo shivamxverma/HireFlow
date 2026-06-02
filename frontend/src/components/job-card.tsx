@@ -5,6 +5,7 @@ type JobCardProps = {
   job: Job;
   onTrack?: (job: Job) => void;
   onSelect?: (job: Job) => void;
+  onAutoApply?: (job: Job) => void;
 };
 
 export function getStatusStyle(status: string) {
@@ -32,7 +33,7 @@ function formatPostedDate(value: string) {
   }).format(new Date(value));
 }
 
-export function JobCard({ job, onTrack, onSelect }: JobCardProps) {
+export function JobCard({ job, onTrack, onSelect, onAutoApply }: JobCardProps) {
   return (
     <article 
       className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 hover:shadow-md transition-shadow relative flex flex-col justify-between"
@@ -79,18 +80,14 @@ export function JobCard({ job, onTrack, onSelect }: JobCardProps) {
           )}
 
           <button
-            disabled={true}
-            style={{
-              cursor: "not-allowed",
-              background: "rgba(182, 95, 42, 0.05)",
-              border: "1px dashed rgba(182, 95, 42, 0.25)",
-              color: "#766858",
-              fontSize: "0.8rem",
+            onClick={(e) => {
+              e.stopPropagation();
+              onAutoApply?.(job);
             }}
-            className="inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-full font-medium ml-2 gap-1.5 opacity-80"
-            title="AI Auto Apply is coming soon in Version 2.0!"
+            className="inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-full text-sm font-medium border border-orange-500/30 bg-orange-500/10 text-orange-600 hover:bg-orange-500/20 transition-colors ml-2 gap-1.5"
+            title="Start AI Auto Apply"
           >
-            <Zap className="w-3.5 h-3.5 text-muted-foreground fill-current" /> Auto Apply (Soon)
+            <Zap className="w-3.5 h-3.5 fill-current" /> Auto Apply
           </button>
         </div>
 
