@@ -29,9 +29,10 @@ interface Application {
 type JobsBoardProps = {
   jobs: Job[];
   defaultTab?: "explore" | "tracker" | "queue";
+  fetchedAt?: string;
 };
 
-export function JobsBoard({ jobs: initialJobs, defaultTab = "explore" }: JobsBoardProps) {
+export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt }: JobsBoardProps) {
   // Main reactive database state
   const [allJobs, setAllJobs] = useState<Job[]>(initialJobs);
 
@@ -234,6 +235,11 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore" }: JobsBoa
     return result;
   }, [allJobs, query, entryLevelOnly]);
 
+  // Dynamic sources count based on filtered jobs
+  const filteredSourcesCount = useMemo(() => {
+    return new Set(filteredJobs.map((job) => job.source)).size;
+  }, [filteredJobs]);
+
   // 2. Process tracked jobs list for the Application Tracker
   const trackedJobs = useMemo(() => {
     let result = allJobs.filter((job) => job.status && job.status !== "Not Applied");
@@ -384,6 +390,33 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore" }: JobsBoa
       {/* ==================== EXPLORE BOARD TAB ==================== */}
       {activeTab === "explore" && (
         <section className="flex flex-col gap-6">
+          {/* Reactive Header */}
+          <header className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <p className="text-primary font-semibold text-sm uppercase tracking-wider">Live job listings</p>
+              <h1 className="text-3xl font-bold mt-1 tracking-tight">Job board</h1>
+              {fetchedAt && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Updated {new Date(fetchedAt).toLocaleString("en-US")}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-6" aria-label="Job board metrics">
+              <span className="flex flex-col">
+                <span className="flex items-baseline gap-1.5">
+                  <strong className="text-3xl font-bold">{filteredJobs.length}</strong>
+                  <span className="text-xs text-muted-foreground font-medium">/ {allJobs.filter(j => j.source !== "manual").length} total</span>
+                </span>
+                <span className="text-sm text-muted-foreground uppercase font-medium tracking-wider">jobs</span>
+              </span>
+              <span className="flex flex-col">
+                <strong className="text-3xl font-bold">{filteredSourcesCount}</strong>
+                <span className="text-sm text-muted-foreground uppercase font-medium tracking-wider">sources</span>
+              </span>
+            </div>
+          </header>
+
           <div className="bg-card text-card-foreground border rounded-xl shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <p className="text-primary font-semibold text-sm uppercase tracking-wider">All listings</p>
