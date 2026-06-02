@@ -134,7 +134,7 @@ export function TelegramDashboard() {
       setIsAuthenticated(true);
       setPasscodeInput("");
       loadAllData();
-    } catch (err) {
+    } catch {
       setAuthError(`Network error. Failed to connect to server at ${API_BASE}.`);
     } finally {
       setLoading(false);
@@ -315,6 +315,7 @@ export function TelegramDashboard() {
 
   useEffect(() => {
     loadAllData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Poll stats and raw message log every 5 seconds to show live updates
@@ -335,6 +336,7 @@ export function TelegramDashboard() {
       }, 5000);
       return () => clearInterval(interval);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   // Joined channels that are not already monitored
@@ -529,7 +531,7 @@ export function TelegramDashboard() {
               <MessageSquare className="w-8 h-8 text-muted-foreground mb-2" />
               <p className="text-sm font-medium">No channels configured</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-[300px]">
-                Click "Load Joined Channels" and select a group/channel to begin real-time message ingestion.
+                Click &quot;Load Joined Channels&quot; and select a group/channel to begin real-time message ingestion.
               </p>
             </div>
           ) : (

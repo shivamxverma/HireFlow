@@ -24,6 +24,9 @@ User Profile Info:
 Role: Software Engineer
 Location: ${profile.location}
 Experience: 5 years
+${resumeText ? `Resume Context:
+${resumeText}
+` : ""}
 
 Question: "${question}"
 

@@ -1,6 +1,6 @@
 import { Page } from "playwright";
-import { MappedField } from "./mapping";
-import { generateAiAnswer, UserProfileData } from "./ai-answer"; // Adjust imports
+import { MappedField, UserProfileData } from "./mapping";
+import { generateAiAnswer } from "./ai-answer"; // Adjust imports
 import fs from "fs";
 
 export async function fillFormFields(

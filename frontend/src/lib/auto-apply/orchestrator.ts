@@ -31,7 +31,7 @@ export async function runAutoApplyOrchestrator(
                  await btn.click({ timeout: 5000, force: true });
                  clickedContinue = true;
                  break;
-             } catch (e) {
+             } catch {
                  console.warn("Click failed, trying another button...");
              }
          }

@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     };
 
     const profileData = userProfile ? {
-      fullName: userProfile.user?.name || mockProfile.fullName,
+      fullName: userProfile.user?.displayName || mockProfile.fullName,
       email: userProfile.user?.email || mockProfile.email,
       phone: userProfile.phone || mockProfile.phone,
       location: userProfile.location || mockProfile.location,

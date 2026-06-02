@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ProfileCompletion } from "@/components/profile/ProfileCompletion";
 import { PersonalInfo } from "@/components/profile/PersonalInfo";
 import { ProfessionalInfo } from "@/components/profile/ProfessionalInfo";

@@ -72,7 +72,7 @@ const autoApplyWorker = new Worker(
           await page.goto(job.data.url);
           // Small delay to let the real job page load
           await page.waitForTimeout(3000);
-        } catch (e) {
+        } catch {
           throw new Error("Timeout waiting for manual login. The browser was closed. Please try again.");
         }
       }
@@ -123,14 +123,15 @@ const autoApplyWorker = new Worker(
 
       console.log(`Job ${job.id} completed successfully.`);
       return { success: true, screenshot: `screenshots/job-${job.id}.png` };
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Job ${job.id} failed:`, error);
       
+      const errorMessage = error instanceof Error ? error.message : String(error);
       // Update Prisma Status to FAILED
       if (job.data.applicationId) {
         await prisma.application.update({
           where: { id: job.data.applicationId },
-          data: { status: "FAILED", errorMessage: error.message }
+          data: { status: "FAILED", errorMessage }
         });
       }
 
