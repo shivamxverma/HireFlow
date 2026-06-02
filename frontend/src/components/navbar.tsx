@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, ListChecks, Target, Mail, Linkedin, Megaphone, LogOut } from "lucide-react";
+import { Compass, ListChecks, Target, Mail, Linkedin, Megaphone, LogOut, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Navbar() {
@@ -59,11 +59,13 @@ export function Navbar() {
 
   const navLinks = [
     { name: "Explore", href: "/", icon: Compass },
+    { name: "Telegram", href: "/telegram", icon: MessageSquare },
     { name: "Auto-Apply Queue", href: "/queue", icon: ListChecks },
     { name: "Tracker", href: "/tracker", icon: Target },
     { name: "Outreach", href: "/outreach", icon: Megaphone },
     { name: "Gmail", href: "/gmail", icon: Mail },
     { name: "LinkedIn", href: "/linkedin", icon: Linkedin },
+    { name: "Profile", href: "/settings/profile", icon: User },
   ];
 
   // Helper to extract initials
@@ -109,15 +111,17 @@ export function Navbar() {
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           ) : session.authenticated && session.user ? (
             <div className="flex items-center gap-3">
-              <div 
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-sm"
-                title={`${session.user.name} (${session.user.email})`}
-              >
-                {getInitials(session.user.name)}
-              </div>
-              <span className="text-sm font-semibold hidden sm:inline-block">
-                {session.user.name.split(" ")[0]}
-              </span>
+              <Link href="/settings/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div 
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-sm"
+                  title={`${session.user.name} (${session.user.email})`}
+                >
+                  {getInitials(session.user.name)}
+                </div>
+                <span className="text-sm font-semibold hidden sm:inline-block">
+                  {session.user.name.split(" ")[0]}
+                </span>
+              </Link>
               <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
                 <LogOut className="w-4 h-4" />
                 Sign Out

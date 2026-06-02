@@ -27,6 +27,11 @@ model Job {
   notes      String?
   appliedAt  DateTime? @map("applied_at")
 
+  // Telegram Ingestion Tracking
+  fingerprint String?
+  telegramMessageId String? @map("telegram_message_id")
+  telegramChannelId String? @map("telegram_channel_id")
+
   // Relations for Auto Apply System
   applications Application[]
   resumes      ResumeVersion[]
@@ -35,6 +40,7 @@ model Job {
   @@index([source])
   @@index([company])
   @@index([status])
+  @@index([fingerprint])
 }
 
 model Application {
@@ -270,5 +276,32 @@ model AuthMethod {
   @@unique([userId])
   @@map("auth_method")
 }
+
+model TelegramMessage {
+  id           String   @id @default(cuid())
+  channelId    String   @map("channel_id")
+  channelName  String   @map("channel_name")
+  messageId    Int      @map("message_id")
+  messageText  String   @map("message_text")
+  postedAt     DateTime @map("posted_at")
+  processed    Boolean  @default(false)
+  status       String   @default("UNPROCESSED") // UNPROCESSED, PROCESSED, REJECTED, SKIPPED_DUPLICATE
+  errorMessage String?  @map("error_message")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([channelId, messageId])
+  @@map("telegram_messages")
+}
+
+model TelegramChannel {
+  id        String   @id @default(cuid())
+  channelId String   @unique @map("channel_id")
+  title     String
+  username  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("telegram_channels")
+}
+
 
 

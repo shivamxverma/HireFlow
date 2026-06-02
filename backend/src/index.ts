@@ -9,11 +9,14 @@ import { startCleanupScheduler, triggerCleanupJob } from "./scheduler/cleanup.sc
 import { resumeWorker } from "./queues/resume.worker.js";
 import { applyWorker } from "./queues/apply.worker.js";
 import { outreachWorker } from "./queues/outreach.worker.js";
+import { telegramExtractionWorker } from "./queues/telegram-extraction.worker.js";
 import { outreachRouter } from "./routes/outreach.routes.js";
 import { outreachFlowRouter } from "./routes/outreach-flow.routes.js";
 import { linkedinOutreachRouter } from "./routes/linkedin-outreach.routes.js";
+import { telegramRouter } from "./routes/telegram.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import { requireAuth } from "./routes/auth.middleware.js";
+import { TelegramService } from "./services/telegram.service.js";
 
 
 const app = express();
@@ -50,6 +53,7 @@ app.use("/api/v1/auth", authRouter);
 app.use(outreachRouter);
 app.use(outreachFlowRouter);
 app.use(linkedinOutreachRouter);
+app.use(telegramRouter);
 
 
 
@@ -142,7 +146,11 @@ async function bootstrap() {
       console.log(`[Express Health Server] Resume Worker active: ${resumeWorker.name}`);
       console.log(`[Express Health Server] Apply Worker active: ${applyWorker.name}`);
       console.log(`[Express Health Server] Outreach Worker active: ${outreachWorker.name}`);
+      console.log(`[Express Health Server] Telegram Extraction Worker active: ${telegramExtractionWorker.name}`);
     });
+
+    // Start Telegram real-time listener
+    await TelegramService.startListener();
 
     // Start fetching scheduler (Runs immediately on boot, then every 3 hours)
     // We pass `false` here as default so that it doesn't run crawlers instantly on local startup
