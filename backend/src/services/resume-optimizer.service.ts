@@ -127,7 +127,7 @@ ${jobDescription}`;
     try {
       const response = await this.openai.chat.completions.create({
         model: this.isGemini
-          ? "gemini-2.5-flash"
+          ? "gemini-2.5-flash-lite"
           : this.isAzure
           ? (process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini")
           : "gpt-4o-mini", // Dynamic routing for Gemini, Azure OpenAI, or standard OpenAI

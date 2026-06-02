@@ -8,24 +8,24 @@ generator client {
 }
 
 model Job {
-  id         String    @id @default(cuid())
-  source     String    // e.g. "wellfound", "yc", "linkedin"
-  externalId String    @map("external_id")
-  title      String
-  company    String
-  location   String
-  salary     String?
-  applyUrl   String?   @map("apply_url")
+  id          String   @id @default(cuid())
+  source      String // e.g. "wellfound", "yc", "linkedin"
+  externalId  String   @map("external_id")
+  title       String
+  company     String
+  location    String
+  salary      String?
+  applyUrl    String?  @map("apply_url")
   description String?
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  lastSeenAt DateTime  @default(now()) @map("last_seen_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  lastSeenAt  DateTime @default(now()) @map("last_seen_at")
 
   // Tracking fields
-  status     String?
-  platform   String?
-  notes      String?
-  appliedAt  DateTime? @map("applied_at")
+  status    String?
+  platform  String?
+  notes     String?
+  appliedAt DateTime? @map("applied_at")
 
   // Relations for Auto Apply System
   applications Application[]
@@ -38,19 +38,19 @@ model Job {
 }
 
 model Application {
-  id               String         @id @default(cuid())
-  jobId            String         @map("job_id")
-  userId           String         @map("user_id") @default("default-user")
-  status           String         // QUEUED, GENERATING_RESUME, READY_TO_APPLY, APPLYING, APPLIED, FAILED
-  createdAt        DateTime       @default(now()) @map("created_at")
-  updatedAt        DateTime       @updatedAt @map("updated_at")
-  appliedAt        DateTime?      @map("applied_at")
-  errorMessage     String?        @map("error_message")
-  resumeVersionId  String?        @map("resume_version_id")
+  id              String    @id @default(cuid())
+  jobId           String    @map("job_id")
+  userId          String    @default("default-user") @map("user_id")
+  status          String // QUEUED, GENERATING_RESUME, READY_TO_APPLY, APPLYING, APPLIED, FAILED
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  appliedAt       DateTime? @map("applied_at")
+  errorMessage    String?   @map("error_message")
+  resumeVersionId String?   @map("resume_version_id")
 
-  job              Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  resumeVersion    ResumeVersion? @relation("AppToResume", fields: [resumeVersionId], references: [id])
-  resumeVersions   ResumeVersion[] @relation("JobAppResumes")
+  job            Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  resumeVersion  ResumeVersion?  @relation("AppToResume", fields: [resumeVersionId], references: [id])
+  resumeVersions ResumeVersion[] @relation("JobAppResumes")
 
   @@index([jobId])
   @@index([userId])
@@ -58,16 +58,16 @@ model Application {
 }
 
 model ResumeVersion {
-  id            String       @id @default(cuid())
-  applicationId String       @map("application_id")
-  jobId         String       @map("job_id")
-  pdfPath       String       @map("pdf_path")
-  latexPath     String       @map("latex_path")
-  generatedAt   DateTime     @default(now()) @map("generated_at")
+  id            String   @id @default(cuid())
+  applicationId String   @map("application_id")
+  jobId         String   @map("job_id")
+  pdfPath       String   @map("pdf_path")
+  latexPath     String   @map("latex_path")
+  generatedAt   DateTime @default(now()) @map("generated_at")
 
-  job           Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  application   Application  @relation("JobAppResumes", fields: [applicationId], references: [id], onDelete: Cascade)
-  applications  Application[] @relation("AppToResume")
+  job          Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application  Application   @relation("JobAppResumes", fields: [applicationId], references: [id], onDelete: Cascade)
+  applications Application[] @relation("AppToResume")
 
   @@index([applicationId])
   @@index([jobId])
@@ -84,20 +84,20 @@ model Lead {
   updatedAt      DateTime  @updatedAt @map("updated_at")
   messages       Message[]
 
-  @@map("leads")
   @@index([userId])
+  @@map("leads")
 }
 
 model Message {
   id        String    @id @default(cuid())
   leadId    String    @map("lead_id")
-  type      String    // INITIAL, FOLLOWUP_1, FOLLOWUP_2, FOLLOWUP_3
+  type      String // INITIAL, FOLLOWUP_1, FOLLOWUP_2, FOLLOWUP_3
   subject   String
   body      String
   sentAt    DateTime? @map("sent_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
-  lead      Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
@@ -115,20 +115,26 @@ enum AuthProvider {
 }
 
 model User {
-  id               String       @id @default(cuid())
-  email            String?      @unique
-  displayName      String?      @map("display_name")
-  avatarUrl        String?      @map("avatar_url")
-  username         String       @unique
-  role             Role         @default(USER)
-  is2FaAuthEnabled Boolean      @default(false) @map("is2fa_auth_enabled")
-  isBanned         Boolean      @default(false) @map("is_banned")
-  isEmailVerified  Boolean      @default(false) @map("is_email_verified")
-  verificationToken String?     @map("verification_token")
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
+  id                String   @id @default(cuid())
+  email             String?  @unique
+  displayName       String?  @map("display_name")
+  avatarUrl         String?  @map("avatar_url")
+  username          String   @unique
+  role              Role     @default(USER)
+  is2FaAuthEnabled  Boolean  @default(false) @map("is2fa_auth_enabled")
+  isBanned          Boolean  @default(false) @map("is_banned")
+  isEmailVerified   Boolean  @default(false) @map("is_email_verified")
+  verificationToken String?  @map("verification_token")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-  authMethods      AuthMethod[]
+  authMethods   AuthMethod[]
+  profile       UserProfile?
+  experiences   UserExperience[]
+  educations    UserEducation[]
+  skills        UserSkill[]
+  preferences   UserPreference?
+  customAnswers UserCustomAnswer[]
 
   @@map("user")
 }
@@ -146,7 +152,7 @@ model AuthMethod {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([googleEmail])
   @@unique([googleSub])
@@ -156,4 +162,88 @@ model AuthMethod {
   @@map("auth_method")
 }
 
+model UserProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique @map("user_id")
+  fullName        String?  @map("full_name")
+  email           String?
+  phone           String?
+  location        String?
+  linkedinUrl     String?  @map("linkedin_url")
+  githubUrl       String?  @map("github_url")
+  portfolioUrl    String?  @map("portfolio_url")
+  currentRole     String?  @map("current_role")
+  currentCompany  String?  @map("current_company")
+  experienceYears Int?     @map("experience_years")
+  currentSalary   String?  @map("current_salary")
+  expectedSalary  String?  @map("expected_salary")
+  noticePeriod    String?  @map("notice_period")
+  resumeUrl       String?  @map("resume_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserExperience {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  company     String
+  role        String
+  description String?
+  startDate   DateTime  @map("start_date")
+  endDate     DateTime? @map("end_date")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_experience")
+}
+
+model UserEducation {
+  id        String @id @default(cuid())
+  userId    String @map("user_id")
+  degree    String
+  college   String
+  startYear Int    @map("start_year")
+  endYear   Int?   @map("end_year")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_education")
+}
+
+model UserSkill {
+  id        String @id @default(cuid())
+  userId    String @map("user_id")
+  skillName String @map("skill_name")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_skills")
+}
+
+model UserPreference {
+  id                  String  @id @default(cuid())
+  userId              String  @unique @map("user_id")
+  authorizedToWork    Boolean @default(false) @map("authorized_to_work")
+  needVisaSponsorship Boolean @default(false) @map("need_visa_sponsorship")
+  openToRelocation    Boolean @default(false) @map("open_to_relocation")
+  openToRemoteRoles   Boolean @default(false) @map("open_to_remote_roles")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model UserCustomAnswer {
+  id       String @id @default(cuid())
+  userId   String @map("user_id")
+  question String
+  answer   String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_custom_answers")
+}

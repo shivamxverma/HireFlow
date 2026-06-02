@@ -16,7 +16,9 @@
     "save-session": "tsx src/connectors/wellfound/save-session.ts",
     "save-session:linkedin": "tsx src/connectors/linkedin/save-session.ts",
     "import-cookies:linkedin": "tsx src/connectors/linkedin/import-cookies.ts",
-    "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts"
+    "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts",
+    "telegram:login": "tsx src/scripts/telegram-login.ts",
+    "test:telegram": "tsx src/scripts/test-telegram-extraction.ts"
   },
   "keywords": [],
   "author": "",
@@ -38,7 +40,8 @@
     "pdf-parse": "^2.4.5",
     "playwright": "^1.60.0",
     "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "telegram": "^2.26.22"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",

@@ -44,4 +44,17 @@ export const outreachQueue = new Queue("outreach-generation", {
   connection: redisConnectionOptions,
 });
 
+// Queue 4: Extracts job postings from raw Telegram messages
+export const telegramExtractionQueue = new Queue("telegram-extraction", {
+  connection: redisConnectionOptions,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: "exponential",
+      delay: 10000, // Wait 10s on first fail, then 20s, 40s
+    },
+  },
+});
+
 console.log("[Queue Setup] BullMQ Queues initialized successfully.");
+

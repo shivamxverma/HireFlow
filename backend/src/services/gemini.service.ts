@@ -8,6 +8,18 @@ export interface GeneratedEmail {
   body: string;
 }
 
+export interface ExtractedJob {
+  company: string;
+  role: string;
+  location: string;
+  salary: string;
+  experience: string;
+  skills: string[];
+  job_type: string;
+  apply_url: string;
+  job_description: string;
+}
+
 export class GeminiService {
   private openai: OpenAI | null = null;
   private resumeFetcher: ResumeFetcherService;
@@ -40,7 +52,34 @@ export class GeminiService {
     if (!this.openai) {
       throw new Error("Gemini API Client is not initialized. Please configure GEMINI_API_KEY in .env.");
     }
-    return await promptTask();
+
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
+      try {
+        return await promptTask();
+      } catch (error: any) {
+        attempts++;
+        const isRateLimit = 
+          error.status === 429 || 
+          error.statusCode === 429 || 
+          error.name === "RateLimitError" || 
+          String(error).includes("429") ||
+          (error.message && String(error.message).includes("429"));
+
+        if (isRateLimit && attempts < maxAttempts) {
+          console.warn(`[Gemini Service] Rate limit (429) encountered. Sleeping 30 seconds before retry (Attempt ${attempts}/${maxAttempts})...`);
+          await new Promise((resolve) => setTimeout(resolve, 30000));
+          continue;
+        }
+
+        // Re-throw if it's not a rate limit error or we ran out of attempts
+        throw error;
+      }
+    }
+
+    throw new Error("Gemini API call failed after max rate-limit retries.");
   }
 
   /**
@@ -96,7 +135,7 @@ Candidate Resume Text:
 ${resumeData.text}`;
 
     const skillsResponse = await this.openai.chat.completions.create({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       messages: [{ role: "user", content: skillsPrompt }],
       temperature: 0.1,
     });
@@ -114,7 +153,7 @@ Candidate Resume Text:
 ${resumeData.text}`;
 
     const projectsResponse = await this.openai.chat.completions.create({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       messages: [{ role: "user", content: projectsPrompt }],
       temperature: 0.1,
     });
@@ -172,7 +211,7 @@ ${jobDescription}`;
 
     const rawResponse = await this.safeCall(async () => {
       const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -234,7 +273,7 @@ ${previousFollowUps.length > 0 ? previousFollowUps.map((e, i) => `[Follow-up ${i
 
     const rawResponse = await this.safeCall(async () => {
       const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -277,7 +316,7 @@ STRICT RULES:
       throw new Error("Gemini API Key is not set. Please configure GEMINI_API_KEY in your environment.");
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${this.geminiApiKey}`;
 
     const body = {
       contents: [
@@ -356,7 +395,7 @@ STRICT RULES:
       throw new Error("Gemini API Key is not set. Please configure GEMINI_API_KEY in your environment.");
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${this.geminiApiKey}`;
 
     const body = {
       contents: [
@@ -456,7 +495,7 @@ Job Description: ${job.description || "None"}` : "No specific job posting attach
 
     const rawResponse = await this.safeCall(async () => {
       const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -468,5 +507,49 @@ Job Description: ${job.description || "None"}` : "No specific job posting attach
     });
 
     return this.parseJsonResponse<GeneratedEmail>(rawResponse);
+  }
+
+  /**
+   * Extracts structured job information from raw message text using Gemini 2.5 Flash
+   */
+  async extractJobFromText(text: string): Promise<ExtractedJob> {
+    if (!this.openai) {
+      throw new Error("Gemini API Client is not initialized.");
+    }
+
+    const systemPrompt = `You are an expert AI recruiting assistant.
+Analyze the provided Telegram message and extract job details.
+You MUST output a valid JSON object with the exact fields below.
+If a field is not found in the text, use an empty string "" (or empty array [] for skills). Do NOT invent information.
+If the message is not a job posting at all, return an empty object or set company, role, and apply_url to empty strings.
+
+Required Output Format:
+{
+  "company": "Company Name",
+  "role": "Job Title / Role",
+  "location": "Location (e.g. Remote, Bangalore, etc.)",
+  "salary": "Salary compensation detail (if mentioned)",
+  "experience": "Experience requirements",
+  "skills": ["skill1", "skill2"],
+  "job_type": "Full-time, Part-time, Internship, Contract, etc.",
+  "apply_url": "URL or email to apply",
+  "job_description": "A clean summary of the job description and requirements"
+}
+Do NOT include any markdown tags (like \`\`\`json) outside of the JSON object itself. Return valid JSON only.`;
+
+    const rawResponse = await this.safeCall(async () => {
+      const response = await this.openai!.chat.completions.create({
+        model: "gemini-2.5-flash-lite",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Telegram Message:\n${text}` },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.1,
+      });
+      return response.choices[0]?.message?.content || "";
+    });
+
+    return this.parseJsonResponse<ExtractedJob>(rawResponse);
   }
 }
