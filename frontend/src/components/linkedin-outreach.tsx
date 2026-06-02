@@ -1,6 +1,5 @@
 "use client";
 
-import { Linkedin, Send } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
 interface OutboundMessage {

@@ -1,5 +1,6 @@
 import { chromium } from "playwright";
 import dotenv from "dotenv";
+import fs from "fs";
 dotenv.config({ path: ".env.local" });
 
 async function debug() {
@@ -19,7 +20,6 @@ async function debug() {
   console.log("Screenshot saved to debug-easy-apply.png");
   
   const html = await page.content();
-  const fs = require('fs');
   fs.writeFileSync('debug-easy-apply.html', html);
   console.log("HTML saved to debug-easy-apply.html");
   

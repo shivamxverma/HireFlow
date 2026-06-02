@@ -4,11 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 
 import { JobCard, getStatusStyle } from "@/components/job-card";
 import type { Job } from "@/types/job";
-import { GmailOutreach } from "@/components/gmail-outreach";
-import { LinkedinOutreach } from "@/components/linkedin-outreach";
-import { Button } from "@/components/ui/button";
-import { Plus, ExternalLink, ChevronDown, Pencil, Wand2, Sparkles } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Plus, ExternalLink, ChevronDown, Pencil, Wand2 } from "lucide-react";
 
 interface ResumeVersion {
   id: string;
@@ -37,7 +33,7 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
   const [allJobs, setAllJobs] = useState<Job[]>(initialJobs);
 
   // Layout Tab State
-  const [activeTab, setActiveTab] = useState<"explore" | "tracker" | "queue">(defaultTab);
+  const [activeTab] = useState<"explore" | "tracker" | "queue">(defaultTab);
 
   // Search & Filter state for Explore
   const [query, setQuery] = useState("");
@@ -72,7 +68,7 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
 
   // Auto Apply & Job Details Drawer States
   const [selectedJobDetails, setSelectedJobDetails] = useState<Job | null>(null);
-  const [activeApplication, setActiveApplication] = useState<Application | null>(null);
+
   const [pollingStatus, setPollingStatus] = useState<"IDLE" | "POLLING" | "SUCCESS" | "FAILED">("IDLE");
   const [pollingIntervalId, setPollingIntervalId] = useState<NodeJS.Timeout | null>(null);
 
@@ -131,7 +127,6 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
     if (pollingStatus === "POLLING") return;
 
     setPollingStatus("POLLING");
-    setActiveApplication(null);
 
     try {
       const response = await fetch("/api/v1/applications", {
@@ -143,7 +138,6 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
       const resJson = await response.json();
       if (resJson.success) {
         const app = resJson.data.application;
-        setActiveApplication(app);
         fetchApplications(); // refresh the queue table instantly!
 
         if (pollingIntervalId) {
@@ -156,7 +150,6 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
             const pollJson = await pollRes.json();
             if (pollJson.success) {
               const currentApp = pollJson.data.application;
-              setActiveApplication(currentApp);
 
               if (currentApp.status === "APPLIED") {
                 setPollingStatus("SUCCESS");
@@ -465,7 +458,6 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                   onTrack={handleOpenTrackModal}
                   onSelect={(j) => {
                     setSelectedJobDetails(j);
-                    setActiveApplication(null);
                     setPollingStatus("IDLE");
                     if (pollingIntervalId) {
                       clearInterval(pollingIntervalId);
@@ -737,7 +729,7 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                 {applications.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="p-8 text-center text-muted-foreground">
-                      No background applications queued yet. Go to the Explore tab and click "Auto Apply Now"!
+                      No background applications queued yet. Go to the Explore tab and click &quot;Auto Apply Now&quot;!
                     </td>
                   </tr>
                 ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Rocket, RefreshCw, Lock, BarChart, Users, FileText, Briefcase, PenTool, Sparkles, Send, CheckCircle2, Copy } from "lucide-react";
+import { Plus, Rocket, Lock, BarChart, Users, FileText, Briefcase, Sparkles, Send } from "lucide-react";
 
 interface MessageDraft {
   id: string;
