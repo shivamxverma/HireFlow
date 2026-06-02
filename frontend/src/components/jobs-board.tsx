@@ -2,9 +2,9 @@
 
 import { useMemo, useState, useEffect } from "react";
 
-import { JobCard, getStatusStyle } from "@/components/job-card";
+import { JobCard, getStatusStyle, formatPostedDate } from "@/components/job-card";
 import type { Job } from "@/types/job";
-import { Plus, ExternalLink, ChevronDown, Pencil, Wand2 } from "lucide-react";
+import { Plus, ExternalLink, ChevronDown, Pencil, Wand2, Search, Inbox, Briefcase, Zap, Target, Loader2, X } from "lucide-react";
 
 interface ResumeVersion {
   id: string;
@@ -382,72 +382,84 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
     <div className="w-full flex flex-col gap-6">
       {/* ==================== EXPLORE BOARD TAB ==================== */}
       {activeTab === "explore" && (
-        <section className="flex flex-col gap-6">
-          {/* Reactive Header */}
-          <header className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <section className="flex flex-col gap-8">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-border">
             <div>
-              <p className="text-primary font-semibold text-sm uppercase tracking-wider">Live job listings</p>
-              <h1 className="text-3xl font-bold mt-1 tracking-tight">Job board</h1>
+              <p className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Live Listings</p>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground mt-1">Jobs Dashboard</h1>
               {fetchedAt && (
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-xs text-muted-foreground mt-1">
                   Updated {new Date(fetchedAt).toLocaleString("en-US")}
                 </p>
               )}
             </div>
 
-            <div className="flex items-center gap-6" aria-label="Job board metrics">
-              <span className="flex flex-col">
-                <span className="flex items-baseline gap-1.5">
-                  <strong className="text-3xl font-bold">{filteredJobs.length}</strong>
-                  <span className="text-xs text-muted-foreground font-medium">/ {allJobs.filter(j => j.source !== "manual").length} total</span>
+            <div className="flex items-center gap-8" aria-label="Job board metrics">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase mb-0.5">Total Jobs</span>
+                <span className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold tracking-tight tabular-nums text-foreground">{filteredJobs.length}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">/ {allJobs.filter(j => j.source !== "manual").length}</span>
                 </span>
-                <span className="text-sm text-muted-foreground uppercase font-medium tracking-wider">jobs</span>
-              </span>
-              <span className="flex flex-col">
-                <strong className="text-3xl font-bold">{filteredSourcesCount}</strong>
-                <span className="text-sm text-muted-foreground uppercase font-medium tracking-wider">sources</span>
-              </span>
-            </div>
-          </header>
-
-          <div className="bg-card text-card-foreground border rounded-xl shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <p className="text-primary font-semibold text-sm uppercase tracking-wider">All listings</p>
-              <h2 className="text-2xl font-bold mt-1">Fresh scraped roles</h2>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer" htmlFor="entry-level-toggle">
-                  <input
-                    id="entry-level-toggle"
-                    type="checkbox"
-                    checked={entryLevelOnly}
-                    onChange={(e) => setEntryLevelOnly(e.target.checked)}
-                  />
-                  <span>Entry Level (0-1 yrs exp)</span>
-                </label>
-
-                <label className="jobs-search" htmlFor="job-search">
-                  <span>Search jobs</span>
-                  <input
-                    id="job-search"
-                    name="job-search"
-                    type="search"
-                    placeholder="Title, company, location, source"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                  />
-                </label>
               </div>
-              <p className="jobs-section__summary">{filteredJobs.length} matching roles</p>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase mb-0.5">Sources</span>
+                <span className="text-2xl font-bold tracking-tight tabular-nums text-foreground">{filteredSourcesCount}</span>
+              </div>
             </div>
           </div>
 
+          {/* Search & Filter Toolbar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-sm font-semibold tracking-tight text-foreground">Scraped Postings</h2>
+              <p className="text-xs text-muted-foreground">{filteredJobs.length} matching roles found</p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <label 
+                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer select-none bg-secondary/30 hover:bg-secondary/60 px-3 h-9 rounded-md border border-border transition-colors" 
+                htmlFor="entry-level-toggle"
+              >
+                <input
+                  id="entry-level-toggle"
+                  type="checkbox"
+                  checked={entryLevelOnly}
+                  onChange={(e) => setEntryLevelOnly(e.target.checked)}
+                  className="rounded-sm border-border bg-background text-foreground focus:ring-ring focus:ring-offset-background"
+                />
+                <span>Entry Level Only</span>
+              </label>
+
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 text-muted-foreground/60 w-3.5 h-3.5" aria-hidden="true" />
+                <label htmlFor="job-search" className="sr-only">Search jobs</label>
+                <input
+                  id="job-search"
+                  name="job-search"
+                  type="search"
+                  placeholder="Search by title, company, or source… e.g. engineer"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  className="pl-9 pr-4 h-9 w-full sm:w-[280px] rounded-md border border-border bg-background text-xs placeholder-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Cards Grid or Empty State */}
           {filteredJobs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center border-2 border-dashed rounded-xl bg-card text-muted-foreground my-8">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">No matching jobs</h3>
-              <p>Try a different keyword or clear the search to see every role in the database.</p>
+            <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed rounded-lg bg-card text-muted-foreground my-4">
+              <Inbox className="w-8 h-8 text-muted-foreground/30 mb-3" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-foreground mb-1">No matching jobs</h3>
+              <p className="text-xs text-muted-foreground max-w-[280px] mb-4">Try a different keyword or clear the search filters to see all available roles.</p>
+              <button 
+                onClick={() => { setQuery(""); setEntryLevelOnly(false); }} 
+                className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-semibold border border-border bg-background text-foreground hover:bg-secondary transition-colors cursor-pointer"
+              >
+                Clear Filters
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -474,61 +486,72 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
 
       {/* ==================== APPLICATION TRACKER TAB ==================== */}
       {activeTab === "tracker" && (
-        <section className="flex flex-col gap-6">
+        <section className="flex flex-col gap-8">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-border">
+            <div>
+              <p className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Pipeline Tracker</p>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground mt-1">Application Tracker</h1>
+              <p className="text-xs text-muted-foreground mt-1">
+                Manage your job application statuses, interviews, offers, and notes.
+              </p>
+            </div>
+          </div>
+
           {/* Metrics Dashboard */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 relative overflow-hidden">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Applications</span>
-                <span className="text-3xl font-bold">{metrics.total}</span>
-              </div>
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-primary/20" />
+            <div className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all hover:border-foreground/10 flex flex-col gap-1">
+              <span className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Applications</span>
+              <span className="text-2xl font-bold tracking-tight tabular-nums text-foreground">{metrics.total}</span>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 relative overflow-hidden">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Interviewing</span>
-                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{metrics.interviewing}</span>
-              </div>
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-primary/20" />
+            <div className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all hover:border-foreground/10 flex flex-col gap-1">
+              <span className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Interviewing</span>
+              <span className="text-2xl font-bold tracking-tight tabular-nums text-blue-600 dark:text-blue-400">{metrics.interviewing}</span>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 relative overflow-hidden">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Offers Received</span>
-                <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{metrics.offers}</span>
-              </div>
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-primary/20" />
+            <div className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all hover:border-foreground/10 flex flex-col gap-1">
+              <span className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Offers Received</span>
+              <span className="text-2xl font-bold tracking-tight tabular-nums text-emerald-600 dark:text-emerald-400">{metrics.offers}</span>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 relative overflow-hidden">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Rejections</span>
-                <span className="text-3xl font-bold text-red-600 dark:text-red-400">{metrics.rejected}</span>
-              </div>
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-primary/20" />
+            <div className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all hover:border-foreground/10 flex flex-col gap-1">
+              <span className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Rejections</span>
+              <span className="text-2xl font-bold tracking-tight tabular-nums text-red-600 dark:text-red-400">{metrics.rejected}</span>
             </div>
           </div>
 
           {/* Tracker Toolbar */}
-          <div className="bg-card text-card-foreground border rounded-xl shadow-sm p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex flex-col">
-              <h2 className="text-xl font-bold">My Applications</h2>
-              <p className="text-sm text-muted-foreground">{trackedJobs.length} active pipelines</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-sm font-semibold tracking-tight text-foreground">Active Pipelines</h2>
+              <p className="text-xs text-muted-foreground">{trackedJobs.length} roles currently tracked</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               {/* Search */}
-              <div className="w-full sm:w-auto">
-                <input type="text" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Filter by company, role..."
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 text-muted-foreground/60 w-3.5 h-3.5" aria-hidden="true" />
+                <label htmlFor="tracker-search" className="sr-only">Search tracked jobs</label>
+                <input 
+                  id="tracker-search"
+                  type="text" 
+                  placeholder="Filter by company or role… e.g. vercel"
                   value={trackerQuery}
                   onChange={(e) => setTrackerQuery(e.target.value)}
+                  className="pl-9 pr-4 h-9 w-full sm:w-[220px] rounded-md border border-border bg-background text-xs placeholder-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring transition-colors"
                 />
               </div>
 
               {/* Status Filter */}
-              <div className="w-full sm:w-auto">
-                <select className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <div className="relative">
+                <label htmlFor="status-filter" className="sr-only">Filter by status</label>
+                <select 
+                  id="status-filter"
+                  value={statusFilter} 
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="h-9 w-full rounded-md border border-border bg-background px-3 text-xs placeholder-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-ring hover:bg-secondary/50 transition-colors cursor-pointer"
+                >
                   <option value="all">All Statuses</option>
                   <option value="Applied">Applied</option>
                   <option value="Followed Up">Followed Up</option>
@@ -539,8 +562,11 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
               </div>
 
               {/* Add Manual Application Button */}
-              <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto whitespace-nowrap" onClick={() => setShowManualModal(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+              <button 
+                className="inline-flex items-center justify-center rounded-md bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90 transition-colors cursor-pointer gap-1.5 whitespace-nowrap"
+                onClick={() => setShowManualModal(true)}
+              >
+                <Plus className="w-3.5 h-3.5" aria-hidden="true" />
                 Track Application
               </button>
             </div>
@@ -548,21 +574,22 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
 
           {/* Applications list */}
           {trackedJobs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center border-2 border-dashed rounded-xl bg-card text-muted-foreground my-8">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">No tracked applications yet</h3>
-              <p>Go to the &quot;Explore Board&quot; to track a scraped job, or click &quot;Track Application&quot; to add a manual entry!</p>
+            <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed rounded-lg bg-card text-muted-foreground my-4">
+              <Inbox className="w-8 h-8 text-muted-foreground/30 mb-3" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-foreground mb-1">No tracked applications</h3>
+              <p className="text-xs text-muted-foreground max-w-[280px] mb-4">Go to the Explore tab to track a scraped job, or create a manual entry.</p>
             </div>
           ) : (
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden overflow-x-auto">
-              <table className="w-full caption-bottom text-sm">
+            <div className="rounded-lg border border-border bg-card overflow-hidden shadow-xs overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Company</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Role</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Platform</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date Applied</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Notes & Details</th>
+                  <tr className="border-b border-border bg-secondary/30 text-muted-foreground font-mono font-semibold uppercase tracking-wider text-[10px]">
+                    <th className="h-10 px-4 align-middle">Company</th>
+                    <th className="h-10 px-4 align-middle">Role</th>
+                    <th className="h-10 px-4 align-middle">Platform</th>
+                    <th className="h-10 px-4 align-middle">Status</th>
+                    <th className="h-10 px-4 align-middle">Date Applied</th>
+                    <th className="h-10 px-4 align-middle">Notes & Details</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -571,36 +598,39 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                     const isDropdownActive = activeInlineDropdownId === job.id;
 
                     return (
-                      <tr key={job.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <td className="p-4 align-middle">
-                          <strong>{job.company}</strong>
-                        </td>
-                        <td className="p-4 align-middle flex items-center gap-2">
-                          <span>{job.title}</span>
-                          {job.applyUrl && (
-                            <a
-                              href={job.applyUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-url-icon"
-                              title="Go to posting"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
-                          )}
+                      <tr key={job.id} className="border-b border-border hover:bg-secondary/40 transition-colors font-medium">
+                        <td className="p-4 align-middle text-foreground font-semibold">
+                          {job.company}
                         </td>
                         <td className="p-4 align-middle">
-                          <span className={`platform-pill ${getPlatformTagClass(job.platform || job.source || "")}`}>
-                            {job.platform || job.source}
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-foreground">{job.title}</span>
+                            {job.applyUrl && (
+                              <a
+                                href={job.applyUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                                title="Go to posting"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4 align-middle">
+                          <span className={`inline-flex items-center rounded-sm border border-border bg-secondary/50 px-2 py-0.5 text-[10px] font-mono font-medium uppercase text-muted-foreground tracking-wider`}>
+                            {job.platform || job.source || "Direct"}
                           </span>
                         </td>
                         <td className="p-4 align-middle">
                           {/* Premium interactive status dropdown */}
-                          <div className="relative">
+                          <div className="relative inline-block">
                             <button
-                              className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold shadow-sm text-[0.68rem] transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                              className="inline-flex items-center px-2 py-0.5 rounded-sm font-semibold border text-[10px] transition-colors focus:outline-hidden hover:opacity-85 cursor-pointer"
                               style={{
                                 background: statusColor.bg,
+                                borderColor: statusColor.border,
                                 color: statusColor.text,
                               }}
                               onClick={() =>
@@ -608,51 +638,28 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                               }
                             >
                               {statusColor.label}
-                              <ChevronDown className="w-3.5 h-3.5 ml-1" />
+                              <ChevronDown className="w-3 h-3 ml-1 text-current opacity-70" />
                             </button>
 
                             {isDropdownActive && (
-                              <div className="absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md top-full mt-1 left-0 flex flex-col p-1 animate-in fade-in-0 zoom-in-95">
-                                <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => {
-                                    handleUpdateStatus(job.id, "Applied", job.platform || job.source, job.notes || "");
-                                    setActiveInlineDropdownId(null);
-                                  }}
-                                >
-                                  Applied
-                                </button>
-                                <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => {
-                                    handleUpdateStatus(job.id, "Followed Up", job.platform || job.source, job.notes || "");
-                                    setActiveInlineDropdownId(null);
-                                  }}
-                                >
-                                  Followed Up
-                                </button>
-                                <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => {
-                                    handleUpdateStatus(job.id, "Interview Scheduled", job.platform || job.source, job.notes || "");
-                                    setActiveInlineDropdownId(null);
-                                  }}
-                                >
-                                  Interview Scheduled
-                                </button>
-                                <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => {
-                                    handleUpdateStatus(job.id, "Offer", job.platform || job.source, job.notes || "");
-                                    setActiveInlineDropdownId(null);
-                                  }}
-                                >
-                                  Offer
-                                </button>
-                                <button className="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => {
-                                    handleUpdateStatus(job.id, "Rejected", job.platform || job.source, job.notes || "");
-                                    setActiveInlineDropdownId(null);
-                                  }}
-                                >
-                                  Rejected
-                                </button>
-                                <div className="dropdown-divider" />
+                              <div className="absolute z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md top-full mt-1 left-0 flex flex-col p-1 animate-in fade-in-0 zoom-in-95">
+                                {["Applied", "Followed Up", "Interview Scheduled", "Offer", "Rejected"].map((st) => (
+                                  <button 
+                                    key={st}
+                                    className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-xs text-left outline-hidden transition-colors hover:bg-secondary hover:text-foreground font-medium" 
+                                    onClick={() => {
+                                      handleUpdateStatus(job.id, st, job.platform || job.source || "Direct", job.notes || "");
+                                      setActiveInlineDropdownId(null);
+                                    }}
+                                  >
+                                    {st}
+                                  </button>
+                                ))}
+                                <div className="h-px bg-border my-1" />
                                 <button
-                                  className="text-muted-delete"
+                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-xs text-left outline-hidden transition-colors hover:bg-destructive/10 text-destructive font-medium"
                                   onClick={() => {
-                                    handleUpdateStatus(job.id, "Not Applied", job.platform || job.source, job.notes || "");
+                                    handleUpdateStatus(job.id, "Not Applied", job.platform || job.source || "Direct", job.notes || "");
                                     setActiveInlineDropdownId(null);
                                   }}
                                 >
@@ -662,27 +669,26 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                             )}
                           </div>
                         </td>
-                        <td className="date-col">
+                        <td className="p-4 align-middle text-muted-foreground font-mono text-[11px] tabular-nums">
                           {job.appliedAt
-                            ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(
-                                new Date(job.appliedAt)
-                              )
-                            : "-"}
+                            ? formatPostedDate(job.appliedAt)
+                            : "—"}
                         </td>
                         <td className="p-4 align-middle">
                           <div className="flex items-center justify-between gap-2 max-w-[200px]">
                             {job.notes ? (
-                              <span className="truncate text-sm text-muted-foreground" title={job.notes}>
+                              <span className="truncate text-xs text-muted-foreground" title={job.notes}>
                                 {job.notes}
                               </span>
                             ) : (
-                              <span className="text-sm text-muted-foreground/50 italic">No notes added</span>
+                              <span className="text-xs text-muted-foreground/40 italic">No notes</span>
                             )}
-                            <button className="shrink-0"
+                            <button 
+                              className="shrink-0 text-muted-foreground/60 hover:text-foreground transition-colors cursor-pointer"
                               onClick={() => handleOpenTrackModal(job)}
                               title="Edit notes/platform"
                             >
-                              <Pencil className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors cursor-pointer" />
+                              <Pencil className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </td>
@@ -698,102 +704,107 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
 
       {/* ==================== AUTO-APPLY LIVE QUEUE TAB ==================== */}
       {activeTab === "queue" && (
-        <section className="flex flex-col gap-6" style={{ minHeight: "70vh", padding: "1rem 0" }}>
-          <header className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+        <section className="flex flex-col gap-8">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-border">
             <div>
-              <span className="text-primary font-semibold text-sm uppercase tracking-wider">Live background agent</span>
-              <h2 className="text-2xl font-bold mt-1 tracking-tight">Auto-Apply Queue</h2>
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">Background Worker</p>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground mt-1">Auto-Apply Queue</h1>
+              <p className="text-xs text-muted-foreground mt-1">
                 Monitor your background worker autonomously filling forms and generating AI resumes.
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[10px] font-semibold font-mono tracking-wider bg-secondary border border-border text-foreground uppercase">
                 ⚡ Active Worker
               </span>
             </div>
-          </header>
+          </div>
 
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden overflow-x-auto">
-            <table className="w-full caption-bottom text-sm">
-              <thead>
-                <tr>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Company</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Role</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Worker Status</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Time Started</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Agent Logs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="p-8 text-center text-muted-foreground">
-                      No background applications queued yet. Go to the Explore tab and click &quot;Auto Apply Now&quot;!
-                    </td>
+          {/* Table or Empty State */}
+          {applications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed rounded-lg bg-card text-muted-foreground my-4">
+              <Inbox className="w-8 h-8 text-muted-foreground/30 mb-3" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-foreground mb-1">Queue is empty</h3>
+              <p className="text-xs text-muted-foreground max-w-[280px]">No background applications are currently queued. Go to the Explore tab and click Auto Apply to initiate a job application.</p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border bg-card overflow-hidden shadow-xs overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-border bg-secondary/30 text-muted-foreground font-mono font-semibold uppercase tracking-wider text-[10px]">
+                    <th className="h-10 px-4 align-middle">Company</th>
+                    <th className="h-10 px-4 align-middle">Role</th>
+                    <th className="h-10 px-4 align-middle">Worker Status</th>
+                    <th className="h-10 px-4 align-middle">Time Started</th>
+                    <th className="h-10 px-4 align-middle">Agent Logs</th>
                   </tr>
-                ) : (
-                  applications.map((app) => (
-                    <tr key={app.id} className="border-b transition-colors hover:bg-muted/50">
-                      <td className="p-4 align-middle">
-                        <strong>{app.job?.company || "Unknown"}</strong>
+                </thead>
+                <tbody>
+                  {applications.map((app) => (
+                    <tr key={app.id} className="border-b border-border hover:bg-secondary/40 transition-colors font-medium">
+                      <td className="p-4 align-middle text-foreground font-semibold">
+                        {app.job?.company || "Unknown"}
                       </td>
-                      <td className="p-4 align-middle">
-                        <span>{app.job?.title || "Unknown"}</span>
+                      <td className="p-4 align-middle text-foreground">
+                        {app.job?.title || "Unknown"}
                       </td>
                       <td className="p-4 align-middle">
                         <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-[0.68rem] font-semibold uppercase tracking-wider ${
+                          className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-semibold border ${
                             app.status === "APPLIED"
-                              ? "bg-green-100 text-green-700 border border-green-200"
+                              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
                               : app.status === "FAILED"
-                              ? "bg-red-100 text-red-700 border border-red-200"
-                              : "bg-blue-100 text-blue-700 border border-blue-200 animate-pulse"
+                              ? "bg-red-500/10 border-red-500/20 text-red-600"
+                              : "bg-blue-500/10 border-blue-500/20 text-blue-600 animate-pulse"
                           }`}
                         >
                           {app.status}
                         </span>
                       </td>
-                      <td className="p-4 align-middle text-muted-foreground">
+                      <td className="p-4 align-middle text-muted-foreground font-mono text-[11px] tabular-nums">
                         {new Date(app.createdAt).toLocaleString()}
                       </td>
                       <td className="p-4 align-middle">
                         {app.status === "FAILED" ? (
-                          <span className="text-red-500 text-xs font-mono max-w-[250px] inline-block truncate" title={app.errorMessage || "Unknown error"}>
+                          <span className="text-red-500 text-[11px] font-mono max-w-[250px] inline-block truncate" title={app.errorMessage || "Unknown error"}>
                             {app.errorMessage || "Failed during Playwright automation"}
                           </span>
                         ) : app.status === "APPLIED" ? (
-                          <span className="text-green-600 text-xs font-mono">
+                          <span className="text-emerald-600 text-[11px] font-mono">
                             Playwright flow completed ✓
                           </span>
                         ) : (
-                          <span className="text-blue-500 text-xs font-mono flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-                            Agent navigating form...
+                          <span className="text-blue-500 text-[11px] font-mono flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                            Agent navigating form…
                           </span>
                         )}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       )}
 
       {/* ==================== SCRAPED JOB TRACK MODAL ==================== */}
       {selectedJobForTrack && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 flex items-center justify-center" onClick={() => setSelectedJobForTrack(null)}>
-          <div className="fixed z-50 grid w-full max-w-lg scale-100 gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg" onClick={(e) => e.stopPropagation()}>
-            <header className="flex flex-col space-y-1.5 text-center sm:text-left mb-4">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 flex items-center justify-center animate-in fade-in duration-200" onClick={() => setSelectedJobForTrack(null)}>
+          <div className="fixed z-50 grid w-full max-w-md scale-100 gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 rounded-lg font-sans" onClick={(e) => e.stopPropagation()}>
+            <header className="flex flex-col space-y-1.5 text-left mb-4 relative">
               <div>
-                <p className="text-sm text-muted-foreground font-semibold uppercase tracking-wider">Track application status</p>
-                <h3 className="text-lg font-semibold leading-none tracking-tight">{selectedJobForTrack.company}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{selectedJobForTrack.title}</p>
+                <p className="text-[10px] font-mono text-muted-foreground font-semibold uppercase tracking-wider">Track application status</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-foreground mt-1">{selectedJobForTrack.company}</h3>
+                <p className="text-xs text-muted-foreground mt-1 font-medium">{selectedJobForTrack.title}</p>
               </div>
-              <button className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" onClick={() => setSelectedJobForTrack(null)}>
-                &times;
+              <button 
+                className="absolute right-0 top-0 rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer" 
+                onClick={() => setSelectedJobForTrack(null)}
+              >
+                <X className="w-4 h-4" />
               </button>
             </header>
 
@@ -804,12 +815,13 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
               }}
               className="flex flex-col gap-4"
             >
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="modal-status">Application Status</label>
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="modal-status" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Application Status</label>
                 <select
                   id="modal-status"
                   value={trackStatus}
                   onChange={(e) => setTrackStatus(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                 >
                   <option value="Applied">Applied</option>
                   <option value="Followed Up">Followed Up</option>
@@ -820,12 +832,13 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                 </select>
               </div>
 
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="modal-platform">Platform / Source</label>
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="modal-platform" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Platform / Source</label>
                 <select
                   id="modal-platform"
                   value={trackPlatform}
                   onChange={(e) => setTrackPlatform(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                 >
                   <option value="LinkedIn">LinkedIn</option>
                   <option value="Wellfound">Wellfound</option>
@@ -837,26 +850,31 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                 </select>
               </div>
 
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="modal-notes">Notes / Outreach log</label>
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="modal-notes" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Notes / Outreach log</label>
                 <textarea
                   id="modal-notes"
                   placeholder="e.g. Referred by John Doe, contacted hiring manager on LinkedIn..."
                   rows={4}
                   value={trackNotes}
                   onChange={(e) => setTrackNotes(e.target.value)}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-2 gap-2 sm:gap-0">
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-4 py-2 transition-colors cursor-pointer"
                   onClick={() => setSelectedJobForTrack(null)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" disabled={isSubmitting}>
+                <button 
+                  type="submit" 
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer" 
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Saving..." : "Save Settings"}
                 </button>
               </div>
@@ -867,22 +885,25 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
 
       {/* ==================== ADD MANUAL APPLICATION MODAL ==================== */}
       {showManualModal && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 flex items-center justify-center" onClick={() => setShowManualModal(false)}>
-          <div className="fixed z-50 grid w-full max-w-lg scale-100 gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg" onClick={(e) => e.stopPropagation()}>
-            <header className="flex flex-col space-y-1.5 text-center sm:text-left mb-4">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 flex items-center justify-center animate-in fade-in duration-200" onClick={() => setShowManualModal(false)}>
+          <div className="fixed z-50 grid w-full max-w-lg scale-100 gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 rounded-lg font-sans" onClick={(e) => e.stopPropagation()}>
+            <header className="flex flex-col space-y-1.5 text-left mb-4 relative">
               <div>
-                <p className="text-sm text-muted-foreground font-semibold uppercase tracking-wider">New Entry</p>
-                <h3 className="text-lg font-semibold leading-none tracking-tight">Track Application</h3>
+                <p className="text-[10px] font-mono text-muted-foreground font-semibold uppercase tracking-wider">New Entry</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-foreground mt-1">Track Application</h3>
               </div>
-              <button className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" onClick={() => setShowManualModal(false)}>
-                &times;
+              <button 
+                className="absolute right-0 top-0 rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer" 
+                onClick={() => setShowManualModal(false)}
+              >
+                <X className="w-4 h-4" />
               </button>
             </header>
 
             <form onSubmit={handleAddManualApplication} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="manual-company">Company *</label>
+                <div className="flex flex-col space-y-1.5">
+                  <label htmlFor="manual-company" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company *</label>
                   <input
                     type="text"
                     id="manual-company"
@@ -890,11 +911,12 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                     placeholder="e.g. Google, Morphie Labs"
                     value={manualCompany}
                     onChange={(e) => setManualCompany(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                   />
                 </div>
 
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="manual-title">Role Title *</label>
+                <div className="flex flex-col space-y-1.5">
+                  <label htmlFor="manual-title" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Role Title *</label>
                   <input
                     type="text"
                     id="manual-title"
@@ -902,41 +924,45 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                     placeholder="e.g. SDE Intern, Python Developer"
                     value={manualTitle}
                     onChange={(e) => setManualTitle(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="manual-loc">Location</label>
+                <div className="flex flex-col space-y-1.5">
+                  <label htmlFor="manual-loc" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Location</label>
                   <input
                     type="text"
                     id="manual-loc"
                     placeholder="e.g. Remote, New York"
                     value={manualLocation}
                     onChange={(e) => setManualLocation(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                   />
                 </div>
 
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="manual-sal">Salary Info</label>
+                <div className="flex flex-col space-y-1.5">
+                  <label htmlFor="manual-sal" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Salary Info</label>
                   <input
                     type="text"
                     id="manual-sal"
                     placeholder="e.g. $60/hr, 12 LPA"
                     value={manualSalary}
                     onChange={(e) => setManualSalary(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="manual-plat">Platform / Source</label>
+                <div className="flex flex-col space-y-1.5">
+                  <label htmlFor="manual-plat" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Platform / Source</label>
                   <select
                     id="manual-plat"
                     value={manualPlatform}
                     onChange={(e) => setManualPlatform(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                   >
                     <option value="College">College Placement</option>
                     <option value="Referral">Referral</option>
@@ -948,12 +974,13 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                   </select>
                 </div>
 
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="manual-status">Current Status</label>
+                <div className="flex flex-col space-y-1.5">
+                  <label htmlFor="manual-status" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Current Status</label>
                   <select
                     id="manual-status"
                     value={manualStatus}
                     onChange={(e) => setManualStatus(e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                   >
                     <option value="Applied">Applied</option>
                     <option value="Followed Up">Followed Up</option>
@@ -964,37 +991,43 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                 </div>
               </div>
 
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="manual-url">Job Posting URL (Optional)</label>
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="manual-url" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Job Posting URL (Optional)</label>
                 <input
                   type="url"
                   id="manual-url"
                   placeholder="https://company.com/careers/job-id"
                   value={manualUrl}
                   onChange={(e) => setManualUrl(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                 />
               </div>
 
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="manual-notes">Outreach & Application Notes</label>
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="manual-notes" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Outreach & Application Notes</label>
                 <textarea
                   id="manual-notes"
                   placeholder="e.g. Interview scheduled with HR on Tuesday, referred by alumni..."
                   rows={3}
                   value={manualNotes}
                   onChange={(e) => setManualNotes(e.target.value)}
+                  className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-2 gap-2 sm:gap-0">
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-4 py-2 transition-colors cursor-pointer"
                   onClick={() => setShowManualModal(false)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" disabled={isSubmitting}>
+                <button 
+                  type="submit" 
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer" 
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Tracking..." : "Save Application"}
                 </button>
               </div>
@@ -1006,20 +1039,7 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
       {/* ==================== PREMIUM JOB DETAILS SLIDE-OVER DRAWER ==================== */}
       {selectedJobDetails && (
         <div 
-          className="drawer-overlay"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.45)",
-            backdropFilter: "blur(6px)",
-            zIndex: 999,
-            display: "flex",
-            justifyContent: "flex-end",
-            animation: "fadeIn 200ms ease-out",
-          }}
+          className="fixed inset-0 bg-black/45 backdrop-blur-xs z-[999] flex justify-end transition-opacity animate-in fade-in duration-200"
           onClick={() => {
             setSelectedJobDetails(null);
             if (pollingIntervalId) {
@@ -1029,185 +1049,90 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
           }}
         >
           <div 
-            className="drawer-container"
-            style={{
-              width: "100%",
-              maxWidth: "580px",
-              height: "100%",
-              backgroundColor: "rgba(255, 255, 255, 0.96)",
-              backdropFilter: "blur(20px)",
-              boxShadow: "-10px 0 40px rgba(0, 0, 0, 0.12)",
-              display: "flex",
-              flexDirection: "column",
-              padding: "0",
-              zIndex: 1000,
-              cursor: "default",
-              borderLeft: "1px solid rgba(0, 0, 0, 0.08)",
-              animation: "slideIn 300ms cubic-bezier(0.16, 1, 0.3, 1)",
-            }}
+            className="w-full max-w-[580px] h-full bg-background border-l border-border shadow-2xl flex flex-col z-[1000] cursor-default animate-in slide-in-from-right duration-300 ease-out font-sans"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer Header */}
-            <header 
-              style={{
-                padding: "1.75rem 2rem 1.5rem",
-                borderBottom: "1px solid rgba(0, 0, 0, 0.06)",
-                background: "linear-gradient(135deg, #faf9f6 0%, #f4f2ee 100%)",
-                position: "relative",
-              }}
-            >
-              <button onClick={() => {
+            <header className="p-6 border-b border-border bg-muted/20 relative flex flex-col gap-2">
+              <button 
+                onClick={() => {
                   setSelectedJobDetails(null);
                   if (pollingIntervalId) {
                     clearInterval(pollingIntervalId);
                     setPollingIntervalId(null);
                   }
                 }}
-                style={{
-                  position: "absolute",
-                  top: "1.5rem",
-                  right: "1.5rem",
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "50%",
-                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-                  border: "none",
-                  fontSize: "1.25rem",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 150ms ease",
-                }}
-                className="close-drawer-btn"
+                className="absolute top-6 right-6 w-8 h-8 rounded-full border border-border bg-background hover:bg-accent text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
               >
-                &times;
+                <X className="w-4 h-4" />
               </button>
               
-              <div style={{ paddingRight: "2.5rem" }}>
+              <div className="pr-10">
                 <span 
-                  className={`source-label ${selectedJobDetails.source}`}
-                  style={{
-                    display: "inline-block",
-                    padding: "0.25rem 0.65rem",
-                    borderRadius: "999px",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    backgroundColor: "rgba(67, 56, 202, 0.08)",
-                    color: "#4338ca",
-                    marginBottom: "0.75rem",
-                  }}
+                  className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase border bg-secondary/50 text-foreground mb-2"
                 >
                   {selectedJobDetails.source}
                 </span>
-                <h2 style={{ fontSize: "1.6rem", fontWeight: 700, color: "#111827", margin: "0 0 0.35rem" }}>
+                <h2 className="text-lg font-bold tracking-tight text-foreground mt-1">
                   {selectedJobDetails.title}
                 </h2>
-                <p style={{ fontSize: "1.1rem", color: "#4b5563", fontWeight: 500, margin: "0" }}>
+                <p className="text-xs text-muted-foreground font-medium">
                   {selectedJobDetails.company}
                 </p>
               </div>
             </header>
 
             {/* Scrollable Body */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "2rem" }} className="drawer-body">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {/* Metadata Badges */}
-              <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
-                <div style={{ background: "#f3f4f6", padding: "0.6rem 1rem", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "2px", flex: "1 1 120px" }}>
-                  <span style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#6b7280", fontWeight: 600 }}>Location</span>
-                  <span style={{ fontSize: "0.92rem", fontWeight: 500, color: "#1f2937" }}>{selectedJobDetails.location}</span>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-secondary/40 border border-border p-3 rounded-md flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Location</span>
+                  <span className="text-xs font-semibold text-foreground">{selectedJobDetails.location}</span>
                 </div>
-                <div style={{ background: "#f3f4f6", padding: "0.6rem 1rem", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "2px", flex: "1 1 120px" }}>
-                  <span style={{ fontSize: "0.72rem", textTransform: "uppercase", color: "#6b7280", fontWeight: 600 }}>Salary</span>
-                  <span style={{ fontSize: "0.92rem", fontWeight: 500, color: "#1f2937" }}>{selectedJobDetails.salary ?? "Not Listed"}</span>
+                <div className="bg-secondary/40 border border-border p-3 rounded-md flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Salary</span>
+                  <span className="text-xs font-semibold text-foreground">{selectedJobDetails.salary ?? "Not Listed"}</span>
                 </div>
               </div>
 
               {/* AUTO APPLY ACTIONS WIDGET - PREVIEW CARD (TEMPORARILY DISABLED FOR v1) */}
-              <div 
-                style={{
-                  background: "linear-gradient(135deg, rgba(30, 27, 75, 0.45) 0%, rgba(49, 16, 66, 0.45) 100%)",
-                  borderRadius: "16px",
-                  padding: "1.5rem 1.75rem",
-                  color: "white",
-                  marginBottom: "2rem",
-                  border: "1px dashed rgba(182, 95, 42, 0.3)",
-                  boxShadow: "0 8px 30px rgba(49, 16, 66, 0.08)",
-                  position: "relative",
-                  overflow: "hidden"
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "0.85rem" }}>
+              <div className="relative overflow-hidden rounded-md border border-zinc-800 bg-zinc-950 p-5 text-white shadow-xs">
+                <div className="absolute top-0 right-0 h-32 w-32 bg-linear-to-bl from-zinc-700/20 via-zinc-900/0 to-transparent pointer-events-none" />
+                <div className="flex justify-between items-start mb-3 relative z-10">
                   <div>
-                    <span 
-                      style={{ 
-                        fontSize: "0.68rem", 
-                        fontWeight: 700, 
-                        background: "rgba(182, 95, 42, 0.15)", 
-                        color: "#b65f2a", 
-                        padding: "0.2rem 0.55rem", 
-                        borderRadius: "999px",
-                        border: "1px solid rgba(182, 95, 42, 0.25)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
-                        display: "inline-block",
-                        marginBottom: "0.5rem"
-                      }}
-                    >
+                    <span className="inline-block bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-sm mb-2">
                       Coming in Version 2.0 ⚡
                     </span>
-                    <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0", color: "#f3f4f6", letterSpacing: "-0.01em" }}>
+                    <h3 className="text-xs font-semibold tracking-tight text-white">
                       AI Auto Apply Pipeline
                     </h3>
                   </div>
-                  <Wand2 className="w-6 h-6 text-orange-300" style={{ opacity: 0.6 }} />
+                  <Wand2 className="w-4 h-4 text-zinc-400" />
                 </div>
                 
-                <p style={{ fontSize: "0.8rem", color: "#a1a1aa", lineHeight: "1.4", margin: 0 }}>
+                <p className="text-[11px] text-zinc-400 leading-normal mb-3">
                   Our upcoming Version 2.0 will feature fully automated, background Playwright form filling and real-time resume tailoring via Gemini!
                 </p>
                 
-                <div style={{ marginTop: "1rem", borderTop: "1px solid rgba(255, 255, 255, 0.05)", paddingTop: "0.85rem", fontSize: "0.78rem", color: "#a1a1aa", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-                  <span>✓ 1-Click Tailored PDF Generation</span>
-                  <span>✓ Background Form Automated Delivery</span>
-                  <span>✓ Live Playwright Browser Status Monitoring</span>
+                <div className="pt-3 border-t border-zinc-800 text-[11px] text-zinc-400 flex flex-col gap-1.5">
+                  <span className="flex items-center gap-1.5">✓ 1-Click Tailored PDF Generation</span>
+                  <span className="flex items-center gap-1.5">✓ Background Form Automated Delivery</span>
+                  <span className="flex items-center gap-1.5">✓ Live Playwright Browser Status Monitoring</span>
                 </div>
               </div>
 
               {/* Full JD Panel */}
-              <div>
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: "0.75rem" }}>Full Job Description</h3>
+              <div className="space-y-2">
+                <h3 className="text-xs font-semibold text-foreground">Full Job Description</h3>
                 {selectedJobDetails.description ? (
-                  <div 
-                    style={{ 
-                      fontSize: "0.92rem", 
-                      color: "#374151", 
-                      lineHeight: "1.6", 
-                      whiteSpace: "pre-wrap",
-                      backgroundColor: "#f9fafb",
-                      padding: "1.25rem",
-                      borderRadius: "12px",
-                      border: "1px solid #e5e7eb"
-                    }}
-                  >
+                  <div className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap bg-secondary/20 border border-border p-4 rounded-md font-sans">
                     {selectedJobDetails.description}
                   </div>
                 ) : (
-                  <div 
-                    style={{ 
-                      fontSize: "0.9rem", 
-                      color: "#6b7280", 
-                      lineHeight: "1.5", 
-                      backgroundColor: "#f9fafb",
-                      padding: "1.25rem",
-                      borderRadius: "12px",
-                      border: "1px solid #e5e7eb",
-                      textAlign: "center"
-                    }}
-                  >
-                    <p style={{ fontWeight: 500, color: "#475569", marginBottom: "0.5rem" }}>Job description details are not cached.</p>
-                    <p style={{ fontSize: "0.8rem" }}>
+                  <div className="text-center bg-secondary/20 border border-border p-6 rounded-md space-y-2">
+                    <p className="text-xs font-semibold text-foreground">Job description details are not cached.</p>
+                    <p className="text-[11px] text-muted-foreground">
                       Click <strong>Auto Apply Now</strong> to pre-fetch the full JD live using Playwright before compiling your AI tailored resume!
                     </p>
                   </div>
@@ -1217,25 +1142,6 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes slideIn {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes pulseGlow {
-          from { opacity: 0.65; box-shadow: 0 0 2px rgba(67, 56, 202, 0.1); }
-          to { opacity: 1; box-shadow: 0 0 8px rgba(67, 56, 202, 0.4); }
-        }
-      `}</style>
     </div>
   );
 }

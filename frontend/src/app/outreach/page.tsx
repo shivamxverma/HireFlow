@@ -8,7 +8,7 @@ export const metadata = {
 export default function OutreachPage() {
   return (
     <main className="container mx-auto px-4 py-8 md:px-8 flex flex-col gap-8">
-      <header className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-1">
+      <header className="rounded-xl border bg-card text-card-foreground shadow-xs p-6 flex flex-col gap-1">
         <div>
           <p className="text-primary font-semibold text-sm uppercase tracking-wider">Campaign Management</p>
           <h1 className="text-3xl font-bold tracking-tight">Outreach Board</h1>

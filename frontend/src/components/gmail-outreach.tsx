@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { Mail, RefreshCw, Plus, Trash2, Inbox, Layers, Lock, Camera, Check, X } from "lucide-react";
 
 interface Message {
   id: string;
@@ -509,43 +510,18 @@ export function GmailOutreach() {
   };
 
   return (
-    <div style={{ fontFamily: "Inter, system-ui, sans-serif", color: "var(--text)" }}>
+    <div className="flex flex-col gap-6 font-sans">
       {/* Google OAuth Connection Banner */}
-      <div 
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "24px",
-          padding: "1.25rem 2rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "2rem",
-          boxShadow: "var(--shadow)",
-          backdropFilter: "blur(14px)"
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "1.2rem" }}>
-          <div 
-            style={{ 
-              width: "48px", 
-              height: "48px", 
-              borderRadius: "14px", 
-              background: googleAuth.authenticated ? "rgba(16, 185, 129, 0.08)" : "rgba(182, 95, 42, 0.08)",
-              border: googleAuth.authenticated ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(182, 95, 42, 0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.5rem"
-            }}
-          >
-            {googleAuth.authenticated ? "📧" : "🔌"}
+      <div className="border border-border bg-card p-4 rounded-md shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-sm shrink-0 ${googleAuth.authenticated ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" : "bg-amber-500/10 border-amber-500/20 text-amber-600"}`}>
+            {googleAuth.authenticated ? <Mail className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: "1.05rem", color: "var(--text)", fontWeight: 600 }}>
+            <h3 className="text-sm font-semibold text-foreground">
               {googleAuth.authenticated ? "Google Account Connected" : "Google Account Connection Required"}
             </h3>
-            <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {googleAuth.authenticated 
                 ? `Authorized as ${googleAuth.email || "Active User"}. Ready to dispatch cold outreach campaigns.` 
                 : "Connect your Google account to grant secure permission for automated cold email campaigns."}
@@ -553,236 +529,108 @@ export function GmailOutreach() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
           <button
             onClick={checkGoogleAuthStatus}
-            style={{
-              background: "transparent",
-              color: "var(--text)",
-              border: "1px solid var(--border)",
-              padding: "0.5rem 1rem",
-              borderRadius: "10px",
-              fontSize: "0.8rem",
-              cursor: "pointer",
-              fontWeight: 500
-            }}
+            className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-3 py-2 gap-1.5 transition-colors cursor-pointer"
           >
-            🔄 Refresh Status
+            <RefreshCw className="w-3.5 h-3.5" /> Refresh Status
           </button>
 
           {googleAuth.authenticated ? (
-            <span 
-              style={{
-                background: "rgba(16, 185, 129, 0.1)",
-                color: "#059669",
-                border: "1px solid rgba(16, 185, 129, 0.2)",
-                padding: "0.5rem 1rem",
-                borderRadius: "10px",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-              }}
-            >
-              Google Active ✅
+            <span className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 h-9 px-3 py-2 gap-1">
+              <Check className="w-3.5 h-3.5" /> Google Active
             </span>
           ) : (
             <button
               onClick={connectGoogleAccount}
-              style={{
-                background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                color: "#fff",
-                border: "none",
-                padding: "0.7rem 1.4rem",
-                borderRadius: "12px",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                cursor: "pointer",
-                boxShadow: "0 8px 20px -6px rgba(182, 95, 42, 0.4)",
-                transition: "all 0.2s ease"
-              }}
+              className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-3 py-2 transition-colors cursor-pointer"
             >
-              🔌 Connect Google Account
+              Connect Google Account
             </button>
           )}
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 2fr", gap: "2.5rem", alignItems: "start" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         
         {/* 2. ADD RECRUITER FORM SIDE */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+        <div className="flex flex-col gap-6 lg:col-span-1">
           
           {/* Main Manual Import Form */}
-          <div 
-            style={{ 
-              background: "var(--surface)", 
-              border: "1px solid var(--border)", 
-              padding: "2rem", 
-              borderRadius: "24px",
-              boxShadow: "var(--shadow)",
-              backdropFilter: "blur(14px)"
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.2rem", color: "var(--text)", margin: 0, fontWeight: 600 }}>
-                ➕ Add Recruiter Target
+          <div className="border border-border bg-card p-5 rounded-md shadow-xs flex flex-col gap-4">
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                <Plus className="w-4 h-4 text-muted-foreground" /> Add Recruiter Target
               </h3>
               
               {/* Screenshot extract label button */}
-              <label 
-                style={{
-                  background: extractingImage ? "#e2e8f0" : "rgba(182, 95, 42, 0.08)",
-                  color: extractingImage ? "#94a3b8" : "var(--accent-dark)",
-                  border: "1px solid rgba(182, 95, 42, 0.2)",
-                  padding: "0.4rem 0.8rem",
-                  borderRadius: "8px",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  cursor: extractingImage ? "not-allowed" : "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.3rem"
-                }}
-              >
+              <label className="inline-flex items-center gap-1.5 border border-border bg-background hover:bg-accent text-[10px] font-mono font-semibold uppercase px-2 py-1 rounded cursor-pointer transition-colors text-muted-foreground hover:text-foreground">
                 <input 
                   type="file" 
                   accept="image/*" 
                   ref={fileInputRef} 
                   onChange={handleImageExtract} 
                   disabled={extractingImage} 
-                  style={{ display: "none" }}
+                  className="hidden"
                 />
-                📷 {extractingImage ? "Analyzing Screenshot..." : "Extract Job Details"}
+                <Camera className="w-3.5 h-3.5 shrink-0" />
+                {extractingImage ? "Analyzing..." : "Extract Image"}
               </label>
             </div>
 
-            <form onSubmit={handleAddLead} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                  <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Company Name</label>
-                  <input type="text" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Stripe"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    required
-                    style={{
-                      padding: "0.7rem 0.9rem",
-                      borderRadius: "10px",
-                      border: "1px solid var(--border)",
-                      background: "#fffdf9",
-                      color: "var(--text)",
-                      outline: "none",
-                      fontSize: "0.9rem",
-                      transition: "border-color 0.2s"
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "var(--legacy-accent)";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(182, 95, 42, 0.12)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "var(--border)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                  <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Recruiter Email</label>
-                  <input type="email" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="recruiter@stripe.com"
-                    value={recipientEmail}
-                    onChange={(e) => setRecipientEmail(e.target.value)}
-                    required
-                    style={{
-                      padding: "0.7rem 0.9rem",
-                      borderRadius: "10px",
-                      border: "1px solid var(--border)",
-                      background: "#fffdf9",
-                      color: "var(--text)",
-                      outline: "none",
-                      fontSize: "0.9rem",
-                      transition: "border-color 0.2s"
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "var(--legacy-accent)";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(182, 95, 42, 0.12)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "var(--border)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                </div>
+            <form onSubmit={handleAddLead} className="flex flex-col gap-3.5">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company Name</label>
+                <input 
+                  type="text"
+                  placeholder="e.g. Stripe"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
+                />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 600 }}>Job Description Context</label>
-                <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  rows={6}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Recruiter Email</label>
+                <input 
+                  type="email"
+                  placeholder="e.g. recruiter@stripe.com"
+                  value={recipientEmail}
+                  onChange={(e) => setRecipientEmail(e.target.value)}
+                  required
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Job Description Context</label>
+                <textarea 
+                  rows={5}
                   placeholder="Paste details of the role or specific specs..."
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   required
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontFamily: "inherit",
-                    fontSize: "0.9rem",
-                    resize: "vertical",
-                    transition: "border-color 0.2s"
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "var(--legacy-accent)";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(182, 95, 42, 0.12)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors font-sans"
                 />
               </div>
 
-              <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
+              <div className="flex gap-2 pt-1">
                 <button
                   type="submit"
                   disabled={actionLoading === "add-lead"}
-                  style={{
-                    flex: 1,
-                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                    color: "#fff",
-                    border: "none",
-                    padding: "0.8rem",
-                    borderRadius: "12px",
-                    fontWeight: 600,
-                    cursor: actionLoading === "add-lead" ? "not-allowed" : "pointer",
-                    boxShadow: "0 4px 12px rgba(182, 95, 42, 0.15)",
-                    transition: "transform 0.2s"
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = "none"}
+                  className="flex-1 inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  {actionLoading === "add-lead" ? "Adding Lead..." : "Add Single Lead 🎯"}
+                  {actionLoading === "add-lead" ? "Adding..." : "Add Single Lead"}
                 </button>
                 
                 <button
                   type="button"
                   onClick={() => setImportOpen(!importOpen)}
-                  style={{
-                    background: "#ffffff",
-                    color: "var(--text)",
-                    border: "1px solid var(--border)",
-                    padding: "0.8rem 1.2rem",
-                    borderRadius: "12px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "background-color 0.2s"
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(49, 37, 24, 0.03)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "#ffffff"}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-3 py-2 transition-colors cursor-pointer"
                 >
-                  📥 Bulk Paste
+                  Bulk Import
                 </button>
               </div>
             </form>
@@ -790,175 +638,108 @@ export function GmailOutreach() {
 
           {/* Bulk Paste Importer Drawer */}
           {importOpen && (
-            <div 
-              style={{ 
-                background: "rgba(255, 255, 255, 0.5)", 
-                border: "1px dashed var(--border)", 
-                padding: "1.5rem", 
-                borderRadius: "20px",
-                marginTop: "1rem"
-              }}
-            >
-              <h4 style={{ margin: "0 0 0.8rem 0", color: "var(--accent-dark)", fontSize: "0.95rem", fontWeight: 600 }}>
+            <div className="border border-dashed border-border bg-muted/20 p-4 rounded-md flex flex-col gap-3 animate-in fade-in duration-200">
+              <h4 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                 📋 Paste Recruiter Details (CSV / JSON)
               </h4>
-              <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <textarea 
                 rows={5}
                 placeholder={`Example CSV:\ncompanyName,recipientEmail,jobDescription\nStripe,recruiter@stripe.com,Software Engineer\n\nOr JSON:\n[{"companyName": "Stripe", "email": "recruiter@stripe.com", "jobDescription": "..."}]`}
                 value={bulkText}
                 onChange={(e) => setBulkText(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.8rem",
-                  borderRadius: "10px",
-                  border: "1px solid var(--border)",
-                  background: "#fffdf9",
-                  color: "#059669",
-                  fontFamily: "monospace",
-                  fontSize: "0.8rem",
-                  outline: "none",
-                  resize: "vertical"
-                }}
+                className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-xs font-mono placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
               />
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.8rem", marginTop: "1rem" }}>
+              <div className="flex justify-end gap-2 text-xs">
                 <button
                   onClick={() => setImportOpen(false)}
-                  style={{ background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "0.85rem", fontWeight: 500 }}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-transparent bg-transparent hover:bg-accent text-muted-foreground hover:text-foreground h-8 px-3 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleBulkAddLeads}
                   disabled={actionLoading === "bulk-add"}
-                  style={{
-                    background: "var(--legacy-accent)",
-                    color: "#fff",
-                    border: "none",
-                    padding: "0.5rem 1.2rem",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    fontSize: "0.85rem",
-                    cursor: "pointer",
-                    transition: "background 0.2s"
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--accent-dark)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "var(--legacy-accent)"}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-8 px-4 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  {actionLoading === "bulk-add" ? "Importing..." : "Parse & Import ⚡"}
+                  {actionLoading === "bulk-add" ? "Importing..." : "Parse & Import"}
                 </button>
               </div>
             </div>
           )}
 
           {/* Quick Metrics Bar */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "1rem", borderRadius: "16px", textAlign: "center", boxShadow: "var(--shadow)" }}>
-              <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--accent-dark)" }}>{leads.length}</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600, marginTop: "0.2rem" }}>TOTAL CAMPAIGNS</div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="border border-border bg-card p-3 rounded-md shadow-xs text-center flex flex-col justify-center">
+              <div className="text-xl font-bold tracking-tight text-foreground font-mono tabular-nums">{leads.length}</div>
+              <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">Total</div>
             </div>
-            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "1rem", borderRadius: "16px", textAlign: "center", boxShadow: "var(--shadow)" }}>
-              <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--legacy-accent)" }}>
+            <div className="border border-border bg-card p-3 rounded-md shadow-xs text-center flex flex-col justify-center">
+              <div className="text-xl font-bold tracking-tight text-foreground font-mono tabular-nums">
                 {leads.filter(l => l.status === "READY").length}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600, marginTop: "0.2rem" }}>READY TO SEND</div>
+              <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">Ready</div>
             </div>
-            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "1rem", borderRadius: "16px", textAlign: "center", boxShadow: "var(--shadow)" }}>
-              <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#10b981" }}>
+            <div className="border border-border bg-card p-3 rounded-md shadow-xs text-center flex flex-col justify-center">
+              <div className="text-xl font-bold tracking-tight text-foreground font-mono tabular-nums">
                 {leads.filter(l => l.status === "SENT").length}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600, marginTop: "0.2rem" }}>SENT COLD MAILS</div>
+              <div className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">Sent</div>
             </div>
           </div>
 
         </div>
 
         {/* 3. CAMPAIGN ACTION GRID / DASHBOARD DECK */}
-        <div 
-          style={{ 
-            background: "var(--surface)", 
-            border: "1px solid var(--border)", 
-            borderRadius: "24px",
-            padding: "2rem",
-            boxShadow: "var(--shadow)",
-            backdropFilter: "blur(14px)"
-          }}
-        >
+        <div className="lg:col-span-2 border border-border bg-card rounded-md p-5 shadow-xs flex flex-col gap-4">
           {/* Header controls */}
-          <div 
-            style={{ 
-              display: "flex", 
-              justifyContent: "space-between", 
-              alignItems: "center", 
-              marginBottom: "2rem",
-              borderBottom: "1px solid var(--border)",
-              paddingBottom: "1.2rem"
-            }}
-          >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-border">
             <div>
-              <h4 style={{ fontSize: "1.2rem", color: "var(--text)", margin: 0, fontWeight: 600 }}>
-                📊 Outreach Campaigns Tracker
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-muted-foreground" /> Outreach Campaigns Tracker
               </h4>
-              <p style={{ margin: "0.2rem 0 0 0", fontSize: "0.82rem", color: "var(--muted)" }}>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Select rows to trigger personalized generations and replies.
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: "0.75rem" }}>
+            <div className="shrink-0">
               <button
                 onClick={handleGenerateAllEmails}
                 disabled={actionLoading !== null || leads.length === 0}
-                style={{
-                  background: "rgba(182, 95, 42, 0.08)",
-                  color: "var(--accent-dark)",
-                  border: "1px solid rgba(182, 95, 42, 0.2)",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "10px",
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  transition: "background-color 0.2s"
-                }}
-                onMouseEnter={(e) => {
-                  if (actionLoading === null && leads.length > 0) {
-                    e.currentTarget.style.background = "rgba(182, 95, 42, 0.15)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(182, 95, 42, 0.08)";
-                }}
+                className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer disabled:opacity-50"
               >
-                ⚙️ {actionLoading === "generate-emails" ? "Generating..." : "Generate Cold Mails"}
+                {actionLoading === "generate-emails" ? "Generating..." : "Generate Cold Mails"}
               </button>
             </div>
           </div>
 
           {/* Leads table */}
           {loading && leads.length === 0 ? (
-            <p style={{ color: "var(--muted)", textAlign: "center", padding: "3rem" }}>Loading campaign list...</p>
+            <p className="text-xs text-muted-foreground text-center py-12">Loading campaign list…</p>
           ) : leads.length === 0 ? (
-            <div style={{ textTransform: "uppercase", textAlign: "center", padding: "4rem 2rem", border: "1px dashed var(--border)", borderRadius: "16px" }}>
-              <span style={{ fontSize: "2.5rem" }}>📭</span>
-              <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginTop: "1rem", fontWeight: 700 }}>No Recruiter Targets Registered Yet</p>
+            <div className="flex flex-col items-center justify-center text-center py-12 bg-secondary/10 border border-dashed rounded-md p-6">
+              <Inbox className="w-8 h-8 text-muted-foreground/30 mb-2" />
+              <p className="text-xs font-semibold text-foreground">No Recruiter Targets Registered Yet</p>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
+            <div className="overflow-x-auto border border-border rounded-md">
+              <table className="w-full border-collapse text-left text-xs font-sans">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--muted)" }}>
-                    <th style={{ padding: "0.75rem 0.5rem", width: "40px" }}>
+                  <tr className="border-b border-border bg-muted/30 text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
+                    <th className="py-2.5 px-3 w-10">
                       <input
                         type="checkbox"
                         checked={selectedLeadIds.length === leads.length}
                         onChange={toggleSelectAll}
-                        style={{ cursor: "pointer" }}
+                        className="cursor-pointer rounded-sm border-border"
                       />
                     </th>
-                    <th style={{ padding: "0.75rem 0.5rem" }}>Company / Recipient</th>
-                    <th style={{ padding: "0.75rem 0.5rem", textAlign: "center" }}>Status</th>
-                    <th style={{ padding: "0.75rem 0.5rem" }}>Outbox Details</th>
-                    <th style={{ padding: "0.75rem 0.5rem", textAlign: "center" }}>Follow Ups</th>
-                    <th style={{ padding: "0.75rem 0.5rem" }}>Last Sent</th>
-                    <th style={{ padding: "0.75rem 0.5rem", textAlign: "center" }}>Actions</th>
+                    <th className="py-2.5 px-3">Company / Recipient</th>
+                    <th className="py-2.5 px-3 text-center">Status</th>
+                    <th className="py-2.5 px-3">Outbox Details</th>
+                    <th className="py-2.5 px-3 text-center">Follow Ups</th>
+                    <th className="py-2.5 px-3">Last Sent</th>
+                    <th className="py-2.5 px-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -969,57 +750,31 @@ export function GmailOutreach() {
                     return (
                       <tr
                         key={lead.id}
-                        style={{
-                          borderBottom: "1px solid var(--border)",
-                          background: isChecked ? "rgba(182, 95, 42, 0.04)" : "transparent",
-                          transition: "background 0.2s"
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isChecked) {
-                            e.currentTarget.style.background = "rgba(49, 37, 24, 0.02)";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isChecked) {
-                            e.currentTarget.style.background = "transparent";
-                          }
-                        }}
+                        className={`border-b border-border last:border-b-0 hover:bg-muted/40 transition-colors ${isChecked ? "bg-secondary/40" : ""}`}
                       >
-                        <td style={{ padding: "1rem 0.5rem" }}>
+                        <td className="py-3 px-3">
                           <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => toggleSelectLead(lead.id)}
-                            style={{ cursor: "pointer" }}
+                            className="cursor-pointer rounded-sm border-border"
                           />
                         </td>
-                        <td style={{ padding: "1rem 0.5rem" }}>
-                          <div style={{ fontWeight: 700, color: "var(--text)" }}>{lead.companyName}</div>
-                          <div style={{ color: "var(--muted)", fontSize: "0.78rem", marginTop: "0.1rem" }}>{lead.recipientEmail}</div>
+                        <td className="py-3 px-3">
+                          <div className="font-semibold text-foreground">{lead.companyName}</div>
+                          <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">{lead.recipientEmail}</div>
                         </td>
-                        <td style={{ padding: "1rem 0.5rem", textAlign: "center" }}>
-                          <span 
-                            style={{
-                              padding: "0.25rem 0.55rem",
-                              borderRadius: "6px",
-                              fontSize: "0.72rem",
-                              fontWeight: 700,
-                              background: 
-                                lead.status === "SENT" ? "#ecfdf5" :
-                                lead.status === "READY" ? "#e0e7ff" :
-                                lead.status === "GENERATING" || lead.status === "SENDING" ? "#f3e8ff" :
-                                lead.status === "FAILED" ? "#fee2e2" : "#f1f5f9",
-                              color: 
-                                lead.status === "SENT" ? "#065f46" :
-                                lead.status === "READY" ? "#3730a3" :
-                                lead.status === "GENERATING" || lead.status === "SENDING" ? "#6b21a8" :
-                                lead.status === "FAILED" ? "#991b1b" : "#475569"
-                            }}
-                          >
+                        <td className="py-3 px-3 text-center">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-mono font-semibold uppercase border ${
+                            lead.status === "SENT" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" :
+                            lead.status === "READY" ? "bg-blue-500/10 border-blue-500/20 text-blue-600" :
+                            lead.status === "GENERATING" || lead.status === "SENDING" ? "bg-purple-500/10 border-purple-500/20 text-purple-600 animate-pulse" :
+                            lead.status === "FAILED" ? "bg-red-500/10 border-red-500/20 text-red-600" : "bg-zinc-500/10 border-zinc-500/20 text-zinc-600"
+                          }`}>
                             {lead.status}
                           </span>
                         </td>
-                        <td style={{ padding: "1rem 0.5rem" }}>
+                        <td className="py-3 px-3">
                           {initialMail ? (
                             <button
                               onClick={() => {
@@ -1027,76 +782,37 @@ export function GmailOutreach() {
                                 setEditedSubject(initialMail.subject);
                                 setEditedBody(initialMail.body);
                               }}
-                              style={{
-                                background: "#ffffff",
-                                border: "1px solid var(--border)",
-                                color: "var(--accent-dark)",
-                                padding: "0.35rem 0.7rem",
-                                borderRadius: "8px",
-                                fontSize: "0.75rem",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.2rem",
-                                boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
-                                transition: "all 0.15s ease"
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = "var(--legacy-accent)";
-                                e.currentTarget.style.background = "var(--surface-strong)";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = "var(--border)";
-                                e.currentTarget.style.background = "#ffffff";
-                              }}
+                              className="inline-flex items-center justify-center rounded-md border border-border bg-background hover:bg-accent text-foreground text-[11px] px-2.5 py-1 transition-colors cursor-pointer font-sans"
                             >
                               📝 {initialMail.subject.length > 25 ? initialMail.subject.substring(0, 25) + "..." : initialMail.subject}
                             </button>
                           ) : (
-                            <span style={{ color: "var(--muted)", fontStyle: "italic" }}>No cold mail yet</span>
+                            <span className="text-muted-foreground italic text-[11px]">No cold mail yet</span>
                           )}
                         </td>
-                        <td style={{ padding: "1rem 0.5rem", textAlign: "center", color: "var(--text)", fontWeight: 600 }}>
+                        <td className="py-3 px-3 text-center font-semibold text-foreground font-mono tabular-nums">
                           {getFollowUpCount(lead)}
                         </td>
-                        <td style={{ padding: "1rem 0.5rem", color: "var(--muted)" }}>
+                        <td className="py-3 px-3 text-muted-foreground font-mono text-[11px]">
                           {getLastSentDate(lead)}
                         </td>
-                        <td style={{ padding: "1rem 0.5rem", textAlign: "center" }}>
-                          <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
+                        <td className="py-3 px-3 text-right">
+                          <div className="flex gap-2 justify-end items-center">
                             {lead.status === "READY" && (
                               <button
                                 onClick={() => handleSendSingleMail(lead.id)}
                                 disabled={actionLoading !== null || !googleAuth.authenticated}
-                                style={{
-                                  background: "#10b981",
-                                  border: "none",
-                                  color: "#fff",
-                                  padding: "0.3rem 0.6rem",
-                                  borderRadius: "6px",
-                                  fontSize: "0.75rem",
-                                  fontWeight: 600,
-                                  cursor: "pointer"
-                                }}
-                                title={!googleAuth.authenticated ? "Connect your Google account first" : "Send Email"}
+                                className="inline-flex items-center justify-center rounded-md text-[10px] font-semibold bg-primary text-primary-foreground hover:opacity-90 h-7 px-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                                title={!googleAuth.authenticated ? "Connect Google account first" : "Send Email"}
                               >
                                 {actionLoading === `sending-${lead.id}` ? "..." : "Send 🚀"}
                               </button>
                             )}
                             <button
                               onClick={() => handleDeleteLead(lead.id)}
-                              style={{
-                                background: "transparent",
-                                border: "none",
-                                color: "var(--muted)",
-                                cursor: "pointer",
-                                transition: "color 0.2s"
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.style.color = "#dc2626"}
-                              onMouseLeave={(e) => e.currentTarget.style.color = "var(--muted)"}
+                              className="inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 transition-colors cursor-pointer"
                             >
-                              🗑️
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </td>
@@ -1110,82 +826,35 @@ export function GmailOutreach() {
 
           {/* Bulk Sending / Threading Action Blocks */}
           {selectedLeadIds.length > 0 && (
-            <div 
-              style={{ 
-                marginTop: "2rem", 
-                background: "var(--surface)", 
-                border: "1px solid var(--border)", 
-                padding: "1.5rem", 
-                borderRadius: "20px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                boxShadow: "var(--shadow)",
-                backdropFilter: "blur(14px)"
-              }}
-            >
-              <span style={{ fontSize: "0.9rem", color: "var(--text)", fontWeight: 600 }}>
-                Selected Recipient(s): <b style={{ color: "var(--accent-dark)" }}>{selectedLeadIds.length} lead(s)</b>
+            <div className="mt-4 border border-border bg-secondary/50 p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 animate-in fade-in duration-200">
+              <span className="text-xs text-muted-foreground">
+                Selected Recipient(s): <b className="text-foreground font-mono tabular-nums">{selectedLeadIds.length} lead(s)</b>
               </span>
 
-              <div style={{ display: "flex", gap: "0.8rem" }}>
-                
-                {/* 1. Initial bulk sender */}
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                 <button
                   onClick={handleSendSelectedMails}
                   disabled={actionLoading !== null || !googleAuth.authenticated}
-                  style={{
-                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                    color: "#fff",
-                    border: "none",
-                    padding: "0.55rem 1.1rem",
-                    borderRadius: "10px",
-                    fontWeight: 600,
-                    fontSize: "0.82rem",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(16, 185, 129, 0.15)"
-                  }}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 transition-colors cursor-pointer disabled:opacity-50 w-full sm:w-auto"
                 >
                   Send Cold Mails 🚀
                 </button>
 
-                {/* 2. Follow up generator */}
                 <button
                   onClick={handleGenerateFollowUps}
                   disabled={actionLoading !== null}
-                  style={{
-                    background: "rgba(182, 95, 42, 0.08)",
-                    color: "var(--accent-dark)",
-                    border: "1px solid rgba(182, 95, 42, 0.2)",
-                    padding: "0.55rem 1.1rem",
-                    borderRadius: "10px",
-                    fontWeight: 600,
-                    fontSize: "0.82rem",
-                    cursor: "pointer"
-                  }}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-3 transition-colors cursor-pointer disabled:opacity-50 w-full sm:w-auto"
                 >
-                  🔄 {actionLoading === "generate-followups" ? "Generating..." : "Generate Follow Up"}
+                  {actionLoading === "generate-followups" ? "Generating..." : "Generate Follow Up"}
                 </button>
 
-                {/* 3. Threaded follow up sender */}
                 <button
                   onClick={handleSendFollowUps}
                   disabled={actionLoading !== null || !googleAuth.authenticated}
-                  style={{
-                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                    color: "#fff",
-                    border: "none",
-                    padding: "0.55rem 1.1rem",
-                    borderRadius: "10px",
-                    fontWeight: 600,
-                    fontSize: "0.82rem",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(182, 95, 42, 0.15)"
-                  }}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 transition-colors cursor-pointer disabled:opacity-50 w-full sm:w-auto"
                 >
-                  📬 {actionLoading === "sending-followups" ? "Replying..." : "Send Threaded Follow Ups"}
+                  {actionLoading === "sending-followups" ? "Replying..." : "Send Threaded Follow Ups"}
                 </button>
-
               </div>
             </div>
           )}
@@ -1197,107 +866,62 @@ export function GmailOutreach() {
       {/* 4. EDIT MESSAGE MODAL OVERLAY */}
       {editingMessage && (
         <div 
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "rgba(33, 23, 15, 0.4)",
-            backdropFilter: "blur(8px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999
-          }}
+          className="fixed inset-0 bg-black/45 backdrop-blur-xs z-[9999] flex items-center justify-center animate-in fade-in duration-200"
           onClick={() => setEditingMessage(null)}
         >
           <div 
-            style={{
-              width: "100%",
-              maxWidth: "600px",
-              background: "rgba(255, 253, 248, 0.98)",
-              border: "1px solid rgba(49, 37, 24, 0.15)",
-              borderRadius: "24px",
-              padding: "2rem",
-              boxShadow: "0 30px 70px rgba(21, 14, 9, 0.3)"
-            }}
+            className="w-full max-w-xl bg-background border border-border p-6 shadow-2xl rounded-lg font-sans animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <h4 style={{ margin: "0 0 1rem 0", color: "var(--accent-dark)", fontSize: "1.25rem", fontWeight: 600 }}>
-              📝 Review & Edit Cold Email Draft
-            </h4>
+            <header className="flex justify-between items-start mb-4 pb-3 border-b border-border relative">
+              <div>
+                <p className="text-[10px] font-mono text-muted-foreground font-semibold uppercase tracking-wider">Draft Review</p>
+                <h4 className="text-sm font-semibold text-foreground mt-1">Review & Edit Cold Email Draft</h4>
+              </div>
+              <button 
+                className="absolute right-0 top-0 rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer" 
+                onClick={() => setEditingMessage(null)}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </header>
 
-            <form onSubmit={handleSaveMessageEdits} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.85rem", color: "var(--muted)", fontWeight: 600 }}>Subject Line</label>
-                <input type="text" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            <form onSubmit={handleSaveMessageEdits} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Subject Line</label>
+                <input 
+                  type="text"
                   value={editedSubject}
                   onChange={(e) => setEditedSubject(e.target.value)}
                   required
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontSize: "0.9rem"
-                  }}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
                 />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <label style={{ fontSize: "0.85rem", color: "var(--muted)", fontWeight: 600 }}>Email Body</label>
-                <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Email Body</label>
+                <textarea 
                   rows={10}
                   value={editedBody}
                   onChange={(e) => setEditedBody(e.target.value)}
                   required
-                  style={{
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "#fffdf9",
-                    color: "var(--text)",
-                    outline: "none",
-                    fontFamily: "inherit",
-                    fontSize: "0.9rem",
-                    resize: "vertical"
-                  }}
+                  className="flex min-h-[200px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors font-sans"
                 />
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem", marginTop: "0.5rem", alignItems: "center" }}>
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setEditingMessage(null)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    color: "var(--muted)",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: 500
-                  }}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-4 py-2 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  style={{
-                    background: "linear-gradient(135deg, var(--legacy-accent) 0%, var(--accent-dark) 100%)",
-                    color: "#fff",
-                    border: "none",
-                    padding: "0.6rem 1.4rem",
-                    borderRadius: "10px",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(182, 95, 42, 0.15)"
-                  }}
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer"
                 >
-                  Save Draft Changes ✅
+                  Save Draft Changes
                 </button>
               </div>
             </form>

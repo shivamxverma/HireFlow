@@ -16,6 +16,7 @@ import {
   Calendar,
   Layers,
   ArrowRight,
+  Inbox,
 } from "lucide-react";
 
 interface MonitoredChannel {
@@ -349,33 +350,30 @@ export function TelegramDashboard() {
   // Auth Screen Render (matches aesthetics of outreach auth)
   if (isAuthenticated === null) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <p className="mt-4 text-muted-foreground font-medium">Verifying dashboard session...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] font-sans">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <p className="mt-4 text-xs text-muted-foreground font-mono">Verifying dashboard session…</p>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center min-h-[70vh] bg-accent/10 rounded-3xl border p-12 relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[300px] height-[300px] bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[300px] height-[300px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="w-full max-w-md bg-card/80 backdrop-blur border rounded-3xl shadow-xl p-8 flex flex-col gap-6 z-10 animate-in fade-in slide-in-from-bottom-8 duration-500">
+      <div className="flex items-center justify-center min-h-[70vh] bg-background p-6 font-sans">
+        <div className="w-full max-w-sm border bg-card p-6 shadow-sm rounded-lg flex flex-col gap-5 animate-in fade-in duration-300">
           <div className="flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-              <Lock className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center mb-3">
+              <Lock className="w-4 h-4 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-bold tracking-tight">Admin Authentication</h2>
-            <p className="text-sm text-muted-foreground mt-2">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground font-sans">Admin Authentication</h2>
+            <p className="text-xs text-muted-foreground mt-1">
               Enter the admin passcode to access Telegram Ingestion controls.
             </p>
           </div>
 
           <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="passcode" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="passcode" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                 Passcode
               </label>
               <input
@@ -384,13 +382,13 @@ export function TelegramDashboard() {
                 placeholder="••••••••••••"
                 value={passcodeInput}
                 onChange={(e) => setPasscodeInput(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
               />
             </div>
             
             {authError && (
-              <div className="text-xs font-medium text-destructive flex items-center gap-1.5 p-2 rounded-lg bg-destructive/10">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <div className="text-[11px] font-medium text-destructive flex items-center gap-1.5 p-2 rounded-md bg-destructive/10 border border-destructive/20">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{authError}</span>
               </div>
             )}
@@ -398,7 +396,7 @@ export function TelegramDashboard() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+              className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer"
             >
               {loading ? "Verifying..." : "Access Dashboard"}
             </button>
@@ -410,33 +408,33 @@ export function TelegramDashboard() {
 
   // Dashboard Main Render
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 font-sans">
       {/* Hero Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-5">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-orange-500 to-amber-600 bg-clip-text text-transparent flex items-center gap-2">
-            <MessageSquare className="w-8 h-8 text-primary" /> Telegram Ingestion Portal
+          <h1 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-foreground" /> Telegram Ingestion Portal
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Automate job listings scraping using Telegram User sessions and structure postings using Gemini.
           </p>
         </div>
-        <div className="flex gap-2.5">
+        <div className="flex gap-2 shrink-0">
           <button
             onClick={loadAllData}
             disabled={loading}
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border hover:bg-accent h-9 px-3 py-2 gap-1.5"
+            className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-3 py-2 gap-1.5 transition-colors cursor-pointer"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh Log
           </button>
           {stats.rejected > 0 && (
             <button
               onClick={handleReprocessFailed}
               disabled={loading}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border hover:bg-destructive/10 text-destructive h-9 px-3 py-2 gap-1.5"
+              className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-3 py-2 gap-1.5 transition-colors cursor-pointer"
             >
-              <Layers className="w-4 h-4" />
+              <Layers className="w-3.5 h-3.5" />
               Reprocess Failed ({stats.rejected})
             </button>
           )}
@@ -445,56 +443,56 @@ export function TelegramDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-4 flex flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total Ingested</span>
-          <span className="text-2xl font-bold">{stats.total}</span>
+        <div className="border border-border bg-card shadow-xs rounded-md p-4 flex flex-col gap-1">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Total Ingested</span>
+          <span className="text-2xl font-bold tracking-tight text-foreground font-mono tabular-nums">{stats.total}</span>
           <span className="text-[10px] text-muted-foreground">Raw messages saved</span>
         </div>
-        <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-4 flex flex-col gap-1.5 border-l-amber-500 border-l-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Unprocessed</span>
-          <span className="text-2xl font-bold text-amber-600">{stats.unprocessed}</span>
+        <div className="border border-border bg-card shadow-xs rounded-md p-4 flex flex-col gap-1 border-l-amber-500 border-l-2">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Unprocessed</span>
+          <span className="text-2xl font-bold tracking-tight text-amber-600 font-mono tabular-nums">{stats.unprocessed}</span>
           <span className="text-[10px] text-muted-foreground">Waiting in extraction queue</span>
         </div>
-        <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-4 flex flex-col gap-1.5 border-l-green-500 border-l-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Processed</span>
-          <span className="text-2xl font-bold text-green-600">{stats.processed}</span>
+        <div className="border border-border bg-card shadow-xs rounded-md p-4 flex flex-col gap-1 border-l-emerald-500 border-l-2">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Processed</span>
+          <span className="text-2xl font-bold tracking-tight text-emerald-600 font-mono tabular-nums">{stats.processed}</span>
           <span className="text-[10px] text-muted-foreground">Successfully parsed as jobs</span>
         </div>
-        <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-4 flex flex-col gap-1.5 border-l-red-500 border-l-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rejected</span>
-          <span className="text-2xl font-bold text-red-600">{stats.rejected}</span>
+        <div className="border border-border bg-card shadow-xs rounded-md p-4 flex flex-col gap-1 border-l-red-500 border-l-2">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Rejected</span>
+          <span className="text-2xl font-bold tracking-tight text-red-600 font-mono tabular-nums">{stats.rejected}</span>
           <span className="text-[10px] text-muted-foreground">Missing role, company, or link</span>
         </div>
-        <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-4 flex flex-col gap-1.5 border-l-slate-500 border-l-2 col-span-2 md:col-span-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Skipped</span>
-          <span className="text-2xl font-bold text-slate-600">{stats.skipped}</span>
-          <span className="text-[10px] text-muted-foreground">Deduplicated (fingerprint matched)</span>
+        <div className="border border-border bg-card shadow-xs rounded-md p-4 flex flex-col gap-1 border-l-zinc-500 border-l-2 col-span-2 md:col-span-1">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Skipped</span>
+          <span className="text-2xl font-bold tracking-tight text-zinc-600 font-mono tabular-nums">{stats.skipped}</span>
+          <span className="text-[10px] text-muted-foreground">Deduplicated messages</span>
         </div>
       </div>
 
       {/* Main Panel Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Monitored Channels Panel */}
-        <div className="lg:col-span-2 border bg-card text-card-foreground shadow-sm rounded-xl p-6 flex flex-col gap-6">
-          <div className="flex justify-between items-center border-b pb-4">
-            <h2 className="text-lg font-bold flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" /> Monitored Channels/Groups
+        <div className="lg:col-span-2 border border-border bg-card shadow-xs rounded-md p-5 flex flex-col gap-5">
+          <div className="flex justify-between items-center border-b border-border pb-3">
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-muted-foreground" /> Monitored Channels & Groups
             </h2>
-            <span className="text-xs font-medium bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono font-semibold bg-secondary text-foreground px-2 py-0.5 rounded-full border border-border">
               {monitoredChannels.length} active
             </span>
           </div>
 
           {/* Add Channel Form */}
-          <div className="bg-muted/40 border rounded-xl p-4">
-            <h3 className="text-sm font-semibold mb-2">Configure Channel to Monitor</h3>
+          <div className="bg-secondary/40 border border-border rounded-md p-4">
+            <h3 className="text-xs font-semibold text-foreground mb-2">Configure Channel to Monitor</h3>
             <div className="flex flex-col sm:flex-row gap-3">
               {joinedChannels.length === 0 ? (
                 <button
                   onClick={fetchJoinedChannels}
                   disabled={loadingJoined}
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border hover:bg-accent h-9 px-3 py-2 w-full sm:w-auto"
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-4 py-2 w-full sm:w-auto transition-colors cursor-pointer"
                 >
                   {loadingJoined ? "Syncing Joined Channels..." : "Load Joined Channels from Telegram"}
                 </button>
@@ -503,7 +501,7 @@ export function TelegramDashboard() {
                   <select
                     value={selectedJoinedChannelId}
                     onChange={(e) => setSelectedJoinedChannelId(e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
                   >
                     <option value="">-- Choose Joined Channel/Group ({unmonitoredJoinedChannels.length} available) --</option>
                     {unmonitoredJoinedChannels.map((c) => (
@@ -515,9 +513,9 @@ export function TelegramDashboard() {
                   <button
                     type="submit"
                     disabled={loading || !selectedJoinedChannelId}
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 flex-shrink-0"
+                    className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 shrink-0 transition-colors cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 mr-1" />
+                    <Plus className="w-3.5 h-3.5 mr-1" />
                     Monitor
                   </button>
                 </form>
@@ -527,51 +525,51 @@ export function TelegramDashboard() {
 
           {/* Channels List */}
           {monitoredChannels.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center py-12 bg-muted/20 border border-dashed rounded-xl">
-              <MessageSquare className="w-8 h-8 text-muted-foreground mb-2" />
-              <p className="text-sm font-medium">No channels configured</p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-[300px]">
+            <div className="flex flex-col items-center justify-center text-center py-12 bg-secondary/10 border border-dashed rounded-md p-6">
+              <Inbox className="w-8 h-8 text-muted-foreground/30 mb-2" />
+              <p className="text-xs font-semibold text-foreground">No monitored channels</p>
+              <p className="text-[11px] text-muted-foreground mt-1 max-w-[280px]">
                 Click &quot;Load Joined Channels&quot; and select a group/channel to begin real-time message ingestion.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
+              <table className="w-full border-collapse text-left text-xs font-sans">
                 <thead>
-                  <tr className="border-b text-left font-medium text-muted-foreground">
-                    <th className="py-2 px-3">Title</th>
-                    <th className="py-2 px-3">Username</th>
-                    <th className="py-2 px-3">ID</th>
-                    <th className="py-2 px-3 text-right">Action</th>
+                  <tr className="border-b border-border text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/20">
+                    <th className="py-2.5 px-3">Title</th>
+                    <th className="py-2.5 px-3">Username</th>
+                    <th className="py-2.5 px-3">ID</th>
+                    <th className="py-2.5 px-3 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {monitoredChannels.map((c) => (
-                    <tr key={c.id} className="border-b last:border-b-0 hover:bg-accent/40 transition-colors">
-                      <td className="py-3 px-3 font-semibold">{c.title}</td>
-                      <td className="py-3 px-3 text-muted-foreground">
+                    <tr key={c.id} className="border-b border-border last:border-b-0 hover:bg-muted/40 transition-colors">
+                      <td className="py-2.5 px-3 font-medium text-foreground">{c.title}</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
                         {c.username ? (
                           <a
                             href={`https://t.me/${c.username}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:underline"
+                            className="text-primary hover:underline font-mono"
                           >
                             @{c.username}
                           </a>
                         ) : (
-                          "Private Group"
+                          <span className="italic text-[11px]">Private Group</span>
                         )}
                       </td>
-                      <td className="py-3 px-3 font-mono text-xs text-muted-foreground">{c.channelId}</td>
-                      <td className="py-3 px-3 text-right">
+                      <td className="py-2.5 px-3 font-mono text-[10px] text-muted-foreground">{c.channelId}</td>
+                      <td className="py-2.5 px-3 text-right">
                         <button
                           onClick={() => handleRemoveMonitoredChannel(c.channelId)}
                           disabled={loading}
-                          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-destructive/10 text-destructive h-8 w-8"
+                          className="inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 transition-colors cursor-pointer"
                           title="Stop Monitoring"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </td>
                     </tr>
@@ -583,23 +581,23 @@ export function TelegramDashboard() {
         </div>
 
         {/* Historical Import Form Panel */}
-        <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-6 flex flex-col gap-6">
-          <div className="border-b pb-4">
-            <h2 className="text-lg font-bold flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" /> Historical Import
+        <div className="border border-border bg-card shadow-xs rounded-md p-5 flex flex-col gap-5">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" /> Historical Import
             </h2>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[11px] text-muted-foreground mt-1">
               Manually crawl and process older messages from a channel database.
             </p>
           </div>
 
           <form onSubmit={handleTriggerHistoricalImport} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">Monitored Channel</label>
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Monitored Channel</label>
               <select
                 value={selectedImportChannelId}
                 onChange={(e) => setSelectedImportChannelId(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
               >
                 <option value="">-- Select Channel --</option>
                 {monitoredChannels.map((c) => (
@@ -612,21 +610,21 @@ export function TelegramDashboard() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">From Date</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">From Date</label>
                 <input
                   type="date"
                   value={fromDate}
                   onChange={(e) => setFromDate(e.target.value)}
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">To Date</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">To Date</label>
                 <input
                   type="date"
                   value={toDate}
                   onChange={(e) => setToDate(e.target.value)}
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black transition-colors"
                 />
               </div>
             </div>
@@ -634,33 +632,33 @@ export function TelegramDashboard() {
             <button
               type="submit"
               disabled={loadingHistory || !selectedImportChannelId}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2 gap-1.5 w-full disabled:opacity-55"
+              className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 mt-1 gap-1.5 w-full disabled:opacity-50 transition-colors cursor-pointer"
             >
               {loadingHistory ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                   Initiating Import...
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4" />
+                  <Play className="w-3.5 h-3.5" />
                   Trigger Import Crawl
                 </>
               )}
             </button>
           </form>
 
-          <div className="text-xs text-muted-foreground border-t pt-4 flex flex-col gap-1.5">
-            <div className="font-semibold text-foreground">Import Architecture:</div>
-            <div className="flex items-center gap-1.5">
+          <div className="text-[11px] text-muted-foreground border-t border-border pt-4 flex flex-col gap-1.5 font-sans">
+            <div className="font-semibold text-foreground text-xs">Import Architecture:</div>
+            <div className="flex items-center gap-1 font-mono text-[10px]">
               <span>GramJS Fetch</span>
-              <ArrowRight className="w-3 h-3" />
-              <span>Raw Messages Table</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 text-muted-foreground" />
+              <span>Raw Messages</span>
+              <ArrowRight className="w-3 h-3 text-muted-foreground" />
               <span>BullMQ Ingest</span>
             </div>
-            <p className="mt-1.5 text-[10px]">
-              Ingested messages are processed sequentially by Gemini 2.5 Flash. Processing takes ~2-3 seconds per message to ensure database integrity.
+            <p className="mt-1 text-[10px] leading-normal text-muted-foreground">
+              Ingested messages are processed sequentially by Gemini 2.5 Flash. Processing takes ~2-3 seconds per message.
             </p>
           </div>
         </div>
@@ -668,10 +666,10 @@ export function TelegramDashboard() {
       </div>
 
       {/* Raw Messages log */}
-      <div className="border bg-card text-card-foreground shadow-sm rounded-xl p-6 flex flex-col gap-4">
-        <div className="border-b pb-4">
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            <Layers className="w-5 h-5 text-primary" /> Live Raw Message Log
+      <div className="border border-border bg-card shadow-xs rounded-md p-5 flex flex-col gap-4">
+        <div className="border-b border-border pb-3">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Layers className="w-4 h-4 text-muted-foreground" /> Live Raw Message Log
           </h2>
           <p className="text-xs text-muted-foreground mt-1">
             Displaying the 100 most recent Telegram messages ingested.
@@ -679,72 +677,72 @@ export function TelegramDashboard() {
         </div>
 
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-12">
-            <MessageSquare className="w-8 h-8 text-muted-foreground mb-2" />
-            <p className="text-sm font-medium">No ingested messages found</p>
-            <p className="text-xs text-muted-foreground mt-1">
+          <div className="flex flex-col items-center justify-center text-center py-12 bg-secondary/10 border border-dashed rounded-md p-6">
+            <Inbox className="w-8 h-8 text-muted-foreground/30 mb-2" />
+            <p className="text-xs font-semibold text-foreground">No ingested messages found</p>
+            <p className="text-[11px] text-muted-foreground mt-1">
               Start monitoring channels or trigger a historical import to observe incoming traffic.
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
-            <table className="w-full border-collapse text-sm">
-              <thead className="sticky top-0 bg-card border-b text-left font-medium text-muted-foreground z-10">
-                <tr>
-                  <th className="py-2.5 px-4 bg-muted/65 w-1/5">Channel</th>
-                  <th className="py-2.5 px-4 bg-muted/65 w-2/5">Message Text</th>
-                  <th className="py-2.5 px-4 bg-muted/65 w-1/5">Ingested / Posted</th>
-                  <th className="py-2.5 px-4 bg-muted/65 w-1/10">Status</th>
-                  <th className="py-2.5 px-4 bg-muted/65 w-1/10">Result Details</th>
+          <div className="overflow-x-auto max-h-[500px] overflow-y-auto border border-border rounded-md">
+            <table className="w-full border-collapse text-left text-xs font-sans">
+              <thead className="sticky top-0 bg-card border-b border-border text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground z-10">
+                <tr className="bg-muted/30">
+                  <th className="py-2.5 px-4 w-1/5">Channel</th>
+                  <th className="py-2.5 px-4 w-2/5">Message Text</th>
+                  <th className="py-2.5 px-4 w-1/5">Ingested / Posted</th>
+                  <th className="py-2.5 px-4 w-1/10">Status</th>
+                  <th className="py-2.5 px-4 w-1/10">Result Details</th>
                 </tr>
               </thead>
               <tbody>
                 {messages.map((m) => {
-                  let statusColor = "bg-slate-100 text-slate-700";
+                  let statusColor = "bg-secondary text-foreground border border-border";
                   let statusIcon = null;
 
                   if (m.status === "UNPROCESSED") {
-                    statusColor = "bg-amber-100 text-amber-800 border-amber-200 border";
+                    statusColor = "bg-amber-500/10 text-amber-600 border border-amber-500/20";
                   } else if (m.status === "PROCESSED") {
-                    statusColor = "bg-green-100 text-green-800 border-green-200 border";
-                    statusIcon = <CheckCircle className="w-3.5 h-3.5 inline mr-1" />;
+                    statusColor = "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
+                    statusIcon = <CheckCircle className="w-3 h-3 inline mr-1 shrink-0" />;
                   } else if (m.status === "REJECTED") {
-                    statusColor = "bg-red-100 text-red-800 border-red-200 border";
-                    statusIcon = <XCircle className="w-3.5 h-3.5 inline mr-1" />;
+                    statusColor = "bg-red-500/10 text-red-600 border border-red-500/20";
+                    statusIcon = <XCircle className="w-3 h-3 inline mr-1 shrink-0" />;
                   } else if (m.status === "SKIPPED_DUPLICATE") {
-                    statusColor = "bg-slate-100 text-slate-800 border-slate-200 border";
+                    statusColor = "bg-zinc-500/10 text-zinc-600 border border-zinc-500/20";
                   }
 
                   return (
-                    <tr key={m.id} className="border-b last:border-b-0 hover:bg-accent/40 transition-colors">
-                      <td className="py-3 px-4 font-semibold align-top">{m.channelName}</td>
+                    <tr key={m.id} className="border-b border-border last:border-b-0 hover:bg-muted/40 transition-colors">
+                      <td className="py-3 px-4 font-semibold text-foreground align-top">{m.channelName}</td>
                       <td className="py-3 px-4 align-top">
-                        <div className="max-h-[100px] overflow-y-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap select-all">
+                        <div className="max-h-[100px] overflow-y-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap select-all bg-secondary/30 p-2 rounded border border-border text-muted-foreground">
                           {m.messageText}
                         </div>
                       </td>
                       <td className="py-3 px-4 align-top text-xs text-muted-foreground">
-                        <div>Posted: {new Date(m.postedAt).toLocaleString()}</div>
-                        <div className="mt-1">Saved: {new Date(m.createdAt).toLocaleString()}</div>
+                        <div>Posted: <span className="font-mono">{new Date(m.postedAt).toLocaleString()}</span></div>
+                        <div className="mt-1">Saved: <span className="font-mono">{new Date(m.createdAt).toLocaleString()}</span></div>
                       </td>
                       <td className="py-3 px-4 align-top">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${statusColor}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-mono font-semibold uppercase ${statusColor}`}>
                           {statusIcon}
                           {m.status}
                         </span>
                       </td>
                       <td className="py-3 px-4 align-top text-xs">
                         {m.errorMessage ? (
-                          <span className="text-destructive flex items-start gap-1 font-medium bg-destructive/10 p-1.5 rounded-md">
-                            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                          <span className="text-red-600 flex items-start gap-1 font-mono text-[10px] bg-red-500/10 border border-red-500/20 p-1.5 rounded bg-clip-border">
+                            <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
                             <span>{m.errorMessage}</span>
                           </span>
                         ) : m.status === "PROCESSED" ? (
-                          <span className="text-green-700 font-semibold">Job Saved</span>
+                          <span className="text-emerald-600 font-semibold text-[11px]">Job Saved</span>
                         ) : m.status === "SKIPPED_DUPLICATE" ? (
-                          <span className="text-slate-500 italic">Deduplicated</span>
+                          <span className="text-zinc-500 italic text-[11px]">Deduplicated</span>
                         ) : (
-                          <span className="text-muted-foreground italic">Pending Queue</span>
+                          <span className="text-muted-foreground italic text-[11px]">Pending Queue</span>
                         )}
                       </td>
                     </tr>
