@@ -45,7 +45,18 @@ const autoApplyWorker = new Worker(
     try {
       const page = browserContext.pages().length > 0 ? browserContext.pages()[0] : await browserContext.newPage();
 
-      await page.goto(job.data.url);
+      let targetUrl = job.data.url;
+      // If the URL is a search results page, rewrite it to the clean, dedicated job page!
+      // This prevents the bot from clicking search filters instead of the real Easy Apply button!
+      if (targetUrl.includes('search-results') && targetUrl.includes('currentJobId=')) {
+        const jobIdMatch = targetUrl.match(/currentJobId=(\d+)/);
+        if (jobIdMatch) {
+          targetUrl = `https://www.linkedin.com/jobs/view/${jobIdMatch[1]}/`;
+          console.log(`Rewrote search results URL to dedicated job page: ${targetUrl}`);
+        }
+      }
+      
+      await page.goto(targetUrl);
       
       // Quick sanity check: If we're redirected to a login page, pause and wait for the user to log in manually!
       const url = page.url();
@@ -69,11 +80,10 @@ const autoApplyWorker = new Worker(
       // Wait a few seconds for LinkedIn's React app to fetch and render the job card
       await page.waitForTimeout(3000);
 
-      // Check for Easy Apply button vs External Apply button
-      console.log("Checking for Easy Apply button...");
-      const easyApplyBtn = page.locator('button', { hasText: /Easy Apply/i }).first();
-      // External Apply is usually an <a> tag because it opens a new tab!
-      const externalApplyBtn = page.locator('a', { hasText: /Apply/i }).first();
+      // Use multiple resilient locators to find the Easy Apply button (can be button or a tag)
+      const easyApplyBtn = page.locator('button:has-text("Easy Apply"), a:has-text("Easy Apply"), [role="button"]:has-text("Easy Apply")').first();
+      // External Apply is usually an <a> tag without "Easy Apply"
+      const externalApplyBtn = page.locator('a:has-text("Apply"), [role="link"]:has-text("Apply"), button:has-text("Apply")').filter({ hasNotText: /Easy Apply/i }).first();
 
       let targetPage = page;
 

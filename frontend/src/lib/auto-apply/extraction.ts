@@ -28,7 +28,7 @@ export async function extractFormFields(page: Page): Promise<FormField[]> {
       // Easiest is to generate a unique selector.
       let id = '';
       if (el.id) {
-        id = `#${el.id}`;
+        id = `[id="${el.id.replace(/"/g, '\\"')}"]`;
       } else if (el.getAttribute('name')) {
         id = `[name="${el.getAttribute('name')}"]`;
       } else {
