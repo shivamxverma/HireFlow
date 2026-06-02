@@ -1,56 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Job {
-  id          String   @id @default(cuid())
-  source      String // e.g. "wellfound", "yc", "linkedin"
-  externalId  String   @map("external_id")
-  title       String
-  company     String
-  location    String
-  salary      String?
-  applyUrl    String?  @map("apply_url")
-  description String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  lastSeenAt  DateTime @default(now()) @map("last_seen_at")
-
-  // Tracking fields
-  status    String?
-  platform  String?
-  notes     String?
-  appliedAt DateTime? @map("applied_at")
-
-  // Relations for Auto Apply System
-  applications Application[]
-  resumes      ResumeVersion[]
+  id                  String          @id @default(cuid())
+  source              String
+  externalId          String          @map("external_id")
+  title               String
+  company             String
+  location            String
+  salary              String?
+  applyUrl            String?         @map("apply_url")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  lastSeenAt          DateTime        @default(now()) @map("last_seen_at")
+  appliedAt           DateTime?       @map("applied_at")
+  notes               String?
+  platform            String?
+  status              String?
+  description         String?
+  fingerprint         String?
+  telegram_channel_id String?
+  telegram_message_id String?
+  applications        Application[]
+  resumes             ResumeVersion[]
 
   @@unique([source, externalId])
   @@index([source])
   @@index([company])
   @@index([status])
+  @@index([fingerprint])
 }
 
 model Application {
-  id              String    @id @default(cuid())
-  jobId           String    @map("job_id")
-  userId          String    @default("default-user") @map("user_id")
-  status          String // QUEUED, GENERATING_RESUME, READY_TO_APPLY, APPLYING, APPLIED, FAILED
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  appliedAt       DateTime? @map("applied_at")
-  errorMessage    String?   @map("error_message")
-  resumeVersionId String?   @map("resume_version_id")
-
-  job            Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  resumeVersion  ResumeVersion?  @relation("AppToResume", fields: [resumeVersionId], references: [id])
-  resumeVersions ResumeVersion[] @relation("JobAppResumes")
+  id              String          @id @default(cuid())
+  jobId           String          @map("job_id")
+  userId          String          @default("default-user") @map("user_id")
+  status          String
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  appliedAt       DateTime?       @map("applied_at")
+  errorMessage    String?         @map("error_message")
+  resumeVersionId String?         @map("resume_version_id")
+  job             Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  resumeVersion   ResumeVersion?  @relation("AppToResume", fields: [resumeVersionId], references: [id])
+  resumeVersions  ResumeVersion[] @relation("JobAppResumes")
 
   @@index([jobId])
   @@index([userId])
@@ -58,16 +57,15 @@ model Application {
 }
 
 model ResumeVersion {
-  id            String   @id @default(cuid())
-  applicationId String   @map("application_id")
-  jobId         String   @map("job_id")
-  pdfPath       String   @map("pdf_path")
-  latexPath     String   @map("latex_path")
-  generatedAt   DateTime @default(now()) @map("generated_at")
-
-  job          Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  application  Application   @relation("JobAppResumes", fields: [applicationId], references: [id], onDelete: Cascade)
-  applications Application[] @relation("AppToResume")
+  id            String        @id @default(cuid())
+  applicationId String        @map("application_id")
+  jobId         String        @map("job_id")
+  pdfPath       String        @map("pdf_path")
+  latexPath     String        @map("latex_path")
+  generatedAt   DateTime      @default(now()) @map("generated_at")
+  applications  Application[] @relation("AppToResume")
+  application   Application   @relation("JobAppResumes", fields: [applicationId], references: [id], onDelete: Cascade)
+  job           Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([applicationId])
   @@index([jobId])
@@ -75,13 +73,14 @@ model ResumeVersion {
 
 model Lead {
   id             String    @id @default(cuid())
-  userId         String    @default("default-user") @map("user_id")
   companyName    String    @map("company_name")
   recipientEmail String    @map("recipient_email")
   jobDescription String    @map("job_description")
-  status         String    @default("READY") // READY, SENDING, SENT, FAILED
+  status         String    @default("READY")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
+  thread_id      String?
+  userId         String    @default("default-user") @map("user_id")
   messages       Message[]
 
   @@index([userId])
@@ -89,46 +88,34 @@ model Lead {
 }
 
 model Message {
-  id        String    @id @default(cuid())
-  leadId    String    @map("lead_id")
-  type      String // INITIAL, FOLLOWUP_1, FOLLOWUP_2, FOLLOWUP_3
-  subject   String
-  body      String
-  sentAt    DateTime? @map("sent_at")
-  createdAt DateTime  @default(now()) @map("created_at")
-
-  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  id               String    @id @default(cuid())
+  leadId           String    @map("lead_id")
+  type             String
+  subject          String
+  body             String
+  sentAt           DateTime? @map("sent_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  gmail_message_id String?
+  lead             Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
 
-enum Role {
-  ADMIN
-  AUTHOR
-  USER
-}
-
-enum AuthProvider {
-  GOOGLE_OAUTH
-  GITHUB_OAUTH
-  EMAIL_PASSWORD
-}
-
 model User {
-  id                String   @id @default(cuid())
-  email             String?  @unique
-  displayName       String?  @map("display_name")
-  avatarUrl         String?  @map("avatar_url")
-  username          String   @unique
-  role              Role     @default(USER)
-  is2FaAuthEnabled  Boolean  @default(false) @map("is2fa_auth_enabled")
-  isBanned          Boolean  @default(false) @map("is_banned")
-  isEmailVerified   Boolean  @default(false) @map("is_email_verified")
-  verificationToken String?  @map("verification_token")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id                String      @id @default(cuid())
+  email             String?     @unique
+  displayName       String?     @map("display_name")
+  avatarUrl         String?     @map("avatar_url")
+  username          String      @unique
+  role              Role        @default(USER)
+  is2FaAuthEnabled  Boolean     @default(false) @map("is2fa_auth_enabled")
+  isBanned          Boolean     @default(false) @map("is_banned")
+  isEmailVerified   Boolean     @default(false) @map("is_email_verified")
+  verificationToken String?     @map("verification_token")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+  authMethods       AuthMethod?
 
-  authMethods   AuthMethod[]
   profile       UserProfile?
   experiences   UserExperience[]
   educations    UserEducation[]
@@ -141,25 +128,150 @@ model User {
 
 model AuthMethod {
   id           String       @id @default(cuid())
-  userId       String       @map("user_id")
+  userId       String       @unique @map("user_id")
   provider     AuthProvider
-  googleSub    String?      @map("google_sub")
-  googleEmail  String?      @map("google_email")
-  githubSub    String?      @map("github_sub")
-  githubEmail  String?      @map("github_email")
+  googleSub    String?      @unique @map("google_sub")
+  googleEmail  String?      @unique @map("google_email")
+  githubSub    String?      @unique @map("github_sub")
+  githubEmail  String?      @unique @map("github_email")
   email        String?
   passwordHash String?      @map("password_hash")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([googleEmail])
-  @@unique([googleSub])
-  @@unique([githubEmail])
-  @@unique([githubSub])
-  @@unique([userId])
   @@map("auth_method")
+}
+
+model conversation_trackers {
+  id                String    @id
+  profile_id        String    @unique
+  status            String    @default("ACTIVE")
+  last_contacted_at DateTime?
+  reply_received    Boolean   @default(false)
+  positive_response Boolean   @default(false)
+  profiles          profiles  @relation(fields: [profile_id], references: [id], onDelete: Cascade)
+}
+
+model generation_jobs {
+  id                String    @id
+  profile_id        String
+  resume_id         String
+  job_id            String?
+  template_id       String
+  status            String    @default("PENDING")
+  generated_subject String?
+  generated_message String?
+  error             String?
+  created_at        DateTime  @default(now())
+  profiles          profiles  @relation(fields: [profile_id], references: [id], onDelete: Cascade)
+  resumes           resumes   @relation(fields: [resume_id], references: [id], onDelete: Cascade)
+  templates         templates @relation(fields: [template_id], references: [id], onDelete: Cascade)
+
+  @@index([profile_id])
+  @@index([resume_id])
+  @@index([template_id])
+}
+
+model google_tokens {
+  id            String   @id @default("singleton")
+  access_token  String
+  refresh_token String
+  expiry_date   DateTime
+  updated_at    DateTime
+}
+
+model outbound_messages {
+  id           String    @id
+  profile_id   String
+  channel      String    @default("EMAIL")
+  subject      String
+  content      String
+  status       String    @default("DRAFT")
+  sent_at      DateTime?
+  delivered_at DateTime?
+  created_at   DateTime  @default(now())
+  profiles     profiles  @relation(fields: [profile_id], references: [id], onDelete: Cascade)
+
+  @@index([profile_id])
+  @@index([status])
+}
+
+model profiles {
+  id                    String                 @id
+  name                  String
+  role                  String
+  company               String
+  linkedin_url          String?
+  email                 String?
+  notes                 String?
+  source                String                 @default("MANUAL")
+  tags                  String[]
+  created_at            DateTime               @default(now())
+  updated_at            DateTime
+  user_id               String                 @default("default-user")
+  conversation_trackers conversation_trackers?
+  generation_jobs       generation_jobs[]
+  outbound_messages     outbound_messages[]
+
+  @@index([user_id])
+}
+
+model resumes {
+  id              String            @id
+  title           String
+  file_url        String?
+  parsed_text     String
+  skills          String[]
+  experience      String?
+  projects        String?
+  created_at      DateTime          @default(now())
+  generation_jobs generation_jobs[]
+}
+
+model telegram_channels {
+  id         String   @id
+  channel_id String   @unique
+  title      String
+  username   String?
+  created_at DateTime @default(now())
+}
+
+model telegram_messages {
+  id            String   @id
+  channel_id    String
+  channel_name  String
+  message_id    Int
+  message_text  String
+  posted_at     DateTime
+  processed     Boolean  @default(false)
+  status        String   @default("UNPROCESSED")
+  error_message String?
+  created_at    DateTime @default(now())
+
+  @@unique([channel_id, message_id])
+}
+
+model templates {
+  id              String            @id
+  name            String
+  type            String
+  prompt          String
+  active          Boolean           @default(true)
+  created_at      DateTime          @default(now())
+  generation_jobs generation_jobs[]
+}
+
+enum Role {
+  ADMIN
+  AUTHOR
+  USER
+}
+
+enum AuthProvider {
+  GOOGLE_OAUTH
+  GITHUB_OAUTH
+  EMAIL_PASSWORD
 }
 
 model UserProfile {

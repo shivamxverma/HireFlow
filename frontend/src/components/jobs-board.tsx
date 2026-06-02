@@ -472,6 +472,7 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                       setPollingIntervalId(null);
                     }
                   }}
+                  onAutoApply={(j) => handleAutoApply(j.id)}
                 />
               ))}
             </div>
@@ -705,178 +706,87 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
 
       {/* ==================== AUTO-APPLY LIVE QUEUE TAB ==================== */}
       {activeTab === "queue" && (
-        <section className="flex flex-col gap-8" style={{ minHeight: "70vh", position: "relative", overflow: "hidden", padding: "1rem 0" }}>
-          {/* Floating animated blobs */}
-          <div style={{ position: "absolute", top: "10%", left: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(182, 95, 42, 0.08) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float1 15s ease-in-out infinite alternate", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "10%", right: "-10%", width: "250px", height: "250px", background: "radial-gradient(circle, rgba(217, 119, 6, 0.06) 0%, rgba(0,0,0,0) 70%)", borderRadius: "50%", animation: "float2 18s ease-in-out infinite alternate", pointerEvents: "none" }} />
-
-          {/* Header Dashboard Deck */}
-          <div className="bg-card text-card-foreground border rounded-xl shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10" style={{ background: "rgba(255, 253, 248, 0.6)", backdropFilter: "blur(12px)" }}>
+        <section className="flex flex-col gap-6" style={{ minHeight: "70vh", padding: "1rem 0" }}>
+          <header className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
             <div>
-              <span 
-                style={{ 
-                  fontSize: "0.68rem", 
-                  fontWeight: 700, 
-                  background: "rgba(182, 95, 42, 0.1)", 
-                  color: "#b65f2a", 
-                  padding: "0.25rem 0.65rem", 
-                  borderRadius: "999px",
-                  border: "1px solid rgba(182, 95, 42, 0.2)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  display: "inline-block",
-                  marginBottom: "0.5rem"
-                }}
-              >
-                Version 2.0 Roadmap Preview 🚀
-              </span>
-              <h2 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text)", margin: "0", letterSpacing: "-0.025em" }}>
-                AI Auto-Apply Live Queue
-              </h2>
-              <p className="text-sm text-muted-foreground" style={{ margin: "6px 0 0" }}>
-                Autonomous Playwright form-filling and real-time Gemini resume optimization.
+              <span className="text-primary font-semibold text-sm uppercase tracking-wider">Live background agent</span>
+              <h2 className="text-2xl font-bold mt-1 tracking-tight">Auto-Apply Queue</h2>
+              <p className="text-sm text-muted-foreground mt-2">
+                Monitor your background worker autonomously filling forms and generating AI resumes.
               </p>
             </div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                🔒 Stealth Mode Ready
+                ⚡ Active Worker
               </span>
             </div>
+          </header>
+
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden overflow-x-auto">
+            <table className="w-full caption-bottom text-sm">
+              <thead>
+                <tr>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Company</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Role</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Worker Status</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Time Started</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Agent Logs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applications.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                      No background applications queued yet. Go to the Explore tab and click "Auto Apply Now"!
+                    </td>
+                  </tr>
+                ) : (
+                  applications.map((app) => (
+                    <tr key={app.id} className="border-b transition-colors hover:bg-muted/50">
+                      <td className="p-4 align-middle">
+                        <strong>{app.job?.company || "Unknown"}</strong>
+                      </td>
+                      <td className="p-4 align-middle">
+                        <span>{app.job?.title || "Unknown"}</span>
+                      </td>
+                      <td className="p-4 align-middle">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-[0.68rem] font-semibold uppercase tracking-wider ${
+                            app.status === "APPLIED"
+                              ? "bg-green-100 text-green-700 border border-green-200"
+                              : app.status === "FAILED"
+                              ? "bg-red-100 text-red-700 border border-red-200"
+                              : "bg-blue-100 text-blue-700 border border-blue-200 animate-pulse"
+                          }`}
+                        >
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="p-4 align-middle text-muted-foreground">
+                        {new Date(app.createdAt).toLocaleString()}
+                      </td>
+                      <td className="p-4 align-middle">
+                        {app.status === "FAILED" ? (
+                          <span className="text-red-500 text-xs font-mono max-w-[250px] inline-block truncate" title={app.errorMessage || "Unknown error"}>
+                            {app.errorMessage || "Failed during Playwright automation"}
+                          </span>
+                        ) : app.status === "APPLIED" ? (
+                          <span className="text-green-600 text-xs font-mono">
+                            Playwright flow completed ✓
+                          </span>
+                        ) : (
+                          <span className="text-blue-500 text-xs font-mono flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+                            Agent navigating form...
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-
-          {/* Feature Deck & Mockup Dashboard */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
-            
-            {/* Left 2 Cols: Pipeline Explanation & Feature list */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              
-              <div 
-                style={{ 
-                  background: "rgba(255, 255, 255, 0.5)", 
-                  border: "1px solid var(--border)", 
-                  borderRadius: "20px", 
-                  padding: "2rem",
-                  boxShadow: "var(--shadow)"
-                }}
-              >
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", marginBottom: "1rem" }}>
-                  How the Auto-Apply Pipeline Works
-                </h3>
-                <p style={{ fontSize: "0.88rem", color: "#64748b", lineHeight: "1.6", marginBottom: "1.5rem" }}>
-                  When Version 2.0 launches, you will be able to select any scraped job from your Explore board and trigger a background agent. The system handles the heavy lifting autonomously:
-                </p>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>1</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>AI Resume Tailoring</strong>
-                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
-                      Gemini reviews the target job requirements and restructures your master PDF/LaTeX resume dynamically to highlight matching technical skills.
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>2</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>LaTeX PDF Compilation</strong>
-                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
-                      The customized LaTeX codebase is compiled directly on the server into a high-fidelity PDF, ensuring zero formatting bugs.
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>3</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>Playwright Automation</strong>
-                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
-                      Stealth background browser instances launch on your backend to navigate forms, input tailored fields, and upload PDFs directly.
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <span style={{ display: "flex", alignItems: "center", width: "28px", height: "28px", borderRadius: "8px", background: "rgba(182, 95, 42, 0.08)", color: "var(--primary)", fontWeight: 700, fontSize: "0.9rem", paddingLeft: "10px", paddingTop: "2px" }}>4</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--text)" }}>Kanban Status Sync</strong>
-                    <span style={{ fontSize: "0.8rem", color: "#64748b", lineHeight: "1.4" }}>
-                      Successful applications are automatically moved to &quot;Applied&quot; inside your Tracker board, storing generated PDF versions for review.
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Col: Live Progress Simulator / Roadmap widget */}
-            <div className="flex flex-col gap-6">
-              
-              <div 
-                style={{ 
-                  background: "linear-gradient(135deg, #1e1b4b 0%, #311042 100%)", 
-                  borderRadius: "20px", 
-                  padding: "1.75rem", 
-                  color: "white",
-                  boxShadow: "0 12px 30px rgba(49, 16, 66, 0.2)"
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
-                  <div>
-                    <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0", color: "#e0e7ff" }}>Pipeline Simulator</h3>
-                    <p style={{ fontSize: "0.78rem", color: "#c7d2fe", margin: "2px 0 0" }}>Interactive mockup of Version 2.0</p>
-                  </div>
-                  <Sparkles className="w-5 h-5 text-indigo-300 animate-pulse" />
-                </div>
-
-                {/* Progress steps mock */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", background: "rgba(255,255,255,0.08)", padding: "0.75rem", borderRadius: "10px" }}>
-                    <div className="spinner" style={{
-                      width: "16px",
-                      height: "16px",
-                      border: "2px solid rgba(255, 255, 255, 0.25)",
-                      borderTopColor: "white",
-                      borderRadius: "50%",
-                      animation: "spin 1.2s linear infinite"
-                    }} />
-                    <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Playwright active: Navigating forms...</span>
-                  </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.8rem", color: "#cbd5e1", paddingLeft: "0.25rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <span style={{ color: "#10b981", fontWeight: 700 }}>✓</span>
-                      <span>Optimize Resume using OpenAI</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <span style={{ color: "#10b981", fontWeight: 700 }}>✓</span>
-                      <span>Compile tailored LaTeX & PDF resume</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: 0.9 }}>
-                      <span style={{ color: "#a855f7" }}>●</span>
-                      <span>Launch Playwright headed apply flow</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "1rem", textAlign: "center" }}>
-                  <p style={{ fontSize: "0.72rem", color: "#cbd5e1", margin: 0 }}>
-                    Auto-apply backend worker triggers and PDF versioning will connect here dynamically in Version 2.0.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-          <style>{`
-            @keyframes float1 {
-              0% { transform: translate(0, 0) scale(1); }
-              100% { transform: translate(25px, 20px) scale(1.08); }
-            }
-            @keyframes float2 {
-              0% { transform: translate(0, 0) scale(1); }
-              100% { transform: translate(-20px, -25px) scale(0.92); }
-            }
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-          `}</style>
         </section>
       )}
 
