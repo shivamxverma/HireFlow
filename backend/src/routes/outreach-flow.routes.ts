@@ -156,7 +156,12 @@ outreachFlowRouter.get("/outreach-flow/profiles", async (req: AuthenticatedReque
   try {
     const userId = req.user?.id || "default-user";
     const profiles = await prisma.profile.findMany({
-      where: { userId },
+      where: {
+        OR: [
+          { userId },
+          { userId: "admin-api-key" },
+        ],
+      },
       include: {
         outboundMessages: true,
       },
@@ -182,10 +187,13 @@ outreachFlowRouter.post("/outreach-flow/profiles", async (req: AuthenticatedRequ
     const created = [];
 
     for (const p of profilesList) {
-      const { name, role, company, linkedinUrl, email, notes, tags } = p;
-      if (!name || !role || !company) {
+      const { name, role, company, linkedinUrl, email, notes, tags, source } = p;
+      if (!name) {
         continue;
       }
+
+      const finalRole = role ? role.trim() : "LinkedIn profile";
+      const finalCompany = company ? company.trim() : "Unknown";
 
       const tagsArray = Array.isArray(tags) 
         ? tags 
@@ -193,19 +201,42 @@ outreachFlowRouter.post("/outreach-flow/profiles", async (req: AuthenticatedRequ
           ? tags.split(",").map((t: string) => t.trim()).filter(Boolean)
           : [];
 
-      const profile = await prisma.profile.create({
-        data: {
-          userId,
-          name: name.trim(),
-          role: role.trim(),
-          company: company.trim(),
-          linkedinUrl: linkedinUrl ? linkedinUrl.trim() : null,
-          email: email ? email.trim().toLowerCase() : null,
-          notes: notes ? notes.trim() : null,
-          tags: tagsArray,
-          source: profilesList.length > 1 ? "BULK_IMPORT" : "MANUAL",
-        },
-      });
+      const normalizedLinkedinUrl = linkedinUrl ? linkedinUrl.trim() : null;
+      const existingProfile = normalizedLinkedinUrl
+        ? await prisma.profile.findFirst({
+            where: {
+              userId,
+              linkedinUrl: normalizedLinkedinUrl,
+            },
+          })
+        : null;
+
+      const profile = existingProfile
+        ? await prisma.profile.update({
+            where: { id: existingProfile.id },
+            data: {
+              name: name.trim(),
+              role: finalRole,
+              company: finalCompany,
+              email: email ? email.trim().toLowerCase() : existingProfile.email,
+              notes: notes ? notes.trim() : existingProfile.notes,
+              tags: tagsArray.length > 0 ? Array.from(new Set([...existingProfile.tags, ...tagsArray])) : existingProfile.tags,
+              source: source || existingProfile.source,
+            },
+          })
+        : await prisma.profile.create({
+            data: {
+              userId,
+              name: name.trim(),
+              role: finalRole,
+              company: finalCompany,
+              linkedinUrl: normalizedLinkedinUrl,
+              email: email ? email.trim().toLowerCase() : null,
+              notes: notes ? notes.trim() : null,
+              tags: tagsArray,
+              source: source || (profilesList.length > 1 ? "BULK_IMPORT" : "MANUAL"),
+            },
+          });
       created.push(profile);
     }
 

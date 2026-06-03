@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Hireflow LinkedIn Saver",
+  "description": "Save the currently viewed LinkedIn profile into Hireflow.",
+  "version": "0.1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to Hireflow"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://linkedin.com/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
+  ]
+}

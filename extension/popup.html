@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hireflow Saver</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">Hireflow</p>
+          <h1>LinkedIn Saver</h1>
+        </div>
+        <span id="statusDot" class="dot"></span>
+      </header>
+
+      <section class="settings">
+        <label>
+          API URL
+          <input id="apiUrl" type="url" placeholder="http://localhost:3000" />
+        </label>
+        <label>
+          API key
+          <input id="apiKey" type="password" placeholder="OUTREACH_API_KEY" />
+        </label>
+        <button id="saveSettings" class="secondary" type="button">Save settings</button>
+      </section>
+
+      <section id="preview" class="preview hidden">
+        <p id="profileName" class="name"></p>
+        <p id="profileUrl" class="url"></p>
+      </section>
+
+      <button id="saveProfile" class="primary" type="button">Save current profile</button>
+      <p id="message" class="message">Open a LinkedIn profile, then click save.</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
