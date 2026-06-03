@@ -3,3 +3,8 @@ node_modules
 .env.local
 dist
 playwright-profile
+
+# Debug and test outputs
+debug-*
+screenshots/*.png
+*.bak
