@@ -20,6 +20,31 @@ const geminiService = new GeminiService();
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const locateProfileCardButton = async (page: any, text: string, defaultSelectors: string[]) => {
+  for (const selector of defaultSelectors) {
+    const locator = page.locator(selector);
+    const count = await locator.count();
+    for (let i = 0; i < count; i++) {
+      const el = locator.nth(i);
+      if (await el.isVisible()) {
+        const rect = await el.boundingBox();
+        // Avoid sticky headers at the top (y < 100) and sidebar profiles on the right (x > 1000)
+        if (rect && rect.y > 100 && rect.x < 1000) {
+          console.log(`[LinkedIn Outreach] Found "${text}" button via selector: "${selector}"`);
+          return el;
+        }
+      }
+    }
+  }
+  // Fallback to first visible selector match
+  const fallback = page.locator(defaultSelectors.join(', ')).first();
+  if (await fallback.isVisible()) {
+    console.log(`[LinkedIn Outreach] Found "${text}" button via fallback selector`);
+    return fallback;
+  }
+  return null;
+};
+
 /**
  * 1. Check LinkedIn Session Status
  * GET /outreach/linkedin/status
@@ -314,10 +339,11 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
             try {
               await page.waitForSelector('main, .scaffold-layout__main, .pv-profile-card, .ph5', { timeout: 15000 });
               console.log("[LinkedIn Outreach] Profile page mounted successfully. Allowing assets to settle...");
-              await page.waitForTimeout(3000);
+              // Safe settle delay: 4-8 seconds
+              await page.waitForTimeout(4000 + Math.random() * 4000);
             } catch (e) {
               console.warn("[LinkedIn Outreach] Profile scaffold layout timed out. Using basic settle fallback.");
-              await page.waitForTimeout(5000);
+              await page.waitForTimeout(6000);
             }
 
             const currentUrl = page.url();
@@ -328,11 +354,21 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
             let messaged = false;
 
             // Flow A: Direct Message Button (if already connected or open profile)
-            const messageBtn = page.locator('button.pvs-profile-actions__action:has-text("Message"), button:has-text("Message"), a:has-text("Message")').first();
-            if (await messageBtn.isVisible()) {
+            const messageBtn = await locateProfileCardButton(page, "Message", [
+              'main#workspace > div > div > section a:has-text("Message")',
+              'main#workspace > div > div > section button:has-text("Message")',
+              'main a:has-text("Message")',
+              'main button:has-text("Message")',
+              'button.pvs-profile-actions__action:has-text("Message")',
+              'button:has-text("Message")',
+              'a:has-text("Message")'
+            ]);
+
+            if (messageBtn) {
               console.log("[LinkedIn Outreach] Direct Message button visible. Initiating chat window...");
-              await messageBtn.click();
-              await page.waitForTimeout(2500);
+              await messageBtn.click({ force: true });
+              // Safe delay after clicking Message: 3-5 seconds
+              await page.waitForTimeout(3000 + Math.random() * 2000);
 
               // Check if a Premium InMail paywall dialog or promotional modal appeared
               const inmailModal = page.locator('div[role="dialog"]:has-text("InMail"), .premium-upsell-link, button:has-text("InMail")').first();
@@ -343,21 +379,27 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
                 // Dismiss the dialog using standard close actions
                 const dismissBtn = page.locator('button[aria-label="Dismiss"], button[aria-label="Close"], button.artdeco-modal__dismiss').first();
                 if (await dismissBtn.isVisible()) {
-                  await dismissBtn.click();
+                  await dismissBtn.click({ force: true });
                   await page.waitForTimeout(1500);
                 }
               } else {
                 const chatInput = page.locator('div.msg-form__contenteditable[contenteditable="true"], div[role="textbox"], .msg-form__placeholder').first();
                 if (await chatInput.isVisible()) {
                   await chatInput.focus();
-                  await page.waitForTimeout(500);
-                  // Type with realistic human pacing
-                  await chatInput.type(msg.content, { delay: 30 + Math.random() * 20 });
-                  await page.waitForTimeout(1000);
+                  // Safe typing delay before starting: 1-2 seconds
+                  await page.waitForTimeout(1000 + Math.random() * 1000);
+
+                  // Type with realistic human pacing: 60-120 ms per character
+                  await chatInput.type(msg.content, { delay: 60 + Math.random() * 60, timeout: 120000 });
+                  
+                  // Safe typing delay after completing: 2-4 seconds
+                  await page.waitForTimeout(2000 + Math.random() * 2000);
 
                   const sendBtn = page.locator('button.msg-form__send-button, button[type="submit"]:has-text("Send")').first();
-                  await sendBtn.click();
-                  await page.waitForTimeout(2500);
+                  await sendBtn.click({ force: true });
+                  
+                  // Safe delay after sending: 3-5 seconds
+                  await page.waitForTimeout(3000 + Math.random() * 2000);
                   messaged = true;
                   console.log("[LinkedIn Outreach] Direct message dispatched successfully!");
                 }
@@ -368,37 +410,64 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
             if (!messaged) {
               console.log("[LinkedIn Outreach] Direct Message not possible. Attempting Connection Invitation note...");
               
-              let connectBtn = page.locator('button.pvs-profile-actions__action:has-text("Connect"), button:has-text("Connect")').first();
-              if (!(await connectBtn.isVisible())) {
-                const moreBtn = page.locator('button[aria-label*="more actions"], button:has-text("More"), button.artdeco-dropdown__trigger').first();
-                if (await moreBtn.isVisible()) {
-                  await moreBtn.click();
-                  await page.waitForTimeout(1500);
+              let connectBtn = await locateProfileCardButton(page, "Connect", [
+                'main#workspace > div > div > section button:has-text("Connect")',
+                'main#workspace > div > div > section a:has-text("Connect")',
+                'main button:has-text("Connect")',
+                'main a:has-text("Connect")',
+                'button.pvs-profile-actions__action:has-text("Connect")',
+                'button:has-text("Connect")'
+              ]);
+
+              if (!connectBtn || !(await connectBtn.isVisible())) {
+                const moreBtn = await locateProfileCardButton(page, "More Actions", [
+                  'main#workspace > div > div > section button[aria-label*="more actions"]',
+                  'main#workspace > div > div > section button:has-text("More")',
+                  'main button[aria-label*="more actions"]',
+                  'main button:has-text("More")',
+                  'button[aria-label*="more actions"]',
+                  'button:has-text("More")',
+                  'button.artdeco-dropdown__trigger'
+                ]);
+
+                if (moreBtn && await moreBtn.isVisible()) {
+                  await moreBtn.click({ force: true });
+                  // Safe delay: 1-2.5 seconds
+                  await page.waitForTimeout(1000 + Math.random() * 1500);
+                  
                   connectBtn = page.locator('span:has-text("Connect"), div[role="button"]:has-text("Connect"), button:has-text("Connect"), button[aria-label*="Connect"]').first();
                 }
               }
 
-              if (await connectBtn.isVisible()) {
-                await connectBtn.click();
-                await page.waitForTimeout(2500);
+              if (connectBtn && await connectBtn.isVisible()) {
+                await connectBtn.click({ force: true });
+                // Safe delay: 3-5 seconds
+                await page.waitForTimeout(3000 + Math.random() * 2000);
 
                 // Handle standard prompt: "Customize your invitation"
                 const addNoteBtn = page.locator('button[aria-label="Add a note"], button:has-text("Add a note"), button.artdeco-button--secondary:has-text("note")').first();
                 if (await addNoteBtn.isVisible()) {
-                  await addNoteBtn.click();
-                  await page.waitForTimeout(1500);
+                  await addNoteBtn.click({ force: true });
+                  // Safe delay: 1.5-3 seconds
+                  await page.waitForTimeout(1500 + Math.random() * 1500);
 
                   const noteArea = page.locator('textarea[name="message"], textarea#custom-message, textarea').first();
                   if (await noteArea.isVisible()) {
                     await noteArea.focus();
-                    await page.waitForTimeout(500);
-                    // Type with realistic human pacing
-                    await noteArea.type(msg.content, { delay: 35 + Math.random() * 25 });
-                    await page.waitForTimeout(1000);
+                    // Safe typing delay before starting: 1-2 seconds
+                    await page.waitForTimeout(1000 + Math.random() * 1000);
+
+                    // Type with realistic human pacing: 60-120 ms per character
+                    await noteArea.type(msg.content, { delay: 60 + Math.random() * 60, timeout: 120000 });
+                    
+                    // Safe typing delay after completing: 2-4 seconds
+                    await page.waitForTimeout(2000 + Math.random() * 2000);
 
                     const sendInvitationBtn = page.locator('button[aria-label="Send now"], button:has-text("Send"), button.artdeco-button--primary:has-text("Send")').first();
-                    await sendInvitationBtn.click();
-                    await page.waitForTimeout(2500);
+                    await sendInvitationBtn.click({ force: true });
+                    
+                    // Safe delay after sending connect: 3-5 seconds
+                    await page.waitForTimeout(3000 + Math.random() * 2000);
                     messaged = true;
                     console.log("[LinkedIn Outreach] Connection request invitation sent with personalized note!");
                   }
@@ -407,8 +476,9 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
                   console.log("[LinkedIn Outreach] Add a note restricted. Sending direct invitation...");
                   const sendInvitationBtn = page.locator('button[aria-label="Send now"], button:has-text("Send now"), button:has-text("Send")').first();
                   if (await sendInvitationBtn.isVisible()) {
-                    await sendInvitationBtn.click();
-                    await page.waitForTimeout(2500);
+                    await sendInvitationBtn.click({ force: true });
+                    // Safe delay: 3-5 seconds
+                    await page.waitForTimeout(3000 + Math.random() * 2000);
                     messaged = true;
                   }
                 }
@@ -457,10 +527,10 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
           });
         }
 
-        // Apply a randomized 5-10 second human-like delay between consecutive DM dispatches
+        // Apply a randomized 45-75 second human-like delay between consecutive DM dispatches to protect account
         if (i < messages.length - 1) {
-          const delay = 5000 + Math.random() * 5000;
-          console.log(`[LinkedIn Outreach] Applying human simulation delay: ${Math.round(delay)}ms before next DM...`);
+          const delay = 45000 + Math.random() * 30000;
+          console.log(`[LinkedIn Outreach] Applying account protection campaign delay: ${Math.round(delay / 1000)}s before next DM...`);
           await sleep(delay);
         }
       }

@@ -573,10 +573,10 @@ export function LinkedinOutreach() {
   };
 
   const toggleSelectAll = () => {
-    // Select all profiles that have generated messages ready for sending
+    // Select all profiles that have generated messages ready for sending (excluding already sent/sending ones)
     const actionable = profiles.filter((p) => {
       const msg = p.outboundMessages?.find((m) => m.channel === "LINKEDIN");
-      return msg && (msg.status === "DRAFT" || msg.status === "EDTIED" || msg.status === "FAILED" || msg.status === "SENDING" || msg.status === "SENT");
+      return msg && (msg.status === "DRAFT" || msg.status === "EDTIED" || msg.status === "FAILED");
     });
     
     if (selectedProfileIds.length === actionable.length) {
@@ -585,6 +585,7 @@ export function LinkedinOutreach() {
       setSelectedProfileIds(actionable.map((p) => p.id));
     }
   };
+
 
   return (
     <div className="flex flex-col gap-6 font-sans">
@@ -856,8 +857,8 @@ export function LinkedinOutreach() {
                         type="checkbox"
                         checked={
                           profiles.length > 0 && 
-                          profiles.filter(p => p.outboundMessages?.some(m => m.channel === "LINKEDIN")).length > 0 &&
-                          selectedProfileIds.length === profiles.filter(p => p.outboundMessages?.some(m => m.channel === "LINKEDIN")).length
+                          profiles.filter(p => p.outboundMessages?.some(m => m.channel === "LINKEDIN" && (m.status === "DRAFT" || m.status === "EDTIED" || m.status === "FAILED"))).length > 0 &&
+                          selectedProfileIds.length === profiles.filter(p => p.outboundMessages?.some(m => m.channel === "LINKEDIN" && (m.status === "DRAFT" || m.status === "EDTIED" || m.status === "FAILED"))).length
                         }
                         onChange={toggleSelectAll}
                         className="cursor-pointer"
@@ -886,9 +887,10 @@ export function LinkedinOutreach() {
                           {linkedInMsg && (
                             <input 
                               type="checkbox"
+                              disabled={linkedInMsg.status === "SENT" || linkedInMsg.status === "SENDING"}
                               checked={selectedProfileIds.includes(profile.id)}
                               onChange={() => toggleSelectProfile(profile.id)}
-                              className="cursor-pointer"
+                              className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                             />
                           )}
                         </td>
