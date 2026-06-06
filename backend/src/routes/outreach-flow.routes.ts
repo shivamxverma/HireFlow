@@ -187,7 +187,7 @@ outreachFlowRouter.post("/outreach-flow/profiles", async (req: AuthenticatedRequ
     const created = [];
 
     for (const p of profilesList) {
-      const { name, role, company, linkedinUrl, email, notes, tags, source } = p;
+      const { name, role, company, companyUrl, linkedinUrl, email, notes, tags, source } = p;
       if (!name) {
         continue;
       }
@@ -218,6 +218,7 @@ outreachFlowRouter.post("/outreach-flow/profiles", async (req: AuthenticatedRequ
               name: name.trim(),
               role: finalRole,
               company: finalCompany,
+              companyUrl: companyUrl ? companyUrl.trim() : existingProfile.companyUrl,
               email: email ? email.trim().toLowerCase() : existingProfile.email,
               notes: notes ? notes.trim() : existingProfile.notes,
               tags: tagsArray.length > 0 ? Array.from(new Set([...existingProfile.tags, ...tagsArray])) : existingProfile.tags,
@@ -230,6 +231,7 @@ outreachFlowRouter.post("/outreach-flow/profiles", async (req: AuthenticatedRequ
               name: name.trim(),
               role: finalRole,
               company: finalCompany,
+              companyUrl: companyUrl ? companyUrl.trim() : null,
               linkedinUrl: normalizedLinkedinUrl,
               email: email ? email.trim().toLowerCase() : null,
               notes: notes ? notes.trim() : null,
