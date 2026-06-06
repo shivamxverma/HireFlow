@@ -19,6 +19,7 @@ interface Profile {
   name: string;
   role: string;
   company: string;
+  companyUrl: string | null;
   linkedinUrl: string | null;
   email: string | null;
   notes: string | null;
@@ -71,6 +72,7 @@ export function LinkedinOutreach() {
   const [newProfileName, setNewProfileName] = useState("");
   const [newProfileRole, setNewProfileRole] = useState("");
   const [newProfileCompany, setNewProfileCompany] = useState("");
+  const [newProfileCompanyUrl, setNewProfileCompanyUrl] = useState("");
   const [newProfileLinkedinUrl, setNewProfileLinkedinUrl] = useState("");
   const [newProfileNotes, setNewProfileNotes] = useState("");
   const [addingProfile, setAddingProfile] = useState(false);
@@ -220,6 +222,7 @@ export function LinkedinOutreach() {
               name: newProfileName,
               role: newProfileRole,
               company: newProfileCompany,
+              companyUrl: newProfileCompanyUrl || null,
               linkedinUrl: newProfileLinkedinUrl || null,
               notes: newProfileNotes || null,
             },
@@ -232,6 +235,7 @@ export function LinkedinOutreach() {
         setNewProfileName("");
         setNewProfileRole("");
         setNewProfileCompany("");
+        setNewProfileCompanyUrl("");
         setNewProfileLinkedinUrl("");
         setNewProfileNotes("");
         await fetchData();
@@ -287,6 +291,7 @@ export function LinkedinOutreach() {
         setNewProfileName(json.data.name || "");
         setNewProfileRole(json.data.role || "");
         setNewProfileCompany(json.data.company || "");
+        setNewProfileCompanyUrl(json.data.companyUrl || "");
         setNewProfileLinkedinUrl(json.data.linkedinUrl || "");
         setNewProfileNotes(json.data.notes || "");
       } else {
@@ -707,26 +712,37 @@ export function LinkedinOutreach() {
                 />
               </div>
 
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Role Title</label>
+                <input 
+                  type="text" 
+                  placeholder="Technical Recruiter"
+                  value={newProfileRole}
+                  onChange={(e) => setNewProfileRole(e.target.value)}
+                  required
+                  className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Role Title</label>
-                  <input 
-                    type="text" 
-                    placeholder="Technical Recruiter"
-                    value={newProfileRole}
-                    onChange={(e) => setNewProfileRole(e.target.value)}
-                    required
-                    className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black w-full"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company</label>
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company Name</label>
                   <input 
                     type="text" 
                     placeholder="Google"
                     value={newProfileCompany}
                     onChange={(e) => setNewProfileCompany(e.target.value)}
                     required
+                    className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black w-full"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company URL</label>
+                  <input 
+                    type="url" 
+                    placeholder="https://linkedin.com/company/google"
+                    value={newProfileCompanyUrl}
+                    onChange={(e) => setNewProfileCompanyUrl(e.target.value)}
                     className="h-9 border border-input focus:border-black text-xs transition-colors rounded-md px-3 bg-background placeholder:text-zinc-400 outline-hidden focus:ring-1 focus:ring-black w-full"
                   />
                 </div>
@@ -899,7 +915,20 @@ export function LinkedinOutreach() {
                           <div className="text-[10px] text-muted-foreground">{profile.role}</div>
                         </td>
                         <td className="py-3 px-3">
-                          <div className="text-xs font-semibold text-foreground">{profile.company}</div>
+                          <div className="text-xs font-semibold text-foreground">
+                            {profile.companyUrl ? (
+                              <a 
+                                href={profile.companyUrl} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="hover:underline hover:text-zinc-900"
+                              >
+                                {profile.company} 🔗
+                              </a>
+                            ) : (
+                              profile.company
+                            )}
+                          </div>
                           {hasLinkedinUrl ? (
                             <a 
                               href={profile.linkedinUrl!} 

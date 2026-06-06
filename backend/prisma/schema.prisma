@@ -131,6 +131,7 @@ model Profile {
   name        String
   role        String
   company     String
+  companyUrl  String?  @map("company_url")
   linkedinUrl String?  @map("linkedin_url")
   email       String?
   notes       String?
