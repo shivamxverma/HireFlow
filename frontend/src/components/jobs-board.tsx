@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 
 import { JobCard, getStatusStyle, formatPostedDate } from "@/components/job-card";
 import type { Job } from "@/types/job";
-import { Plus, ExternalLink, ChevronDown, Pencil, Wand2, Search, Inbox, Briefcase, Zap, Target, Loader2, X } from "lucide-react";
+import { Plus, ExternalLink, ChevronDown, Pencil, Wand2, Search, Inbox, X } from "lucide-react";
 
 interface ResumeVersion {
   id: string;
@@ -62,6 +62,13 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
   const [manualPlatform, setManualPlatform] = useState("College");
   const [manualStatus, setManualStatus] = useState("Applied");
   const [manualNotes, setManualNotes] = useState("");
+
+  // Cold Mail state
+  const [selectedJobForColdMail, setSelectedJobForColdMail] = useState<Job | null>(null);
+  const [coldMailCompany, setColdMailCompany] = useState("");
+  const [coldMailEmail, setColdMailEmail] = useState("");
+  const [coldMailDescription, setColdMailDescription] = useState("");
+  const [coldMailIsSubmitting, setColdMailIsSubmitting] = useState(false);
 
   // Inline dropdown status state (which job ID is currently opening the inline picker)
   const [activeInlineDropdownId, setActiveInlineDropdownId] = useState<string | null>(null);
@@ -378,6 +385,66 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
     return "tag-direct";
   };
 
+  // Opens the Cold Mail modal and pre-fills Company and Description
+  const handleOpenColdMailModal = (job: Job) => {
+    setSelectedJobForColdMail(job);
+    setColdMailCompany(job.company);
+    setColdMailEmail("");
+    setColdMailDescription(job.description || `${job.title} role at ${job.company}`);
+  };
+
+  // Submits the Cold Mail Lead
+  const handleColdMailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!coldMailCompany || !coldMailEmail || !coldMailDescription) {
+      alert("Company Name, Recruiter Email, and Job Description Context are required.");
+      return;
+    }
+
+    setColdMailIsSubmitting(true);
+    try {
+      const apiKey = typeof window !== "undefined"
+        ? localStorage.getItem("outreach_api_key") || process.env.NEXT_PUBLIC_OUTREACH_API_KEY || "bypass_key"
+        : process.env.NEXT_PUBLIC_OUTREACH_API_KEY || "bypass_key";
+
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+      const response = await fetch(`${API_BASE}/outreach/leads`, {
+        method: "POST",
+        headers: {
+          "X-API-Key": apiKey,
+          "Content-Type": "application/json",
+          "bypass-tunnel-reminder": "true",
+        },
+        body: JSON.stringify({
+          leads: [
+            {
+              companyName: coldMailCompany,
+              recipientEmail: coldMailEmail,
+              jobDescription: coldMailDescription,
+            },
+          ],
+        }),
+      });
+
+      const resJson = await response.json();
+      if (resJson.success) {
+        alert("Cold mail recruiter lead added successfully! You can review and send the email on the Gmail Outreach page.");
+        setSelectedJobForColdMail(null);
+        setColdMailCompany("");
+        setColdMailEmail("");
+        setColdMailDescription("");
+      } else {
+        alert("Failed to add recruiter lead: " + resJson.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error adding cold mail recruiter lead.");
+    } finally {
+      setColdMailIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="w-full flex flex-col gap-6">
       {/* ==================== EXPLORE BOARD TAB ==================== */}
@@ -462,12 +529,13 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-4">
               {filteredJobs.map((job) => (
                 <JobCard
                   key={job.id}
                   job={job}
                   onTrack={handleOpenTrackModal}
+                  onColdMail={handleOpenColdMailModal}
                   onSelect={(j) => {
                     setSelectedJobDetails(j);
                     setPollingStatus("IDLE");
@@ -476,7 +544,6 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                       setPollingIntervalId(null);
                     }
                   }}
-                  onAutoApply={(j) => handleAutoApply(j.id)}
                 />
               ))}
             </div>
@@ -1139,6 +1206,84 @@ export function JobsBoard({ jobs: initialJobs, defaultTab = "explore", fetchedAt
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== COLD MAIL MODAL ==================== */}
+      {selectedJobForColdMail && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center animate-in fade-in duration-200" onClick={() => setSelectedJobForColdMail(null)}>
+          <div className="fixed z-50 grid w-full max-w-lg scale-100 gap-4 border bg-background p-6 shadow-lg rounded-lg font-sans" onClick={(e) => e.stopPropagation()}>
+            <header className="flex flex-col space-y-1.5 text-left mb-4 relative">
+              <div>
+                <p className="text-[10px] font-mono text-muted-foreground font-semibold uppercase tracking-wider">Recruiter Outreach</p>
+                <h3 className="text-base font-semibold leading-none tracking-tight text-foreground mt-1">Generate Cold Mail</h3>
+              </div>
+              <button 
+                className="absolute right-0 top-0 rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer" 
+                onClick={() => setSelectedJobForColdMail(null)}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </header>
+
+            <form onSubmit={handleColdMailSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="cold-company" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Company Name</label>
+                <input
+                  type="text"
+                  id="cold-company"
+                  required
+                  placeholder="e.g. Google"
+                  value={coldMailCompany}
+                  onChange={(e) => setColdMailCompany(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="cold-email" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Recruiter Email *</label>
+                <input
+                  type="email"
+                  id="cold-email"
+                  required
+                  placeholder="recruiter@company.com"
+                  value={coldMailEmail}
+                  onChange={(e) => setColdMailEmail(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black"
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <label htmlFor="cold-desc" className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Job Description Context</label>
+                <textarea
+                  id="cold-desc"
+                  required
+                  placeholder="Paste details of the role or specific specs..."
+                  rows={5}
+                  value={coldMailDescription}
+                  onChange={(e) => setColdMailDescription(e.target.value)}
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-xs placeholder:text-muted-foreground/75 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus:border-black font-sans"
+                />
+              </div>
+
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-2 gap-2 sm:gap-0">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold border border-border bg-background hover:bg-accent text-foreground h-9 px-4 py-2 transition-colors cursor-pointer"
+                  onClick={() => setSelectedJobForColdMail(null)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="inline-flex items-center justify-center rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 h-9 px-4 py-2 transition-colors cursor-pointer" 
+                  disabled={coldMailIsSubmitting}
+                >
+                  {coldMailIsSubmitting ? "Generating..." : "Generate Cold Mail"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

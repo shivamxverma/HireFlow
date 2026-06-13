@@ -1,11 +1,11 @@
 import type { Job } from "@/types/job";
-import { MapPin, DollarSign, ExternalLink, Zap, Target } from "lucide-react";
+import { MapPin, DollarSign, ExternalLink, Target, Mail } from "lucide-react";
 
 type JobCardProps = {
   job: Job;
   onTrack?: (job: Job) => void;
   onSelect?: (job: Job) => void;
-  onAutoApply?: (job: Job) => void;
+  onColdMail?: (job: Job) => void;
 };
 
 export function getStatusStyle(status: string) {
@@ -33,16 +33,16 @@ export function formatPostedDate(value: string) {
   }).format(new Date(value));
 }
 
-export function JobCard({ job, onTrack, onSelect, onAutoApply }: JobCardProps) {
+export function JobCard({ job, onTrack, onSelect, onColdMail }: JobCardProps) {
   const statusStyle = job.status ? getStatusStyle(job.status) : null;
   return (
     <article 
-      className="group relative flex flex-col justify-between rounded-lg border border-border bg-card p-6 shadow-xs hover:border-foreground/20 hover:shadow-sm transition-all duration-200"
+      className="group relative flex flex-col md:flex-row md:items-center justify-between rounded-lg border border-border bg-card p-5 shadow-xs hover:border-foreground/30 hover:shadow-md hover:bg-secondary/20 hover:-translate-y-[1px] transition-all duration-200 gap-4"
       onClick={() => onSelect?.(job)}
       style={{ cursor: "pointer" }}
     >
-      <div>
-        <div className="flex justify-between items-center mb-4">
+      <div className="flex-1 min-w-0 flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-sm border border-border bg-secondary/50 px-2 py-0.5 text-[10px] font-mono font-medium uppercase text-muted-foreground tracking-wider">{job.source}</span>
           <div className="flex gap-2 items-center text-[11px] text-muted-foreground font-medium">
             {statusStyle && (
@@ -61,43 +61,42 @@ export function JobCard({ job, onTrack, onSelect, onAutoApply }: JobCardProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <h2 className="text-base font-semibold leading-snug tracking-tight text-foreground group-hover:text-foreground/90 transition-colors">{job.title}</h2>
-          <p className="text-xs font-medium text-muted-foreground">{job.company}</p>
+        <div className="flex flex-col gap-0.5">
+          <h2 className="text-base font-semibold leading-snug tracking-tight text-foreground group-hover:text-foreground/90 transition-colors truncate">{job.title}</h2>
+          <p className="text-xs font-semibold text-muted-foreground">{job.company}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-muted-foreground mb-6">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-muted-foreground">
           <span className="flex items-center gap-1.5 text-muted-foreground/80"><MapPin className="w-3.5 h-3.5 text-muted-foreground/50" /> {job.location}</span>
           <span className="flex items-center gap-1.5 text-muted-foreground/80"><DollarSign className="w-3.5 h-3.5 text-muted-foreground/50" /> {job.salary ?? "Salary not listed"}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border pt-4 mt-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 border-border pt-3 md:pt-0 shrink-0" onClick={(e) => e.stopPropagation()}>
         <div className="flex gap-2 items-center">
           {job.applyUrl ? (
             <a 
               href={job.applyUrl} 
               target="_blank" 
               rel="noreferrer" 
-              className="inline-flex items-center text-xs font-semibold text-foreground hover:opacity-85 gap-1 transition-opacity"
+              className="inline-flex items-center text-xs font-semibold text-foreground hover:opacity-85 gap-1 transition-opacity h-8 px-2"
             >
               Apply
               <ExternalLink className="w-3 h-3 text-muted-foreground" />
             </a>
           ) : (
-            <span className="text-xs text-muted-foreground/50">No link</span>
+            <span className="text-xs text-muted-foreground/50 px-2">No link</span>
           )}
 
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onAutoApply?.(job);
+              onColdMail?.(job);
             }}
-            className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-medium border border-border bg-foreground text-background hover:bg-foreground/90 transition-colors ml-3 gap-1 cursor-pointer"
-            title="Start AI Auto Apply"
+            className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-medium border border-border bg-background text-foreground hover:bg-secondary transition-colors cursor-pointer gap-1"
           >
-            <Zap className="w-3 h-3 fill-current" />
-            Auto Apply
+            <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+            Cold Mail
           </button>
         </div>
 

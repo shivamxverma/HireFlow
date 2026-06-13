@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, ListChecks, Target, Mail, Linkedin, Megaphone, LogOut, MessageSquare, User, Menu } from "lucide-react";
+import { Compass, Mail, Linkedin, User, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -66,14 +66,10 @@ export function Navbar() {
 
   const coreLinks = [
     { name: "Explore", href: "/", icon: Compass },
-    { name: "Tracker", href: "/tracker", icon: Target },
-    { name: "Auto-Apply", href: "/queue", icon: ListChecks },
   ];
 
   const channelsLinks = [
-    { name: "Outreach", href: "/outreach", icon: Megaphone },
     { name: "Gmail", href: "/gmail", icon: Mail },
-    { name: "Telegram", href: "/telegram", icon: MessageSquare },
     { name: "LinkedIn", href: "/linkedin", icon: Linkedin },
   ];
 
@@ -220,20 +216,6 @@ export function Navbar() {
                     <User className="w-3.5 h-3.5 text-muted-foreground" />
                     <span>View Profile</span>
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-xs cursor-pointer">
-                  <Link href="/tracker">
-                    <Target className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span>Outreach Tracker</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-border/60 my-1" />
-                <DropdownMenuItem 
-                  onClick={handleSignOut}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm text-destructive hover:bg-destructive/10 cursor-pointer focus:bg-destructive/10 focus:text-destructive"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Sign Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
