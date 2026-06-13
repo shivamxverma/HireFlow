@@ -15,12 +15,12 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
   let failed = 0;
 
   for (const job of jobs) {
-    if (!isIndiaJob(job.location)) {
+    if (job.source !== "telegram" && !isIndiaJob(job.location)) {
       console.log(`[Ingestion Service] Skipping job listing "${job.title}" at "${job.company}" because location "${job.location}" is not in India.`);
       continue;
     }
 
-    if (!isAllowedRole(job.title)) {
+    if (job.source !== "telegram" && !isAllowedRole(job.title)) {
       console.log(`[Ingestion Service] Skipping job listing "${job.title}" at "${job.company}" because title does not match allowed roles.`);
       continue;
     }
@@ -41,6 +41,10 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
           source: job.source,
           externalId: job.externalId,
           lastSeenAt: new Date(),
+          fingerprint: job.fingerprint ?? null,
+          telegramMessageId: job.telegramMessageId ?? null,
+          telegramChannelId: job.telegramChannelId ?? null,
+          notes: job.notes ?? null,
         },
         create: {
           applyUrl: job.applyUrl,
@@ -51,6 +55,10 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
           source: job.source,
           externalId: job.externalId,
           lastSeenAt: new Date(),
+          fingerprint: job.fingerprint ?? null,
+          telegramMessageId: job.telegramMessageId ?? null,
+          telegramChannelId: job.telegramChannelId ?? null,
+          notes: job.notes ?? null,
         },
       });
       upserted++;

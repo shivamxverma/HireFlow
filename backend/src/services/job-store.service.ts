@@ -8,7 +8,7 @@ export interface StoreJobInput {
   company: string;
   location?: string;
   salary?: string;
-  applyUrl: string;
+  applyUrl?: string | null;
   externalId?: string;
 }
 
@@ -35,7 +35,7 @@ export async function upsertJobs(jobs: StoreJobInput[]): Promise<{ upserted: num
 
     try {
       const derivedId = job.externalId ?? 
-        job.applyUrl.split("/").pop()?.split("?")[0] ?? 
+        (job.applyUrl ? job.applyUrl.split("/").pop()?.split("?")[0] : null) ?? 
         `legacy-${job.company.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
       await prisma.job.upsert({
@@ -54,7 +54,7 @@ export async function upsertJobs(jobs: StoreJobInput[]): Promise<{ upserted: num
           externalId: derivedId,
         },
         create: {
-          applyUrl: job.applyUrl,
+          applyUrl: job.applyUrl ?? null,
           title: job.title,
           company: job.company,
           location: job.location ?? "Remote / Multiple Locations",

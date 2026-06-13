@@ -5,8 +5,12 @@ export interface Job {
   company: string;
   location?: string;
   salary?: string;
-  applyUrl: string;
+  applyUrl?: string | null;
   experienceLevel?: string;
+  fingerprint?: string;
+  telegramMessageId?: string;
+  telegramChannelId?: string;
+  notes?: string;
 }
 
 export interface JobConnector<TSearchConfig> {

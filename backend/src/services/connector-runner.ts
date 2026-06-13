@@ -1,6 +1,7 @@
 import { searchLinkedinJobs } from "../connectors/linkedin/index.js";
 import { searchYcJobs } from "../connectors/yc/index.js";
 import { searchWellfoundJobs } from "../connectors/wellfound/index.js";
+import { searchTelegramJobs } from "../connectors/telegram/index.js";
 import { ingestJobs } from "./ingestion.service.js";
 import type { Job } from "../connectors/types.js";
 
@@ -55,6 +56,16 @@ export async function runAllConnectors(): Promise<{ totalFetched: number; upsert
     console.log(`[Connector Runner] LinkedIn Jobs Connector successfully returned ${linkedinJobs.length} normalized listings.`);
   } catch (error) {
     console.error("[Connector Runner] LinkedIn Jobs Connector execution failed (check session cookies or site changes):", error);
+  }
+
+  // 4. Run Telegram Jobs Connector
+  try {
+    console.log("[Connector Runner] Launching Telegram Jobs Connector...");
+    const telegramJobs = await searchTelegramJobs();
+    allJobs.push(...telegramJobs);
+    console.log(`[Connector Runner] Telegram Jobs Connector successfully returned ${telegramJobs.length} normalized listings.`);
+  } catch (error) {
+    console.error("[Connector Runner] Telegram Jobs Connector execution failed:", error);
   }
 
   console.log(`\n[Connector Runner] Finished scanning. Consolidated list contains ${allJobs.length} jobs.`);

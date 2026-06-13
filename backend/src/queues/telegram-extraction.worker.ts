@@ -6,6 +6,33 @@ import crypto from "crypto";
 
 const geminiService = new GeminiService();
 
+function isExperienceSuitableForFresher(expStr: string | null | undefined): boolean {
+  if (!expStr) return true; // Default to true if not specified
+  const lower = expStr.toLowerCase().trim();
+  if (
+    lower.includes("fresher") ||
+    lower.includes("intern") ||
+    lower.includes("graduate") ||
+    lower.includes("entry") ||
+    lower.includes("0-1") ||
+    lower.includes("0 to 1")
+  ) {
+    return true;
+  }
+
+  // Extract numbers
+  const matches = lower.match(/\d+/g);
+  if (matches) {
+    const numbers = matches.map(Number);
+    // If the minimum required experience is > 1, then it's not suitable
+    const minExp = Math.min(...numbers);
+    if (minExp > 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export const telegramExtractionWorker = new Worker(
   "telegram-extraction",
   async (job) => {
@@ -38,8 +65,13 @@ export const telegramExtractionWorker = new Worker(
       // 2. Validate
       const { company, role, apply_url: applyUrl, location, salary, job_description: description } = extracted;
 
-      if (!company || !role || !applyUrl) {
-        const errorMsg = `Validation failed: ${!company ? "company " : ""}${!role ? "role " : ""}${!applyUrl ? "apply_url " : ""}is missing.`;
+      const titleLower = (rawMessage.channelName || "").toLowerCase();
+      const isSdePremium = titleLower.includes("sde premium");
+      const isTechJobs = titleLower.includes("tech jobs") && (titleLower.includes("fresher") || titleLower.includes("exp"));
+
+      // 2.1 Basic validation (company and role are always required)
+      if (!company || !role) {
+        const errorMsg = `Validation failed: ${!company ? "company " : ""}${!role ? "role " : ""}is missing.`;
         console.warn(`[Telegram Extraction Worker] Message ${rawMessageId} failed validation: ${errorMsg}`);
         
         await prisma.telegramMessage.update({
@@ -53,8 +85,56 @@ export const telegramExtractionWorker = new Worker(
         return;
       }
 
+      // 2.2 applyUrl validation
+      let finalApplyUrl = applyUrl ? applyUrl.trim() : "";
+      
+      if (isSdePremium) {
+        // SDE Premium Group: apply_url is optional. If it's an email address, prepend mailto:
+        if (finalApplyUrl) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailRegex.test(finalApplyUrl)) {
+            finalApplyUrl = `mailto:${finalApplyUrl}`;
+          }
+        }
+      } else {
+        // Other groups: apply_url is required
+        if (!finalApplyUrl) {
+          const errorMsg = "Validation failed: apply_url is missing.";
+          console.warn(`[Telegram Extraction Worker] Message ${rawMessageId} failed validation: ${errorMsg}`);
+          
+          await prisma.telegramMessage.update({
+            where: { id: rawMessageId },
+            data: {
+              processed: true,
+              status: "REJECTED",
+              errorMessage: errorMsg,
+            },
+          });
+          return;
+        }
+      }
+
+      // 2.3 Experience check for "Tech Jobs: Freshers & Exp | Off Campus"
+      if (isTechJobs) {
+        const expStr = extracted.experience || "";
+        if (!isExperienceSuitableForFresher(expStr)) {
+          const skipMsg = `Skipped: Job requires experience (${expStr}) beyond 0-1 year range.`;
+          console.info(`[Telegram Extraction Worker] Message ${rawMessageId} skipped: ${skipMsg}`);
+          
+          await prisma.telegramMessage.update({
+            where: { id: rawMessageId },
+            data: {
+              processed: true,
+              status: "REJECTED",
+              errorMessage: skipMsg,
+            },
+          });
+          return;
+        }
+      }
+
       // 3. Deduplication (Fingerprint hash)
-      const fingerprintRaw = `${company.trim().toLowerCase()}|${role.trim().toLowerCase()}|${applyUrl.trim().toLowerCase()}`;
+      const fingerprintRaw = `${company.trim().toLowerCase()}|${role.trim().toLowerCase()}|${finalApplyUrl.trim().toLowerCase()}`;
       const fingerprintHash = crypto.createHash("sha256").update(fingerprintRaw).digest("hex");
 
       const existingJob = await prisma.job.findFirst({
@@ -84,7 +164,7 @@ export const telegramExtractionWorker = new Worker(
           company: company,
           location: location || "Remote",
           salary: salary || null,
-          applyUrl: applyUrl,
+          applyUrl: finalApplyUrl || null,
           description: description || null,
           fingerprint: fingerprintHash,
           telegramMessageId: rawMessage.messageId.toString(),
