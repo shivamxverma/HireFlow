@@ -179,6 +179,53 @@ export class TelegramService {
   }
 
   /**
+   * Enqueues recent message history for every monitored Telegram channel.
+   * This keeps Telegram on the queue-based extraction path while allowing
+   * the app to catch up shortly after boot.
+   */
+  static async syncRecentMonitoredChannels(
+    hoursBack: number = 4,
+  ): Promise<{ channelCount: number; importedCount: number }> {
+    const monitoredChannels = await prisma.telegramChannel.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (monitoredChannels.length === 0) {
+      console.log("[Telegram Service] No monitored Telegram channels configured. Skipping recent history sync.");
+      return { channelCount: 0, importedCount: 0 };
+    }
+
+    const toDate = new Date();
+    const fromDate = new Date(toDate.getTime() - hoursBack * 60 * 60 * 1000);
+    let importedCount = 0;
+
+    console.log(
+      `[Telegram Service] Syncing recent Telegram history for ${monitoredChannels.length} monitored channels from ${fromDate.toISOString()} to ${toDate.toISOString()}.`,
+    );
+
+    for (const channel of monitoredChannels) {
+      try {
+        const result = await this.importHistory(channel.channelId, fromDate, toDate);
+        importedCount += result.importedCount;
+      } catch (err) {
+        console.error(
+          `[Telegram Service] Failed to sync recent history for monitored channel ${channel.title} (${channel.channelId}):`,
+          err,
+        );
+      }
+    }
+
+    console.log(
+      `[Telegram Service] Recent Telegram sync completed. Enqueued ${importedCount} messages across ${monitoredChannels.length} channels.`,
+    );
+
+    return {
+      channelCount: monitoredChannels.length,
+      importedCount,
+    };
+  }
+
+  /**
    * Starts the real-time listener for monitored channels
    */
   static async startListener(): Promise<void> {

@@ -138,8 +138,8 @@ export async function searchTelegramJobs(): Promise<Job[]> {
           if (rawMessage.status === "UNPROCESSED" && !rawMessage.processed) {
             console.log(`[Telegram Connector] Extracting job from message ID ${message.id} in "${channelTitle}"...`);
             
-            // Respect Gemini API rate limits
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            // Respect API rate limits
+            await new Promise((resolve) => setTimeout(resolve, 200));
 
             const extracted = await geminiService.extractJobFromText(rawText);
             const { company, role, apply_url: applyUrl, location, salary, job_description: description } = extracted;

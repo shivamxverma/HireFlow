@@ -1,115 +1,112 @@
-import type { Job } from "@/types/job";
-import { MapPin, DollarSign, ExternalLink, Target, Mail } from "lucide-react";
+"use client";
+
+import { ExternalLink, MapPin, MessageSquareText, Radar, Sparkles } from "lucide-react";
+
+import type { DiscoveryItem } from "@/lib/job-discovery";
 
 type JobCardProps = {
-  job: Job;
-  onTrack?: (job: Job) => void;
-  onSelect?: (job: Job) => void;
-  onColdMail?: (job: Job) => void;
+  job: DiscoveryItem;
+  isSelected: boolean;
+  onSelect: (job: DiscoveryItem) => void;
 };
 
-export function getStatusStyle(status: string) {
-  switch (status) {
-    case "Applied":
-      return { bg: "rgba(234, 179, 8, 0.08)", border: "rgba(234, 179, 8, 0.2)", text: "#d97706", label: "Applied" };
-    case "Followed Up":
-      return { bg: "rgba(99, 102, 241, 0.08)", border: "rgba(99, 102, 241, 0.2)", text: "#4f46e5", label: "Followed Up" };
-    case "Interview Scheduled":
-      return { bg: "rgba(59, 130, 246, 0.08)", border: "rgba(59, 130, 246, 0.2)", text: "#2563eb", label: "Interview" };
-    case "Rejected":
-      return { bg: "rgba(239, 68, 68, 0.08)", border: "rgba(239, 68, 68, 0.2)", text: "#dc2626", label: "Rejected" };
-    case "Offer":
-      return { bg: "rgba(16, 185, 129, 0.08)", border: "rgba(16, 185, 129, 0.2)", text: "#059669", label: "Offer" };
-    default:
-      return { bg: "rgba(107, 114, 128, 0.08)", border: "rgba(107, 114, 128, 0.2)", text: "#4b5563", label: status };
+function getFreshnessClass(freshness: DiscoveryItem["freshness"]) {
+  if (freshness === "hot") {
+    return "border-emerald-200 bg-emerald-500/10 text-emerald-700";
   }
+
+  if (freshness === "recent") {
+    return "border-sky-200 bg-sky-500/10 text-sky-700";
+  }
+
+  if (freshness === "warm") {
+    return "border-amber-200 bg-amber-500/10 text-amber-700";
+  }
+
+  return "border-border bg-secondary/70 text-muted-foreground";
 }
 
-export function formatPostedDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-export function JobCard({ job, onTrack, onSelect, onColdMail }: JobCardProps) {
-  const statusStyle = job.status ? getStatusStyle(job.status) : null;
+export function JobCard({ job, isSelected, onSelect }: JobCardProps) {
   return (
-    <article 
-      className="group relative flex flex-col md:flex-row md:items-center justify-between rounded-lg border border-border bg-card p-5 shadow-xs hover:border-foreground/30 hover:shadow-md hover:bg-secondary/20 hover:-translate-y-[1px] transition-all duration-200 gap-4"
-      onClick={() => onSelect?.(job)}
-      style={{ cursor: "pointer" }}
+    <article
+      className={`group rounded-3xl border p-5 transition-all duration-200 ${
+        isSelected
+          ? "border-foreground/20 bg-card shadow-lg"
+          : "border-border/70 bg-white/85 shadow-sm hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-md"
+      }`}
     >
-      <div className="flex-1 min-w-0 flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center rounded-sm border border-border bg-secondary/50 px-2 py-0.5 text-[10px] font-mono font-medium uppercase text-muted-foreground tracking-wider">{job.source}</span>
-          <div className="flex gap-2 items-center text-[11px] text-muted-foreground font-medium">
-            {statusStyle && (
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-semibold tracking-wide border"
-                style={{
-                  background: statusStyle.bg,
-                  borderColor: statusStyle.border,
-                  color: statusStyle.text,
-                }}
-              >
-                {statusStyle.label}
+      <button className="flex w-full flex-col gap-4 text-left" onClick={() => onSelect(job)} type="button">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              {job.source}
+            </span>
+            <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${getFreshnessClass(job.freshness)}`}>
+              {job.freshnessLabel}
+            </span>
+            {job.channelName ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/60 px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
+                <MessageSquareText className="h-3 w-3" />
+                {job.channelName}
               </span>
-            )}
-            <span>Updated {formatPostedDate(job.updatedAt)}</span>
+            ) : null}
+          </div>
+
+          <div className="inline-flex items-center gap-1 rounded-full border border-foreground/10 bg-foreground px-3 py-1 text-[11px] font-semibold text-background">
+            <Radar className="h-3.5 w-3.5" />
+            {job.relevanceScore}% match
           </div>
         </div>
 
-        <div className="flex flex-col gap-0.5">
-          <h2 className="text-base font-semibold leading-snug tracking-tight text-foreground group-hover:text-foreground/90 transition-colors truncate">{job.title}</h2>
-          <p className="text-xs font-semibold text-muted-foreground">{job.company}</p>
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">{job.title}</h2>
+          <p className="text-sm font-medium text-muted-foreground">{job.company}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-muted-foreground">
-          <span className="flex items-center gap-1.5 text-muted-foreground/80"><MapPin className="w-3.5 h-3.5 text-muted-foreground/50" /> {job.location}</span>
-          <span className="flex items-center gap-1.5 text-muted-foreground/80"><DollarSign className="w-3.5 h-3.5 text-muted-foreground/50" /> {job.salary ?? "Salary not listed"}</span>
+        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5" />
+            {job.location}
+          </span>
+          {job.salary ? <span>{job.salary}</span> : null}
         </div>
-      </div>
 
-      <div className="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 border-border pt-3 md:pt-0 shrink-0" onClick={(e) => e.stopPropagation()}>
-        <div className="flex gap-2 items-center">
-          {job.applyUrl ? (
-            <a 
-              href={job.applyUrl} 
-              target="_blank" 
-              rel="noreferrer" 
-              className="inline-flex items-center text-xs font-semibold text-foreground hover:opacity-85 gap-1 transition-opacity h-8 px-2"
+        <div className="flex flex-wrap gap-2">
+          {job.reasons.map((reason) => (
+            <span
+              key={`${job.id}-${reason}`}
+              className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-secondary-foreground"
             >
-              Apply
-              <ExternalLink className="w-3 h-3 text-muted-foreground" />
-            </a>
-          ) : (
-            <span className="text-xs text-muted-foreground/50 px-2">No link</span>
-          )}
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onColdMail?.(job);
-            }}
-            className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-medium border border-border bg-background text-foreground hover:bg-secondary transition-colors cursor-pointer gap-1"
-          >
-            <Mail className="w-3.5 h-3.5 text-muted-foreground" />
-            Cold Mail
-          </button>
+              <Sparkles className="h-3 w-3" />
+              {reason}
+            </span>
+          ))}
         </div>
+      </button>
 
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/70 pt-4">
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onTrack?.(job);
-          }}
-          className="inline-flex items-center justify-center h-8 px-3 rounded-md text-[11px] font-medium border border-border bg-background text-foreground hover:bg-secondary transition-colors cursor-pointer"
+          className="text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+          onClick={() => onSelect(job)}
+          type="button"
         >
-          <Target className="w-3 h-3 mr-1" />
-          {job.status ? "Update" : "Track"}
+          View details
         </button>
+
+        {job.applyUrl ? (
+          <a
+            className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90"
+            href={job.applyUrl}
+            onClick={(event: { stopPropagation: () => void }) => event.stopPropagation()}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Open job
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        ) : (
+          <span className="text-xs text-muted-foreground">No apply link yet</span>
+        )}
       </div>
     </article>
   );

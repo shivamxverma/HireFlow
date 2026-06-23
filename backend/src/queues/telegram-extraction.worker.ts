@@ -54,13 +54,13 @@ export const telegramExtractionWorker = new Worker(
     }
 
     try {
-      // 1. Extract using Gemini
-      console.log(`[Telegram Extraction Worker] Sleeping 12000ms to respect Gemini API rate limits...`);
-      await new Promise((resolve) => setTimeout(resolve, 12000));
+      // 1. Extract using Azure OpenAI
+      console.log(`[Telegram Extraction Worker] Sleeping 500ms to respect API rate limits...`);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      console.log(`[Telegram Extraction Worker] Sending message text to Gemini for extraction...`);
+      console.log(`[Telegram Extraction Worker] Sending message text to Azure OpenAI for extraction...`);
       const extracted = await geminiService.extractJobFromText(rawMessage.messageText);
-      console.log(`[Telegram Extraction Worker] Gemini response received for message ${rawMessageId}:`, JSON.stringify(extracted));
+      console.log(`[Telegram Extraction Worker] Azure OpenAI response received for message ${rawMessageId}:`, JSON.stringify(extracted));
 
       // 2. Validate
       const { company, role, apply_url: applyUrl, location, salary, job_description: description } = extracted;
@@ -200,6 +200,6 @@ export const telegramExtractionWorker = new Worker(
   },
   {
     connection: redisConnectionOptions,
-    concurrency: 1, // Process sequentially to respect Gemini API rate limits
+    concurrency: 2, // Concurrency 2 is safe for the Azure OpenAI endpoint
   }
 );
