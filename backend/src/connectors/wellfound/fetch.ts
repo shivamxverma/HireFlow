@@ -16,8 +16,13 @@ export async function fetchWellfoundPage(url: string): Promise<string> {
   });
 
   try {
-    const sessionPath = path.resolve(process.cwd(), "session.json");
-    const hasSession = fs.existsSync(sessionPath);
+    const sessionCandidates = [
+      path.resolve(process.cwd(), "session.json"),
+      path.resolve(process.cwd(), "authentication/session.json"),
+      path.resolve(process.cwd(), "backend/authentication/session.json"),
+    ];
+    const sessionPath = sessionCandidates.find((candidate) => fs.existsSync(candidate));
+    const hasSession = Boolean(sessionPath);
 
     const contextOptions: any = {
       userAgent:
@@ -60,6 +65,17 @@ export async function fetchWellfoundPage(url: string): Promise<string> {
 
     // Get the dynamic page content
     const html = await page.content();
+
+    if (
+      html.includes("DataDome CAPTCHA") ||
+      html.includes("captcha-delivery.com") ||
+      html.includes("geo.captcha-delivery.com")
+    ) {
+      throw new Error(
+        "[Wellfound Fetcher] Blocked by DataDome CAPTCHA. Refresh the Wellfound session with 'pnpm save-session' and solve the challenge in the headed browser.",
+      );
+    }
+
     return html;
   } catch (error) {
     console.error("[Wellfound Fetcher] Error fetching page:", error);

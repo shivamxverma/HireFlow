@@ -15,7 +15,7 @@ export type Job = {
   appliedAt?: string | null;
 };
 
-export type DiscoverySource = "all" | "linkedin" | "telegram";
+export type DiscoverySource = "all" | "linkedin" | "telegram" | "yc" | "wellfound";
 export type DiscoveryFreshness = "all" | "24h" | "72h" | "7d";
 
 export type JobsResponse = {

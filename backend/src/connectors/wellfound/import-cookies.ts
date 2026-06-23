@@ -2,16 +2,22 @@ import * as fs from "fs";
 import * as path from "path";
 
 function importCookies() {
-  const rawPath = path.resolve(process.cwd(), "raw-cookies.json");
-  const outputPath = path.resolve(process.cwd(), "session.json");
+  const authDir = path.resolve(process.cwd(), "authentication");
+  const rawCandidates = [
+    path.resolve(process.cwd(), "raw-cookies.json"),
+    path.resolve(authDir, "raw-cookies.json"),
+  ];
+  const rawPath = rawCandidates.find((candidate) => fs.existsSync(candidate));
+  const outputPath = path.resolve(authDir, "session.json");
 
-  if (!fs.existsSync(rawPath)) {
-    console.error(`\n❌ Error: Could not find 'raw-cookies.json' in ${process.cwd()}`);
+  if (!rawPath) {
+    console.error(`\n❌ Error: Could not find 'raw-cookies.json'. Checked: ${rawCandidates.join(", ")}`);
     console.log("Please export your cookies using a standard browser extension (like Cookie-Editor) and save it as 'raw-cookies.json'.");
     process.exit(1);
   }
 
   try {
+    fs.mkdirSync(authDir, { recursive: true });
     const rawContent = fs.readFileSync(rawPath, "utf-8");
     const rawCookies = JSON.parse(rawContent);
 
@@ -49,7 +55,7 @@ function importCookies() {
     fs.writeFileSync(outputPath, JSON.stringify(storageState, null, 2), "utf-8");
     console.log(`\n✅ Success! Converted exported cookies to Playwright format!`);
     console.log(`Saved session credentials to: ${outputPath}`);
-    console.log("You can now run 'pnpm test:connector' to scrape live jobs successfully!");
+    console.log("You can now run the live Wellfound connector with the saved session.");
   } catch (error: any) {
     console.error("\n❌ Failed to parse or map cookies:", error.message);
   }

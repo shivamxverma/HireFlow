@@ -16,6 +16,8 @@ const sourceOptions: Array<{ label: string; value: DiscoverySource }> = [
   { label: "All sources", value: "all" },
   { label: "LinkedIn", value: "linkedin" },
   { label: "Telegram", value: "telegram" },
+  { label: "YC", value: "yc" },
+  { label: "Wellfound", value: "wellfound" },
 ];
 
 const freshnessOptions: Array<{ label: string; value: DiscoveryFreshness }> = [
@@ -87,6 +89,8 @@ export function JobsBoard({ jobs, fetchedAt }: JobsBoardProps) {
             <div className="mt-5 space-y-3">
               <SourceRow label="LinkedIn" value={stats.linkedin} accent="bg-sky-500" />
               <SourceRow label="Telegram" value={stats.telegram} accent="bg-emerald-500" />
+              <SourceRow label="YC" value={stats.yc} accent="bg-amber-500" />
+              <SourceRow label="Wellfound" value={stats.wellfound} accent="bg-rose-500" />
             </div>
 
             <div className="mt-5 rounded-2xl border border-border/70 bg-secondary/50 p-4 text-sm text-muted-foreground">
