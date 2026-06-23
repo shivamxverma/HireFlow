@@ -34,6 +34,12 @@ export function isAllowedRole(title: string | null | undefined): boolean {
   const isSoftwareEng = 
     lowerTitle.includes("software engineer");
 
+  const isGenericEngineer =
+    lowerTitle.includes(" engineer") ||
+    lowerTitle.startsWith("engineer") ||
+    lowerTitle.includes("engineer,") ||
+    lowerTitle.includes(", engineer");
+
   const isAiEngineer = 
     lowerTitle.includes("ai engineer") || 
     lowerTitle.includes("ml engineer") || 
@@ -41,7 +47,13 @@ export function isAllowedRole(title: string | null | undefined): boolean {
     lowerTitle.includes("artificial intelligence") || 
     lowerTitle.includes("deep learning");
 
-  const matchesAllowedRole = isFullStack || isBackend || isSoftwareDev || isSoftwareEng || isAiEngineer;
+  const matchesAllowedRole =
+    isFullStack ||
+    isBackend ||
+    isSoftwareDev ||
+    isSoftwareEng ||
+    isAiEngineer ||
+    isGenericEngineer;
 
   if (!matchesAllowedRole) {
     return false;
@@ -94,6 +106,8 @@ export function isAllowedRole(title: string | null | undefined): boolean {
 
   // 6. Filter out other non-technical or unrelated roles
   const blacklistedTerms = [
+    "chief technology officer",
+    "cto",
     "recruiter",
     "sales",
     "marketing",
@@ -102,6 +116,7 @@ export function isAllowedRole(title: string | null | undefined): boolean {
     "financial analyst",
     "content writer",
     "designer",
+    "design engineer",
     "ui/ux",
     "graphic",
     "support specialist",

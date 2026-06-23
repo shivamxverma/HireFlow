@@ -2,6 +2,7 @@ import { chromium } from "playwright-extra";
 import stealthPlugin from "puppeteer-extra-plugin-stealth";
 import * as readline from "readline";
 import * as path from "path";
+import * as fs from "fs";
 
 chromium.use(stealthPlugin());
 
@@ -35,7 +36,9 @@ async function saveSession() {
   });
 
   rl.question("Press [ENTER] here once you have finished logging in...", async () => {
-    const sessionPath = path.resolve(process.cwd(), "session.json");
+    const authDir = path.resolve(process.cwd(), "authentication");
+    fs.mkdirSync(authDir, { recursive: true });
+    const sessionPath = path.resolve(authDir, "session.json");
     await context.storageState({ path: sessionPath });
     console.log(`\n✅ Success! Authentication cookies saved to: ${sessionPath}`);
     await browser.close();

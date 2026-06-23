@@ -1,6 +1,6 @@
 import type { Job } from "@/types/job";
 
-type DiscoverySourceFilter = "all" | "linkedin" | "telegram";
+type DiscoverySourceFilter = "all" | "linkedin" | "telegram" | "yc" | "wellfound";
 type DiscoveryFreshnessFilter = "all" | "24h" | "72h" | "7d";
 
 const SOURCE_WEIGHTS: Record<string, number> = {
@@ -244,7 +244,12 @@ export function buildDiscoveryFeed(jobs: Job[], options: DiscoveryOptions = {}) 
 
   return jobs
     .map(scoreJob)
-    .filter((job) => job.source === "linkedin" || job.source === "telegram")
+    .filter((job) =>
+      job.source === "linkedin" ||
+      job.source === "telegram" ||
+      job.source === "yc" ||
+      job.source === "wellfound",
+    )
     .filter((job) => (source === "all" ? true : job.source === source))
     .filter((job) => matchesFreshness(job, freshness))
     .filter((job) => matchesQuery(job, normalizedQuery))
@@ -261,6 +266,8 @@ export function getDiscoveryStats(items: DiscoveryItem[]) {
   const hot = items.filter((job) => job.freshness === "hot").length;
   const linkedin = items.filter((job) => job.source === "linkedin").length;
   const telegram = items.filter((job) => job.source === "telegram").length;
+  const yc = items.filter((job) => job.source === "yc").length;
+  const wellfound = items.filter((job) => job.source === "wellfound").length;
   const avgScore = items.length
     ? Math.round(items.reduce((total, job) => total + job.relevanceScore, 0) / items.length)
     : 0;
@@ -270,6 +277,8 @@ export function getDiscoveryStats(items: DiscoveryItem[]) {
     hot,
     linkedin,
     telegram,
+    yc,
+    wellfound,
     avgScore,
   };
 }
