@@ -15,6 +15,9 @@ export type Job = {
   appliedAt?: string | null;
 };
 
+export type DiscoverySource = "all" | "linkedin" | "telegram";
+export type DiscoveryFreshness = "all" | "24h" | "72h" | "7d";
+
 export type JobsResponse = {
   success: boolean;
   message: string;

@@ -3,6 +3,33 @@ import { normalizeJobUrl } from "@/lib/job-url";
 import type { Job } from "@/types/job";
 
 export async function listJobs(): Promise<Job[]> {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+
+  if (apiBaseUrl) {
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/v1/jobs`, {
+        cache: "no-store",
+      });
+
+      if (response.ok) {
+        const payload = await response.json() as {
+          data?: {
+            jobs?: Job[];
+          };
+        };
+
+        return (payload.data?.jobs ?? []).map((job) => ({
+          ...job,
+          applyUrl: job.applyUrl ? normalizeJobUrl(job.source, job.applyUrl) : null,
+        }));
+      }
+
+      console.error("[listJobs Error] Backend API returned non-OK status:", response.status);
+    } catch (error) {
+      console.error("[listJobs Error] Backend API request failed, falling back to frontend DB:", error);
+    }
+  }
+
   try {
     const jobs = await prisma.job.findMany({
       orderBy: [

@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import * as fs from "fs";
 import * as path from "path";
 import { ResumeFetcherService } from "./resume-fetcher.service.js";
+// @ts-ignore
+import { PDFParse } from "pdf-parse";
 
 export interface GeneratedEmail {
   subject: string;
@@ -24,33 +26,36 @@ export class GeminiService {
   private openai: OpenAI | null = null;
   private resumeFetcher: ResumeFetcherService;
   private storageDir: string;
-  private geminiApiKey: string | undefined;
+  private modelName: string;
 
   constructor() {
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    this.geminiApiKey = geminiApiKey;
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "https://raghvendrasinghdhakar2--resource.services.ai.azure.com/openai/v1";
+    const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-5.4";
+    const apiKey = process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY || "3oxSFeNj0GluFk9qObTSk04D943F0GSaGUxQIrVwzhdWAb2FIKRVJQQJ99CDACHYHv6XJ3w3AAAAACOGHxI4";
+
     this.resumeFetcher = new ResumeFetcherService();
     this.storageDir = path.resolve(process.cwd(), "storage");
+    this.modelName = deploymentName;
 
-    if (geminiApiKey) {
-      console.log("[Gemini Service] Initializing OpenAI Client in Gemini Compatibility Mode...");
-      this.openai = new OpenAI({
-        apiKey: geminiApiKey,
-        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
-      });
-    } else {
-      console.warn(
-        "[Gemini Service] WARNING: GEMINI_API_KEY environment variable is not set. LLM features will fail."
-      );
-    }
+    console.log(`[Gemini Service] Initializing OpenAI Client in Azure Responses Mode...`);
+    console.log(`[Gemini Service] Endpoint: ${endpoint}`);
+    console.log(`[Gemini Service] Deployment: ${deploymentName}`);
+
+    this.openai = new OpenAI({
+      baseURL: endpoint,
+      apiKey: apiKey,
+    });
   }
 
   /**
-   * Helper to sleep if needed or handle potential delays
+   * Helper to execute call with retries and handle potential delays
    */
-  private async safeCall(promptTask: () => Promise<string>): Promise<string> {
+  private async safeCall(
+    input: any,
+    options: { format?: any; temperature?: number } = {}
+  ): Promise<string> {
     if (!this.openai) {
-      throw new Error("Gemini API Client is not initialized. Please configure GEMINI_API_KEY in .env.");
+      throw new Error("OpenAI Client is not initialized.");
     }
 
     let attempts = 0;
@@ -58,9 +63,29 @@ export class GeminiService {
 
     while (attempts < maxAttempts) {
       try {
-        return await promptTask();
+        const streamParams: any = {
+          model: this.modelName,
+          input: input,
+        };
+
+        if (options.format) {
+          streamParams.text = {
+            format: options.format,
+          };
+        }
+
+        if (options.temperature !== undefined) {
+          streamParams.temperature = options.temperature;
+        }
+
+        const runner = this.openai.responses.stream(streamParams);
+        const result = await runner.finalResponse();
+        const firstOutput = result.output?.[0] as any;
+        const contentItem = firstOutput?.content?.find((c: any) => c.type === 'output_text');
+        return contentItem?.text || "";
       } catch (error: any) {
         attempts++;
+
         const isRateLimit = 
           error.status === 429 || 
           error.statusCode === 429 || 
@@ -83,7 +108,7 @@ export class GeminiService {
   }
 
   /**
-   * Safe parser for extracting JSON content from Gemini responses
+   * Safe parser for extracting JSON content from response messages
    */
   private parseJsonResponse<T>(rawContent: string): T {
     try {
@@ -134,12 +159,10 @@ Format them as a clean, bulleted or comma-separated list. Keep it concise.
 Candidate Resume Text:
 ${resumeData.text}`;
 
-    const skillsResponse = await this.openai.chat.completions.create({
-      model: "gemini-2.5-flash-lite",
-      messages: [{ role: "user", content: skillsPrompt }],
-      temperature: 0.1,
-    });
-    skills = skillsResponse.choices[0]?.message?.content || "";
+    skills = await this.safeCall(
+      [{ role: "user", content: skillsPrompt }],
+      { temperature: 0.1 }
+    );
     fs.writeFileSync(skillsPath, skills.trim(), "utf-8");
     console.log(`[Gemini Service] Saved extracted skills to: ${skillsPath}`);
 
@@ -152,12 +175,10 @@ Include project names, technologies utilized, and key bullet points describing f
 Candidate Resume Text:
 ${resumeData.text}`;
 
-    const projectsResponse = await this.openai.chat.completions.create({
-      model: "gemini-2.5-flash-lite",
-      messages: [{ role: "user", content: projectsPrompt }],
-      temperature: 0.1,
-    });
-    projects = projectsResponse.choices[0]?.message?.content || "";
+    projects = await this.safeCall(
+      [{ role: "user", content: projectsPrompt }],
+      { temperature: 0.1 }
+    );
     fs.writeFileSync(projectsPath, projects.trim(), "utf-8");
     console.log(`[Gemini Service] Saved extracted projects to: ${projectsPath}`);
 
@@ -209,18 +230,16 @@ ${companyName}
 Target Job Description:
 ${jobDescription}`;
 
-    const rawResponse = await this.safeCall(async () => {
-      const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
+    const rawResponse = await this.safeCall(
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      {
+        format: { type: "json_object" },
         temperature: 0.2,
-      });
-      return response.choices[0]?.message?.content || "";
-    });
+      }
+    );
 
     return this.parseJsonResponse<GeneratedEmail>(rawResponse);
   }
@@ -271,18 +290,16 @@ Previous Follow-up Emails:
 ${previousFollowUps.length > 0 ? previousFollowUps.map((e, i) => `[Follow-up ${i + 1}]:\n${e}`).join("\n\n") : "None"}
 `;
 
-    const rawResponse = await this.safeCall(async () => {
-      const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
+    const rawResponse = await this.safeCall(
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      {
+        format: { type: "json_object" },
         temperature: 0.2,
-      });
-      return response.choices[0]?.message?.content || "";
-    });
+      }
+    );
 
     return this.parseJsonResponse<GeneratedEmail>(rawResponse);
   }
@@ -312,52 +329,25 @@ STRICT RULES:
 }
 5. Do NOT include any markdown or text around the JSON object.`;
 
-    if (!this.geminiApiKey) {
-      throw new Error("Gemini API Key is not set. Please configure GEMINI_API_KEY in your environment.");
-    }
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${this.geminiApiKey}`;
-
-    const body = {
-      contents: [
+    console.log("[Gemini Service] Extracting lead from image using Azure Responses API...");
+    const rawResponse = await this.safeCall(
+      [
         {
           role: "user",
-          parts: [
+          content: [
+            { type: "input_text", text: `${systemPrompt}\n\nPlease extract the recruiter lead details from this image.` },
             {
-              text: `${systemPrompt}\n\nPlease extract the recruiter lead details from this image.`
+              type: "input_image",
+              image_url: `data:${mimeType};base64,${base64Image}`,
             },
-            {
-              inlineData: {
-                mimeType,
-                data: base64Image
-              }
-            }
-          ]
+          ],
         }
       ],
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.1
+      {
+        format: { type: "json_object" },
+        temperature: 0.1,
       }
-    };
-
-    console.log("[Gemini Service] Making native Gemini REST API call for lead image extraction...");
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("[Gemini Service] Native API error response:", errorText);
-      throw new Error(`Gemini API returned status ${res.status}: ${errorText}`);
-    }
-
-    const json = await res.json() as any;
-    const rawResponse = json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    );
 
     return this.parseJsonResponse<{ companyName: string; recipientEmail: string; jobDescription: string }>(rawResponse);
   }
@@ -393,52 +383,47 @@ STRICT RULES:
 }
 8. Do NOT include any markdown or text around the JSON object.`;
 
-    if (!this.geminiApiKey) {
-      throw new Error("Gemini API Key is not set. Please configure GEMINI_API_KEY in your environment.");
-    }
+    let contentInput: any;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${this.geminiApiKey}`;
+    if (mimeType === "application/pdf") {
+      console.log("[Gemini Service] PDF uploaded. Parsing PDF text locally before sending to LLM...");
+      const buffer = Buffer.from(base64Data, "base64");
+      const pdfParser = new PDFParse({ data: buffer });
+      const parsedTextResult = await pdfParser.getText();
+      const parsedText = parsedTextResult.text || "";
 
-    const body = {
-      contents: [
+      if (!parsedText.trim()) {
+        throw new Error("Failed to extract text from PDF profile.");
+      }
+
+      contentInput = [
         {
           role: "user",
-          parts: [
-            {
-              text: `${systemPrompt}\n\nPlease extract the profile details from this document.`
-            },
-            {
-              inlineData: {
-                mimeType,
-                data: base64Data
-              }
-            }
+          content: [
+            { type: "input_text", text: `${systemPrompt}\n\nPlease extract the profile details from the following resume text:\n\n${parsedText}` }
           ]
         }
-      ],
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.1
-      }
-    };
-
-    console.log("[Gemini Service] Making native Gemini REST API call for profile file extraction...");
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("[Gemini Service] Native API error response:", errorText);
-      throw new Error(`Gemini API returned status ${res.status}: ${errorText}`);
+      ];
+    } else {
+      console.log("[Gemini Service] Image uploaded. Extracting profile details using Azure Responses API...");
+      contentInput = [
+        {
+          role: "user",
+          content: [
+            { type: "input_text", text: `${systemPrompt}\n\nPlease extract the profile details from this document.` },
+            {
+              type: "input_image",
+              image_url: `data:${mimeType};base64,${base64Data}`,
+            },
+          ],
+        }
+      ];
     }
 
-    const json = await res.json() as any;
-    const rawResponse = json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const rawResponse = await this.safeCall(contentInput, {
+      format: { type: "json_object" },
+      temperature: 0.1,
+    });
 
     return this.parseJsonResponse<{ name: string; role: string; company: string; companyUrl: string; linkedinUrl: string; notes: string }>(rawResponse);
   }
@@ -453,10 +438,6 @@ STRICT RULES:
     templatePrompt: string,
     messageType: string
   ): Promise<GeneratedEmail> {
-    if (!this.openai) {
-      throw new Error("Gemini API Client is not initialized.");
-    }
-
     const systemPrompt = `You are an expert cold outreach copywriter.
 Your goal is to write a highly compelling, personalized networking or referral email.
 The message MUST be written in the FIRST PERSON perspective ("I", "my", "me") directly from the candidate Shivam Kumar Verma.
@@ -495,30 +476,24 @@ Job Company: ${job.company}
 Job Description: ${job.description || "None"}` : "No specific job posting attached."}
 `;
 
-    const rawResponse = await this.safeCall(async () => {
-      const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
+    const rawResponse = await this.safeCall(
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      {
+        format: { type: "json_object" },
         temperature: 0.25,
-      });
-      return response.choices[0]?.message?.content || "";
-    });
+      }
+    );
 
     return this.parseJsonResponse<GeneratedEmail>(rawResponse);
   }
 
   /**
-   * Extracts structured job information from raw message text using Gemini 2.5 Flash
+   * Extracts structured job information from raw message text using Azure Responses API
    */
   async extractJobFromText(text: string): Promise<ExtractedJob> {
-    if (!this.openai) {
-      throw new Error("Gemini API Client is not initialized.");
-    }
-
     const systemPrompt = `You are an expert AI recruiting assistant.
 Analyze the provided Telegram message and extract job details.
 You MUST output a valid JSON object with the exact fields below.
@@ -539,18 +514,16 @@ Required Output Format:
 }
 Do NOT include any markdown tags (like \`\`\`json) outside of the JSON object itself. Return valid JSON only.`;
 
-    const rawResponse = await this.safeCall(async () => {
-      const response = await this.openai!.chat.completions.create({
-        model: "gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Telegram Message:\n${text}` },
-        ],
-        response_format: { type: "json_object" },
+    const rawResponse = await this.safeCall(
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Telegram Message:\n${text}` },
+      ],
+      {
+        format: { type: "json_object" },
         temperature: 0.1,
-      });
-      return response.choices[0]?.message?.content || "";
-    });
+      }
+    );
 
     return this.parseJsonResponse<ExtractedJob>(rawResponse);
   }

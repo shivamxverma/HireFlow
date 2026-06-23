@@ -5,6 +5,10 @@ import { searchTelegramJobs } from "../connectors/telegram/index.js";
 import { ingestJobs } from "./ingestion.service.js";
 import type { Job } from "../connectors/types.js";
 
+type ConnectorRunOptions = {
+  includeTelegram?: boolean;
+};
+
 /**
  * Connector Runner
  * Responsibilities:
@@ -13,7 +17,10 @@ import type { Job } from "../connectors/types.js";
  * 3. Consolidate results into a unified array.
  * 4. Trigger the Ingestion Service to store and update listings in PostgreSQL.
  */
-export async function runAllConnectors(): Promise<{ totalFetched: number; upserted: number; failed: number }> {
+export async function runAllConnectors(
+  options: ConnectorRunOptions = {},
+): Promise<{ totalFetched: number; upserted: number; failed: number }> {
+  const { includeTelegram = true } = options;
   console.log("[Connector Runner] Executing active job aggregation connectors...");
 
   const allJobs: Job[] = [];
@@ -58,14 +65,17 @@ export async function runAllConnectors(): Promise<{ totalFetched: number; upsert
     console.error("[Connector Runner] LinkedIn Jobs Connector execution failed (check session cookies or site changes):", error);
   }
 
-  // 4. Run Telegram Jobs Connector
-  try {
-    console.log("[Connector Runner] Launching Telegram Jobs Connector...");
-    const telegramJobs = await searchTelegramJobs();
-    allJobs.push(...telegramJobs);
-    console.log(`[Connector Runner] Telegram Jobs Connector successfully returned ${telegramJobs.length} normalized listings.`);
-  } catch (error) {
-    console.error("[Connector Runner] Telegram Jobs Connector execution failed:", error);
+  if (includeTelegram) {
+    try {
+      console.log("[Connector Runner] Launching Telegram Jobs Connector...");
+      const telegramJobs = await searchTelegramJobs();
+      allJobs.push(...telegramJobs);
+      console.log(`[Connector Runner] Telegram Jobs Connector successfully returned ${telegramJobs.length} normalized listings.`);
+    } catch (error) {
+      console.error("[Connector Runner] Telegram Jobs Connector execution failed:", error);
+    }
+  } else {
+    console.log("[Connector Runner] Skipping Telegram connector in direct crawl mode. Telegram stays on the queue-based ingestion path.");
   }
 
   console.log(`\n[Connector Runner] Finished scanning. Consolidated list contains ${allJobs.length} jobs.`);

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, Mail, Linkedin, User, Menu } from "lucide-react";
+import { Compass, Mail, Linkedin, User, Menu, MessageSquare } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -65,10 +65,11 @@ export function Navbar() {
   };
 
   const coreLinks = [
-    { name: "Explore", href: "/", icon: Compass },
+    { name: "Discover", href: "/", icon: Compass },
   ];
 
   const channelsLinks = [
+    { name: "Telegram", href: "/telegram", icon: MessageSquare },
     { name: "Gmail", href: "/gmail", icon: Mail },
     { name: "LinkedIn", href: "/linkedin", icon: Linkedin },
   ];

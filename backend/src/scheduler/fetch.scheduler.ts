@@ -19,7 +19,7 @@ export async function triggerFetchJob(): Promise<void> {
   console.log(`\n=== [Fetch Scheduler] Triggered Job Ingestion at ${startTime.toISOString()} ===`);
 
   try {
-    const stats = await runAllConnectors();
+    const stats = await runAllConnectors({ includeTelegram: false });
     const duration = ((Date.now() - startTime.getTime()) / 1000).toFixed(1);
     console.log(`=== [Fetch Scheduler] Job Ingestion Complete. Duration: ${duration}s. Fetched: ${stats.totalFetched}, Saved/Updated: ${stats.upserted}, Failures: ${stats.failed} ===\n`);
   } catch (error) {

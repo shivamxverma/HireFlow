@@ -4,8 +4,8 @@ dotenv.config();
 import express from "express";
 import cookieParser from "cookie-parser";
 import { prisma } from "./services/prisma.js";
-import { startFetchScheduler, triggerFetchJob } from "./scheduler/fetch.scheduler.js";
-import { startCleanupScheduler, triggerCleanupJob } from "./scheduler/cleanup.scheduler.js";
+import { triggerFetchJob } from "./scheduler/fetch.scheduler.js";
+import { triggerCleanupJob } from "./scheduler/cleanup.scheduler.js";
 import { resumeWorker } from "./queues/resume.worker.js";
 import { applyWorker } from "./queues/apply.worker.js";
 import { outreachWorker } from "./queues/outreach.worker.js";
@@ -83,10 +83,10 @@ app.get("/health", async (req, res) => {
         totalJobs,
         bySource: jobsBySource,
       },
-      schedulers: {
-        fetchInterval: "3 Hours",
-        cleanupInterval: "12 Hours",
-        purgingThreshold: "30 Days",
+      automation: {
+        mode: "manual",
+        fetchTriggerEndpoint: "POST /jobs/trigger-crawl",
+        cleanupTriggerEndpoint: "POST /jobs/trigger-cleanup",
       },
     });
   } catch (error) {
@@ -95,6 +95,53 @@ app.get("/health", async (req, res) => {
       status: "unhealthy",
       timestamp: new Date().toISOString(),
       error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.get("/api/v1/jobs", async (req, res) => {
+  try {
+    const jobs = await prisma.job.findMany({
+      orderBy: [
+        { updatedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      include: {
+        applications: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Jobs fetched successfully.",
+      data: {
+        jobs: jobs.map((job) => {
+          const activeApp = job.applications?.[0];
+          const effectiveStatus = activeApp?.status === "APPLIED" ? "Applied" : job.status;
+          const effectiveAppliedAt = activeApp?.status === "APPLIED" ? activeApp.updatedAt : job.appliedAt;
+
+          return {
+            ...job,
+            status: effectiveStatus,
+            createdAt: job.createdAt.toISOString(),
+            updatedAt: job.updatedAt.toISOString(),
+            appliedAt: effectiveAppliedAt ? effectiveAppliedAt.toISOString() : null,
+          };
+        }),
+      },
+      meta: {
+        total: jobs.length,
+        fetchedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("[Jobs API] Failed to fetch jobs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch jobs.",
     });
   }
 });
@@ -132,7 +179,7 @@ app.post("/jobs/trigger-cleanup", requireAuth, async (req, res) => {
 
 
 /**
- * Start Server & Schedulers
+ * Start Server
  */
 async function bootstrap() {
   console.log("=== STARTING JOB AGGREGATOR ENGINE ===");
@@ -151,15 +198,11 @@ async function bootstrap() {
 
     // Start Telegram real-time listener
     await TelegramService.startListener();
+    await TelegramService.syncRecentMonitoredChannels();
 
-    // Start fetching scheduler (Runs immediately on boot, then every 3 hours)
-    // We pass `false` here as default so that it doesn't run crawlers instantly on local startup
-    // unless explicitly configured, avoiding rate limits.
-    const shouldRunFetchImmediately = process.env.RUN_CRAWLER_ON_BOOT === "true";
-    startFetchScheduler(shouldRunFetchImmediately);
-
-    // Start cleanup scheduler (Runs immediately on boot, then every 12 hours)
-    startCleanupScheduler(true);
+    console.log("[Bootstrap] Running one-time platform crawl on startup.");
+    await triggerFetchJob();
+    console.log("[Bootstrap] Automatic schedulers are disabled. Use the manual trigger endpoints when you want to fetch or clean jobs.");
 
   } catch (error) {
     console.error("[Bootstrap Error] Critical system failure during bootstrapping:", error);

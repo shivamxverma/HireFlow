@@ -1,4 +1,4 @@
-import OpenAI, { AzureOpenAI } from "openai";
+import OpenAI from "openai";
 
 export interface TailoredResumeData {
   personalInfo: {
@@ -39,46 +39,24 @@ export interface TailoredResumeData {
 }
 
 export class ResumeOptimizerService {
-  private openai: OpenAI | AzureOpenAI | null = null;
-  private isAzure: boolean = false;
-  private isGemini: boolean = false;
+  private openai: OpenAI | null = null;
+  private modelName: string;
 
   constructor() {
-    const apiKey = process.env.OPENAI_API_KEY;
-    const azureApiKey = process.env.AZURE_OPENAI_API_KEY;
-    const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
-    const azureDeployment = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini";
-    const azureApiVersion = process.env.AZURE_OPENAI_API_VERSION || "2024-06-01-preview";
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "https://raghvendrasinghdhakar2--resource.services.ai.azure.com/openai/v1";
+    const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-5.4";
+    const apiKey = process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY || "3oxSFeNj0GluFk9qObTSk04D943F0GSaGUxQIrVwzhdWAb2FIKRVJQQJ99CDACHYHv6XJ3w3AAAAACOGHxI4";
 
-    if (geminiApiKey) {
-      console.log("[Resume Optimizer] Initializing standard OpenAI Client in Gemini Compatibility Mode...");
-      this.openai = new OpenAI({
-        apiKey: geminiApiKey,
-        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
-      });
-      this.isGemini = true;
-    } else if (azureApiKey && azureEndpoint) {
-      console.log(`[Resume Optimizer] Initializing Azure OpenAI Client...`);
-      console.log(`[Resume Optimizer] Endpoint: ${azureEndpoint}`);
-      console.log(`[Resume Optimizer] Deployment: ${azureDeployment}`);
-      
-      this.openai = new AzureOpenAI({
-        apiKey: azureApiKey,
-        endpoint: azureEndpoint,
-        deployment: azureDeployment,
-        apiVersion: azureApiVersion,
-      });
-      this.isAzure = true;
-    } else if (apiKey) {
-      console.log("[Resume Optimizer] Initializing standard OpenAI Client...");
-      this.openai = new OpenAI({ apiKey });
-      this.isAzure = false;
-    } else {
-      console.warn(
-        "[Resume Optimizer] OpenAI / Gemini API Credentials are missing. Requests will fail until GEMINI_API_KEY, OPENAI_API_KEY, or AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT are configured."
-      );
-    }
+    this.modelName = deploymentName;
+
+    console.log(`[Resume Optimizer] Initializing OpenAI Client in Azure Responses Mode...`);
+    console.log(`[Resume Optimizer] Endpoint: ${endpoint}`);
+    console.log(`[Resume Optimizer] Deployment: ${deploymentName}`);
+
+    this.openai = new OpenAI({
+      baseURL: endpoint,
+      apiKey: apiKey,
+    });
   }
 
   /**
@@ -92,7 +70,7 @@ export class ResumeOptimizerService {
     jobDescription: string
   ): Promise<TailoredResumeData> {
     if (!this.openai) {
-      throw new Error("OpenAI API client is not initialized. Please set the OPENAI_API_KEY environment variable.");
+      throw new Error("OpenAI API client is not initialized.");
     }
 
     console.log(`[Resume Optimizer] Starting LLM optimization for role: "${jobTitle}" at "${companyName}"...`);
@@ -125,48 +103,44 @@ Description:
 ${jobDescription}`;
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: this.isGemini
-          ? "gemini-2.5-flash-lite"
-          : this.isAzure
-          ? (process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o-mini")
-          : "gpt-4o-mini", // Dynamic routing for Gemini, Azure OpenAI, or standard OpenAI
-        messages: [
+      const runner = this.openai.responses.stream({
+        model: this.modelName,
+        input: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
+        text: {
+          format: {
+            type: "json_schema",
             name: "tailored_resume",
             strict: true,
             schema: {
-              type: "OBJECT",
+              type: "object",
               properties: {
                 personalInfo: {
-                  type: "OBJECT",
+                  type: "object",
                   properties: {
-                    name: { type: "STRING" },
-                    email: { type: "STRING" },
-                    phone: { type: "STRING" },
-                    website: { type: "STRING" },
-                    location: { type: "STRING" },
-                    github: { type: "STRING" },
-                    linkedin: { type: "STRING" }
+                    name: { type: "string" },
+                    email: { type: "string" },
+                    phone: { type: "string" },
+                    website: { type: "string" },
+                    location: { type: "string" },
+                    github: { type: "string" },
+                    linkedin: { type: "string" }
                   },
                   required: ["name", "email", "phone", "website", "location", "github", "linkedin"],
                   additionalProperties: false
                 },
-                summary: { type: "STRING" },
+                summary: { type: "string" },
                 skills: {
-                  type: "ARRAY",
+                  type: "array",
                   items: {
-                    type: "OBJECT",
+                    type: "object",
                     properties: {
-                      category: { type: "STRING" },
+                      category: { type: "string" },
                       items: {
-                        type: "ARRAY",
-                        items: { type: "STRING" }
+                        type: "array",
+                        items: { type: "string" }
                       }
                     },
                     required: ["category", "items"],
@@ -174,17 +148,17 @@ ${jobDescription}`;
                   }
                 },
                 experience: {
-                  type: "ARRAY",
+                  type: "array",
                   items: {
-                    type: "OBJECT",
+                    type: "object",
                     properties: {
-                      company: { type: "STRING" },
-                      role: { type: "STRING" },
-                      location: { type: "STRING" },
-                      duration: { type: "STRING" },
+                      company: { type: "string" },
+                      role: { type: "string" },
+                      location: { type: "string" },
+                      duration: { type: "string" },
                       achievements: {
-                        type: "ARRAY",
-                        items: { type: "STRING" }
+                        type: "array",
+                        items: { type: "string" }
                       }
                     },
                     required: ["company", "role", "location", "duration", "achievements"],
@@ -192,20 +166,20 @@ ${jobDescription}`;
                   }
                 },
                 projects: {
-                  type: "ARRAY",
+                  type: "array",
                   items: {
-                    type: "OBJECT",
+                    type: "object",
                     properties: {
-                      name: { type: "STRING" },
-                      description: { type: "STRING" },
+                      name: { type: "string" },
+                      description: { type: "string" },
                       technologies: {
-                        type: "ARRAY",
-                        items: { type: "STRING" }
+                        type: "array",
+                        items: { type: "string" }
                       },
-                      duration: { type: "STRING" },
+                      duration: { type: "string" },
                       bullets: {
-                        type: "ARRAY",
-                        items: { type: "STRING" }
+                        type: "array",
+                        items: { type: "string" }
                       }
                     },
                     required: ["name", "description", "technologies", "duration", "bullets"],
@@ -213,15 +187,15 @@ ${jobDescription}`;
                   }
                 },
                 education: {
-                  type: "ARRAY",
+                  type: "array",
                   items: {
-                    type: "OBJECT",
+                    type: "object",
                     properties: {
-                      institution: { type: "STRING" },
-                      degree: { type: "STRING" },
-                      location: { type: "STRING" },
-                      duration: { type: "STRING" },
-                      details: { type: "STRING" }
+                      institution: { type: "string" },
+                      degree: { type: "string" },
+                      location: { type: "string" },
+                      duration: { type: "string" },
+                      details: { type: "string" }
                     },
                     required: ["institution", "degree", "location", "duration", "details"],
                     additionalProperties: false
@@ -236,7 +210,11 @@ ${jobDescription}`;
         temperature: 0.1 // Low temperature to maximize adherence to facts and instructions
       });
 
-      const rawJson = response.choices[0].message.content;
+      const result = await runner.finalResponse();
+      const firstOutput = result.output?.[0] as any;
+      const contentItem = firstOutput?.content?.find((c: any) => c.type === 'output_text');
+      const rawJson = contentItem?.text || "";
+
       if (!rawJson) {
         throw new Error("Received empty response content from OpenAI Chat Completion.");
       }
