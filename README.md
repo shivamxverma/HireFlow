@@ -12,32 +12,60 @@ Styled with a stark, premium developer-centric Vercel-inspired interface (design
 
 Hireflow is divided into three distinct modules: a Next.js frontend, an Express.js backend powered by Prisma ORM and BullMQ background workers, and a Manifest V3 Chrome extension.
 
-```mermaid
-graph TD
-    %% Styling
-    classDef frontend fill:#fafafa,stroke:#a1a1a1,stroke-width:2px,color:#171717;
-    classDef backend fill:#171717,stroke:#ebebeb,stroke-width:2px,color:#ffffff;
-    classDef db fill:#0070f3,stroke:#ffffff,stroke-width:1px,color:#ffffff;
-    classDef queue fill:#7928ca,stroke:#ffffff,stroke-width:1px,color:#ffffff;
-    classDef external fill:#50e3c2,stroke:#171717,stroke-width:1px,color:#171717;
+![Hireflow System Design](./system-design.svg)
 
-    %% Nodes
-    ChromeExt["Chrome Extension<br>Manifest V3"] -->|POST /outreach-flow/profiles| ExpressAPI["Express.js Backend<br>Node/TypeScript"]
-    NextJS["Next.js Frontend<br>Vercel-inspired UI"] -->|REST API & Cookie Auth| ExpressAPI
-    ExpressAPI -->|Prisma ORM| DB[(Neon PostgreSQL)]
-    ExpressAPI -->|Enqueue Jobs| Redis[(Redis - BullMQ)]
-    Redis -->|Processes Tasks| Workers["Background Workers"]
-    Workers -->|Playwright Stealth| TargetWeb["Job Boards / LinkedIn"]
-    Workers -->|Gemini / OpenAI API| LLMs["AI Resume Optimization<br>& JD Ingestion"]
-    Workers -->|Gmail API / CDP| Outreach["Gmail & LinkedIn Outreach"]
-    
-    %% Apply Styling
-    class NextJS,ChromeExt frontend;
-    class ExpressAPI,Workers backend;
-    class DB db;
-    class Redis queue;
-    class TargetWeb,LLMs,Outreach external;
-```
+### Architecture Overview
+
+1. **User Interfaces**
+   * **Next.js Frontend** renders the jobs board, profile settings, outreach board, and Telegram dashboard.
+   * **Chrome Extension** captures LinkedIn profiles and sends them to the backend outreach flow.
+
+2. **Backend API**
+   * **Express routes** expose auth, jobs, applications, Telegram, and outreach endpoints.
+   * **Core services** handle ingestion, Gmail, Telegram, resume generation, resume optimization, and stealth browser setup.
+   * **Scheduler** triggers recurring fetch cycles.
+   * **Connector runner** executes the active job sources and consolidates normalized jobs.
+
+3. **Job Aggregation Layer**
+   * **LinkedIn connector** builds search URLs, opens pages with Playwright + saved session state, parses rendered listings, and normalizes them.
+   * **Wellfound connector** builds role/location URLs, loads pages with Playwright, parses startup/job cards, and normalizes them.
+   * **YC connector** requests WorkAtAStartup pages with saved cookies, parses listings, and normalizes them.
+   * **Telegram connector** reads monitored channel messages, stores raw messages, and converts them to jobs through the extraction pipeline.
+
+4. **Background Workers**
+   * **Resume worker** fetches or reuses the job description, optimizes the resume with an LLM, and generates PDF/LaTeX/HTML artifacts.
+   * **Auto-apply worker** launches Playwright, selects the correct platform adapter, uploads the tailored resume, fills forms, and updates application state.
+   * **Telegram extraction worker** reads raw Telegram messages from the queue, sends them to Gemini for structured extraction, validates them, deduplicates them, and stores them as jobs.
+   * **Outreach worker** generates and sends email or LinkedIn outreach flows.
+
+5. **Data Layer**
+   * **PostgreSQL + Prisma** stores jobs, applications, resume versions, outreach entities, profiles, users, and Telegram raw messages.
+   * **Redis + BullMQ** powers asynchronous pipelines for resume generation, auto-apply, outreach, and Telegram extraction.
+   * **Local storage** holds saved browser sessions, generated resumes, and failure screenshots.
+
+6. **External Systems**
+   * **LinkedIn / Wellfound / WorkAtAStartup** are scraped or automated by connectors/adapters.
+   * **Telegram** is consumed through GramJS using the authenticated user session.
+   * **Gemini / OpenAI / Azure OpenAI** are used for extraction, resume tailoring, and message generation.
+   * **Gmail / Google OAuth** supports outreach sending and account authorization.
+   * **Playwright / Chromium / Chrome** powers scraping, job description crawling, and application submission.
+
+### Primary End-to-End Flows
+
+1. **Job ingestion**
+   * Scheduler -> Connector Runner -> Source Connectors -> Normalization -> Ingestion Service -> Jobs table
+
+2. **Resume optimization**
+   * Application queued -> Resume worker -> Job description fetch -> LLM optimization -> Resume artifact generation -> Resume version stored
+
+3. **Auto apply**
+   * Ready application -> Auto-apply worker -> Playwright browser -> LinkedIn/Wellfound adapter -> Form filling / resume upload -> Application and job status update
+
+4. **Telegram extraction**
+   * Telegram message -> Raw message table -> BullMQ queue -> Gemini extraction worker -> Validation / dedupe -> Jobs table
+
+5. **Cold outreach**
+   * Frontend/Extension input -> Lead/Profile records -> Outreach worker -> Draft generation -> Approval / send -> Gmail or LinkedIn delivery
 
 For a detailed technical design breakdown of all pipelines, schemas, and evasion tactics, see [architecture.md](file:///Users/shivamverma/Desktop/projects/Job-Scraper/architecture.md).
 

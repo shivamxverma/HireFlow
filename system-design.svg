@@ -1,0 +1,141 @@
+<svg width="1600" height="980" viewBox="0 0 1600 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #f6f7fb; }
+      .panel { fill: #ffffff; stroke: #d7dce5; stroke-width: 2; rx: 20; }
+      .panel-title { font: 700 24px Arial, sans-serif; fill: #1f2937; }
+      .box { fill: #ffffff; stroke: #94a3b8; stroke-width: 2; rx: 14; }
+      .box-blue { fill: #eef6ff; stroke: #5b9cff; stroke-width: 2; rx: 14; }
+      .box-green { fill: #eefcf4; stroke: #53b67b; stroke-width: 2; rx: 14; }
+      .box-purple { fill: #f5f0ff; stroke: #8b6df2; stroke-width: 2; rx: 14; }
+      .box-orange { fill: #fff5ea; stroke: #f59e0b; stroke-width: 2; rx: 14; }
+      .box-gray { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; rx: 14; }
+      .label { font: 600 18px Arial, sans-serif; fill: #111827; }
+      .small { font: 500 15px Arial, sans-serif; fill: #475569; }
+      .tiny { font: 500 13px Arial, sans-serif; fill: #64748b; }
+      .arrow { stroke: #64748b; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .arrow-soft { stroke: #94a3b8; stroke-width: 2.5; fill: none; marker-end: url(#arrowheadSoft); }
+      .title { font: 700 34px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 500 17px Arial, sans-serif; fill: #475569; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowheadSoft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="980"/>
+
+  <text class="title" x="60" y="60">Hireflow System Design</text>
+  <text class="subtitle" x="60" y="92">Clean architecture view of the full repository: ingestion, processing, automation, and outreach.</text>
+
+  <rect class="panel" x="50" y="130" width="240" height="220"/>
+  <text class="panel-title" x="75" y="170">User Interfaces</text>
+  <rect class="box-blue" x="75" y="195" width="190" height="55"/>
+  <text class="label" x="103" y="228">Next.js Frontend</text>
+  <rect class="box-blue" x="75" y="270" width="190" height="55"/>
+  <text class="label" x="97" y="303">Chrome Extension</text>
+
+  <rect class="panel" x="350" y="130" width="330" height="290"/>
+  <text class="panel-title" x="375" y="170">Backend API</text>
+  <rect class="box" x="375" y="195" width="280" height="55"/>
+  <text class="label" x="446" y="228">Routes / Controllers</text>
+  <rect class="box" x="375" y="270" width="280" height="55"/>
+  <text class="label" x="453" y="303">Core Services</text>
+  <rect class="box" x="375" y="345" width="130" height="50"/>
+  <text class="label" x="405" y="377">Scheduler</text>
+  <rect class="box" x="525" y="345" width="130" height="50"/>
+  <text class="label" x="542" y="377">Connector Runner</text>
+
+  <rect class="panel" x="740" y="130" width="300" height="330"/>
+  <text class="panel-title" x="765" y="170">Connectors</text>
+  <rect class="box-orange" x="765" y="195" width="250" height="50"/>
+  <text class="label" x="842" y="227">LinkedIn</text>
+  <rect class="box-orange" x="765" y="260" width="250" height="50"/>
+  <text class="label" x="836" y="292">Wellfound</text>
+  <rect class="box-orange" x="765" y="325" width="250" height="50"/>
+  <text class="label" x="872" y="357">YC</text>
+  <rect class="box-orange" x="765" y="390" width="250" height="50"/>
+  <text class="label" x="838" y="422">Telegram</text>
+
+  <rect class="panel" x="1100" y="130" width="430" height="330"/>
+  <text class="panel-title" x="1125" y="170">External Systems</text>
+  <rect class="box-gray" x="1125" y="195" width="175" height="50"/>
+  <text class="label" x="1178" y="227">LinkedIn</text>
+  <rect class="box-gray" x="1325" y="195" width="175" height="50"/>
+  <text class="label" x="1371" y="227">Wellfound</text>
+  <rect class="box-gray" x="1125" y="260" width="175" height="50"/>
+  <text class="label" x="1146" y="292">WorkAtAStartup</text>
+  <rect class="box-gray" x="1325" y="260" width="175" height="50"/>
+  <text class="label" x="1380" y="292">Telegram</text>
+  <rect class="box-gray" x="1125" y="325" width="175" height="50"/>
+  <text class="label" x="1150" y="357">Playwright / Chrome</text>
+  <rect class="box-gray" x="1325" y="325" width="175" height="50"/>
+  <text class="label" x="1355" y="357">Gmail / OAuth</text>
+  <rect class="box-gray" x="1225" y="390" width="175" height="50"/>
+  <text class="label" x="1250" y="422">Gemini / OpenAI</text>
+
+  <rect class="panel" x="50" y="510" width="500" height="350"/>
+  <text class="panel-title" x="75" y="550">Background Workers (BullMQ)</text>
+  <rect class="box-purple" x="75" y="580" width="200" height="60"/>
+  <text class="label" x="127" y="615">Resume Worker</text>
+  <rect class="box-purple" x="320" y="580" width="200" height="60"/>
+  <text class="label" x="358" y="615">Auto Apply Worker</text>
+  <rect class="box-purple" x="75" y="685" width="200" height="60"/>
+  <text class="label" x="88" y="720">Telegram Extraction</text>
+  <rect class="box-purple" x="320" y="685" width="200" height="60"/>
+  <text class="label" x="366" y="720">Outreach Worker</text>
+  <text class="small" x="80" y="785">Async pipelines handled here:</text>
+  <text class="tiny" x="80" y="813">resume generation, auto-apply, Telegram parsing, outreach sending</text>
+
+  <rect class="panel" x="630" y="510" width="330" height="260"/>
+  <text class="panel-title" x="655" y="550">Data Layer</text>
+  <rect class="box-green" x="655" y="580" width="280" height="55"/>
+  <text class="label" x="731" y="613">PostgreSQL / Prisma</text>
+  <rect class="box-green" x="655" y="650" width="280" height="55"/>
+  <text class="label" x="740" y="683">Redis Queue</text>
+  <rect class="box-green" x="655" y="720" width="280" height="55"/>
+  <text class="label" x="709" y="753">File Storage</text>
+
+  <rect class="panel" x="1030" y="510" width="500" height="350"/>
+  <text class="panel-title" x="1055" y="550">Primary Flows</text>
+  <text class="small" x="1060" y="595">1. Job ingestion:</text>
+  <text class="tiny" x="1060" y="620">Scheduler -&gt; Connector Runner -&gt; Connectors -&gt; DB</text>
+  <text class="small" x="1060" y="665">2. Resume + apply:</text>
+  <text class="tiny" x="1060" y="690">Application -&gt; Resume Worker -&gt; Auto Apply Worker -&gt; Job Site</text>
+  <text class="small" x="1060" y="735">3. Telegram:</text>
+  <text class="tiny" x="1060" y="760">Messages -&gt; Extraction Worker -&gt; LLM -&gt; DB</text>
+  <text class="small" x="1060" y="805">4. Outreach:</text>
+  <text class="tiny" x="1060" y="830">Profiles / Leads -&gt; Outreach Worker -&gt; Gmail / LinkedIn</text>
+
+  <path class="arrow" d="M265 223H375"/>
+  <path class="arrow" d="M265 298H375"/>
+  <path class="arrow" d="M655 370H740"/>
+  <path class="arrow" d="M1040 220H1125"/>
+  <path class="arrow" d="M1040 285H1125"/>
+  <path class="arrow" d="M1040 350H1125"/>
+  <path class="arrow" d="M1040 415H1325"/>
+
+  <path class="arrow-soft" d="M1215 375V470H795V580"/>
+  <path class="arrow-soft" d="M1410 375V470H420V580"/>
+  <path class="arrow-soft" d="M1410 310V470H175V685"/>
+  <path class="arrow-soft" d="M1385 245V470H420V685"/>
+
+  <path class="arrow" d="M515 325V580H175"/>
+  <path class="arrow" d="M515 325V580H420"/>
+  <path class="arrow" d="M515 250V580H795"/>
+
+  <path class="arrow" d="M550 610H655"/>
+  <path class="arrow" d="M550 715H655"/>
+  <path class="arrow" d="M275 610H655"/>
+  <path class="arrow" d="M520 610V753H655"/>
+
+  <path class="arrow-soft" d="M935 607H1040"/>
+  <path class="arrow-soft" d="M935 677H1040"/>
+  <path class="arrow-soft" d="M935 747H1040"/>
+
+  <text class="tiny" x="80" y="930">File: system-design.svg</text>
+  <text class="tiny" x="1385" y="930">Generated for repo-level architecture understanding</text>
+</svg>

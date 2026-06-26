@@ -17,6 +17,7 @@
     "save-session:linkedin": "tsx src/connectors/linkedin/save-session.ts",
     "import-cookies:linkedin": "tsx src/connectors/linkedin/import-cookies.ts",
     "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts",
+    "clear:jobs": "tsx src/scripts/clear-job-data.ts",
     "telegram:login": "tsx src/scripts/telegram-login.ts",
     "test:telegram": "tsx src/scripts/test-telegram-extraction.ts"
   },

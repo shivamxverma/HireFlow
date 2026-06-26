@@ -2,6 +2,42 @@
 
 This document provides an in-depth architectural and technical design breakdown of the **Hireflow** project. It outlines the technology stack, database schema, background worker pipelines, browser automation details, and outreach integration mechanisms.
 
+![Hireflow System Design](./system-design.svg)
+
+## Architecture Summary
+
+Hireflow is organized around six major layers:
+
+1. **User Interfaces**
+   * Next.js frontend for jobs, applications, outreach, and Telegram management
+   * Chrome extension for LinkedIn profile capture
+
+2. **Backend API**
+   * Express routes and service layer
+   * Scheduler for recurring fetch cycles
+   * Connector runner for source orchestration
+
+3. **Source Connectors**
+   * LinkedIn, Wellfound, YC, Telegram
+   * All sources normalize into the shared `Job` model before persistence
+
+4. **Background Workers**
+   * Resume generation
+   * Auto-apply
+   * Telegram extraction
+   * Outreach generation and sending
+
+5. **Data Layer**
+   * PostgreSQL via Prisma
+   * Redis via BullMQ
+   * Filesystem storage for sessions, resumes, and screenshots
+
+6. **External Dependencies**
+   * Playwright / Chromium / Chrome
+   * Telegram / GramJS
+   * Gmail / Google OAuth
+   * Gemini / OpenAI / Azure OpenAI
+
 ---
 
 ## 1. Technological Stack
