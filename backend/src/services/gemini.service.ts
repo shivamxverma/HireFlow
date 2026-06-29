@@ -29,9 +29,9 @@ export class GeminiService {
   private modelName: string;
 
   constructor() {
-    const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "https://raghvendrasinghdhakar2--resource.services.ai.azure.com/openai/v1";
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
     const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-5.4";
-    const apiKey = process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY || "3oxSFeNj0GluFk9qObTSk04D943F0GSaGUxQIrVwzhdWAb2FIKRVJQQJ99CDACHYHv6XJ3w3AAAAACOGHxI4";
+    const apiKey = process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
 
     this.resumeFetcher = new ResumeFetcherService();
     this.storageDir = path.resolve(process.cwd(), "storage");
