@@ -10,7 +10,6 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "mcp": "tsx src/mcp-server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "test:connector": "tsx src/connectors/wellfound/test-connector.ts",
     "test:yc": "tsx src/connectors/yc/test-connector.ts",
     "test:linkedin": "tsx src/connectors/linkedin/test-connector.ts",
@@ -44,7 +43,8 @@
     "playwright": "^1.60.0",
     "playwright-extra": "^4.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "telegram": "^2.26.22"
+    "telegram": "^2.26.22",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",

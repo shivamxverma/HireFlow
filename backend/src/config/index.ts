@@ -1,0 +1,93 @@
+import dotenv from "dotenv";
+import * as yup from "yup";
+
+dotenv.config();
+
+const configSchema = yup.object({
+  PORT: yup.string().default("3000"),
+  NODE_ENV: yup.string().oneOf(["development", "production", "test"]).default("development"),
+  ACCESS_TOKEN_SECRET: yup.string().default("hireflow_jwt_access_secret_2026_x18"),
+  REFRESH_TOKEN_SECRET: yup.string().default("hireflow_jwt_refresh_secret_2026_y99"),
+  GOOGLE_CLIENT_ID: yup.string().optional(),
+  GOOGLE_CLIENT_SECRET: yup.string().optional(),
+  GOOGLE_REDIRECT_URI: yup.string().default("http://localhost:3000/api/auth/callback/google"),
+  MAX_DAILY_EMAILS: yup.number().integer().default(50),
+  TELEGRAM_API_ID: yup.number().integer().default(0),
+  TELEGRAM_API_HASH: yup.string().default(""),
+  TELEGRAM_SESSION: yup.string().default(""),
+  EMAIL_USER: yup.string().optional(),
+  EMAIL_PASS: yup.string().optional(),
+  AZURE_OPENAI_ENDPOINT: yup.string().optional(),
+  AZURE_OPENAI_DEPLOYMENT: yup.string().default("gpt-5.4"),
+  AZURE_OPENAI_API_KEY: yup.string().optional(),
+  OPENAI_API_KEY: yup.string().optional(),
+  GOOGLE_DRIVE_RESUME_FILE_ID: yup.string().optional(),
+  DATABASE_URL: yup.string().required("DATABASE_URL is required"),
+  PROXY_URL: yup.string().optional(),
+  REDIS_URL: yup.string().optional(),
+  REDIS_HOST: yup.string().default("127.0.0.1"),
+  REDIS_PORT: yup.number().integer().default(6379),
+  REDIS_PASSWORD: yup.string().optional(),
+  MAX_DAILY_APPLICATIONS: yup.number().integer().default(15),
+  MIN_APPLY_DELAY_MS: yup.number().integer().default(180000),
+  MAX_APPLY_DELAY_MS: yup.number().integer().default(480000),
+  USE_PERSISTENT_CHROME: yup.string().default("false"),
+  HEADLESS_APPLY: yup.string().default("false"),
+  CHROME_USER_DATA_DIR: yup.string().optional(),
+  CHROME_PROFILE: yup.string().default("Default"),
+  GEMINI_API_KEY: yup.string().optional(),
+});
+
+let validatedEnv: any;
+
+try {
+  validatedEnv = configSchema.validateSync(process.env, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+} catch (error) {
+  if (error instanceof yup.ValidationError) {
+    console.error("❌ Environment configuration validation failed:");
+    console.error(error.errors.join("\n"));
+  } else {
+    console.error("❌ Configuration loading failed:", error);
+  }
+  process.exit(1);
+}
+
+const env = {
+  PORT: validatedEnv.PORT,
+  NODE_ENV: validatedEnv.NODE_ENV,
+  ACCESS_TOKEN_SECRET: validatedEnv.ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET: validatedEnv.REFRESH_TOKEN_SECRET,
+  GOOGLE_CLIENT_ID: validatedEnv.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: validatedEnv.GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI: validatedEnv.GOOGLE_REDIRECT_URI,
+  MAX_DAILY_EMAILS: validatedEnv.MAX_DAILY_EMAILS,
+  TELEGRAM_API_ID: validatedEnv.TELEGRAM_API_ID,
+  TELEGRAM_API_HASH: validatedEnv.TELEGRAM_API_HASH,
+  TELEGRAM_SESSION: validatedEnv.TELEGRAM_SESSION,
+  EMAIL_USER: validatedEnv.EMAIL_USER,
+  EMAIL_PASS: validatedEnv.EMAIL_PASS,
+  AZURE_OPENAI_ENDPOINT: validatedEnv.AZURE_OPENAI_ENDPOINT,
+  AZURE_OPENAI_DEPLOYMENT: validatedEnv.AZURE_OPENAI_DEPLOYMENT,
+  AZURE_OPENAI_API_KEY: validatedEnv.AZURE_OPENAI_API_KEY,
+  OPENAI_API_KEY: validatedEnv.OPENAI_API_KEY,
+  GOOGLE_DRIVE_RESUME_FILE_ID: validatedEnv.GOOGLE_DRIVE_RESUME_FILE_ID,
+  DATABASE_URL: validatedEnv.DATABASE_URL,
+  PROXY_URL: validatedEnv.PROXY_URL,
+  REDIS_URL: validatedEnv.REDIS_URL,
+  REDIS_HOST: validatedEnv.REDIS_HOST,
+  REDIS_PORT: validatedEnv.REDIS_PORT,
+  REDIS_PASSWORD: validatedEnv.REDIS_PASSWORD,
+  MAX_DAILY_APPLICATIONS: validatedEnv.MAX_DAILY_APPLICATIONS,
+  MIN_APPLY_DELAY_MS: validatedEnv.MIN_APPLY_DELAY_MS,
+  MAX_APPLY_DELAY_MS: validatedEnv.MAX_APPLY_DELAY_MS,
+  USE_PERSISTENT_CHROME: validatedEnv.USE_PERSISTENT_CHROME,
+  HEADLESS_APPLY: validatedEnv.HEADLESS_APPLY,
+  CHROME_USER_DATA_DIR: validatedEnv.CHROME_USER_DATA_DIR,
+  CHROME_PROFILE: validatedEnv.CHROME_PROFILE,
+  GEMINI_API_KEY: validatedEnv.GEMINI_API_KEY,
+};
+
+export default env;
