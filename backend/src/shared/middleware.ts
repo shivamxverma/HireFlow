@@ -21,9 +21,9 @@ export const validate = (location: 'query' | 'body' | 'params', schema: yup.Obje
       const validatedData = await schema.validate(req[location], { abortEarly: false });
       Object.assign(req[location], validatedData);
       next();
-    } catch (error: unknown) {
-      if (error instanceof yup.ValidationError) {
-        return res.status(400).json({ error: error.errors.join(', ') });
+    } catch (error: any) {
+      if (error && error.name === "ValidationError") {
+        return res.status(400).json({ error: error.errors?.join(', ') || error.message });
       }
       return res.status(400).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }

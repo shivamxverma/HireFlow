@@ -40,21 +40,6 @@ const configSchema = yup.object({
 
 let validatedEnv: any;
 
-try {
-  validatedEnv = configSchema.validateSync(process.env, {
-    abortEarly: false,
-    stripUnknown: true,
-  });
-} catch (error) {
-  if (error instanceof yup.ValidationError) {
-    console.error("❌ Environment configuration validation failed:");
-    console.error(error.errors.join("\n"));
-  } else {
-    console.error("❌ Configuration loading failed:", error);
-  }
-  process.exit(1);
-}
-
 const env = {
   PORT: validatedEnv.PORT,
   NODE_ENV: validatedEnv.NODE_ENV,

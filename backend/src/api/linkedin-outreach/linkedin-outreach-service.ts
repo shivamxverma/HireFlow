@@ -1,103 +1,58 @@
-import { Router, Request, Response } from "express";
-import { prisma } from "../services/prisma.js";
-import { requireAuth, requireSendAuth } from "./auth.middleware.js";
-import { GeminiService } from "../services/gemini.service.js";
 import { 
   hasLinkedinSession, 
   validateLinkedinSession, 
   saveLinkedinSession, 
   getLinkedinSessionPath 
-} from "../connectors/linkedin/session.js";
-import { launchStealthBrowser } from "../services/stealth-browser.js";
+} from "../../connectors/linkedin/session.js";
+import { launchStealthBrowser } from "../../services/stealth-browser.js";
+import { prisma } from "../../services/prisma.js";
+import { GeminiService } from "../../services/gemini.service.js";
+import { chromium } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
-import { chromium } from "playwright";
-
-export const linkedinOutreachRouter = Router();
-linkedinOutreachRouter.use(requireAuth);
 
 const geminiService = new GeminiService();
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const locateProfileCardButton = async (page: any, text: string, defaultSelectors: string[]) => {
-  for (const selector of defaultSelectors) {
-    const locator = page.locator(selector);
-    const count = await locator.count();
-    for (let i = 0; i < count; i++) {
-      const el = locator.nth(i);
-      if (await el.isVisible()) {
-        const rect = await el.boundingBox();
-        // Avoid sticky headers at the top (y < 100) and sidebar profiles on the right (x > 1000)
-        if (rect && rect.y > 100 && rect.x < 1000) {
-          console.log(`[LinkedIn Outreach] Found "${text}" button via selector: "${selector}"`);
-          return el;
+export class LinkedinOutreachService {
+  static async locateProfileCardButton(page: any, text: string, defaultSelectors: string[]) {
+    for (const selector of defaultSelectors) {
+      const locator = page.locator(selector);
+      const count = await locator.count();
+      for (let i = 0; i < count; i++) {
+        const el = locator.nth(i);
+        if (await el.isVisible()) {
+          const rect = await el.boundingBox();
+          if (rect && rect.y > 100 && rect.x < 1000) {
+            console.log(`[LinkedIn Outreach] Found "${text}" button via selector: "${selector}"`);
+            return el;
+          }
         }
       }
     }
+    const fallback = page.locator(defaultSelectors.join(', ')).first();
+    if (await fallback.isVisible()) {
+      console.log(`[LinkedIn Outreach] Found "${text}" button via fallback selector`);
+      return fallback;
+    }
+    return null;
   }
-  // Fallback to first visible selector match
-  const fallback = page.locator(defaultSelectors.join(', ')).first();
-  if (await fallback.isVisible()) {
-    console.log(`[LinkedIn Outreach] Found "${text}" button via fallback selector`);
-    return fallback;
-  }
-  return null;
-};
 
-/**
- * 1. Check LinkedIn Session Status
- * GET /outreach/linkedin/status
- */
-linkedinOutreachRouter.get("/outreach/linkedin/status", async (req: Request, res: Response): Promise<void> => {
-  try {
+  static checkSessionStatus() {
     const sessionFileExists = hasLinkedinSession();
     if (!sessionFileExists) {
-      res.status(200).json({ authenticated: false });
-      return;
+      return { authenticated: false };
     }
-
-    const isValid = await validateLinkedinSession();
-    res.status(200).json({ authenticated: isValid });
-  } catch (error) {
-    console.error("[LinkedIn Outreach] Status check failed:", error);
-    res.status(500).json({ success: false, error: String(error) });
+    return validateLinkedinSession().then((isValid) => ({ authenticated: isValid }));
   }
-});
 
-/**
- * 2. Connect LinkedIn Account (Headless session saver)
- * GET /outreach/linkedin/connect
- */
-linkedinOutreachRouter.get("/outreach/linkedin/connect", async (req: Request, res: Response): Promise<void> => {
-  try {
+  static async connectLinkedin() {
     console.log("[LinkedIn Outreach] Starting headed login browser session...");
-    
-    // Immediate response as connection launches headed window on server/local host
-    res.write("Launching headed browser for manual login...");
     await saveLinkedinSession();
-    
-    res.end("\nConnection process complete. Session saved.");
-  } catch (error) {
-    console.error("[LinkedIn Outreach] Connection failed:", error);
-    if (!res.headersSent) {
-      res.status(500).send(`Authentication failed: ${error instanceof Error ? error.message : String(error)}`);
-    }
   }
-});
 
-/**
- * 2.5. Import LinkedIn cookies directly via JSON
- * POST /outreach/linkedin/import-cookies
- */
-linkedinOutreachRouter.post("/outreach/linkedin/import-cookies", async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { cookies } = req.body;
-    if (!cookies || !Array.isArray(cookies)) {
-      res.status(400).json({ success: false, message: "Missing or invalid cookies array." });
-      return;
-    }
-
+  static importCookies(cookies: any[]) {
     const mapSameSite = (value: string | undefined): "Strict" | "Lax" | "None" => {
       const normalized = value?.toLowerCase();
       if (normalized === "strict") return "Strict";
@@ -119,51 +74,27 @@ linkedinOutreachRouter.post("/outreach/linkedin/import-cookies", async (req: Req
       }));
 
     if (mappedCookies.length === 0) {
-      res.status(400).json({ success: false, message: "No valid linkedin.com cookies found in the payload." });
-      return;
+      throw new Error("No valid linkedin.com cookies found in the payload.");
     }
 
     const outputPath = getLinkedinSessionPath();
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, JSON.stringify({ cookies: mappedCookies, origins: [] }, null, 2), "utf-8");
 
-    console.log(`[LinkedIn Session] Successfully imported ${mappedCookies.length} cookies directly via API.`);
-
-    res.status(200).json({
-      success: true,
-      message: `Successfully imported ${mappedCookies.length} LinkedIn session cookies.`
-    });
-  } catch (error) {
-    console.error("[LinkedIn Session] Cookie import failed:", error);
-    res.status(500).json({ success: false, error: String(error) });
+    console.log(`[LinkedIn Session] Successfully imported ${mappedCookies.length} cookies directly.`);
+    return mappedCookies.length;
   }
-});
 
-/**
- * 3. Generate personalized LinkedIn DM draft
- * POST /outreach/linkedin/generate
- */
-linkedinOutreachRouter.post("/outreach/linkedin/generate", async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { profileId, resumeId, templateId } = req.body;
-    if (!profileId || !resumeId || !templateId) {
-      res.status(400).json({ success: false, message: "Missing profileId, resumeId, or templateId." });
-      return;
-    }
-
-    // Load contexts
+  static async generateColdNote(profileId: string, resumeId: string, templateId: string) {
     const profile = await prisma.profile.findUnique({ where: { id: profileId } });
     const resume = await prisma.resume.findUnique({ where: { id: resumeId } });
     const template = await prisma.template.findUnique({ where: { id: templateId } });
 
     if (!profile || !resume || !template) {
-      res.status(404).json({ success: false, message: "Recruiter profile, resume, or template not found." });
-      return;
+      throw new Error("Recruiter profile, resume, or template not found.");
     }
 
-    console.log(`[LinkedIn Outreach] Generating cold note note for profile: ${profile.name}...`);
-    
-    // Append strict length limit in instructions for LinkedIn connection requests (300 character constraint)
+    console.log(`[LinkedIn Outreach] Generating cold note for profile: ${profile.name}...`);
     const lengthInstructions = `${template.prompt}\n\nSTRICT REQUIREMENT: The generated message MUST be extremely concise and direct. It MUST fit within a strict 300 character count limit (including spaces and punctuation) so it can be sent inside a connection request note. Maximum 2-3 sentences.`;
 
     const generated = await geminiService.generateOutreachMessage(
@@ -179,12 +110,11 @@ linkedinOutreachRouter.post("/outreach/linkedin/generate", async (req: Request, 
         experience: resume.experience,
         projects: resume.projects
       },
-      null, // No attached job posting metadata needed for cold DMs
+      null,
       lengthInstructions,
       "LINKEDIN_CONNECTION_NOTE"
     );
 
-    // Save as draft OutboundMessage
     const draft = await prisma.outboundMessage.create({
       data: {
         profileId,
@@ -195,65 +125,18 @@ linkedinOutreachRouter.post("/outreach/linkedin/generate", async (req: Request, 
       }
     });
 
-    res.status(201).json({
-      success: true,
-      message: "Successfully generated LinkedIn cold outreach note draft.",
-      data: draft
-    });
-  } catch (error) {
-    console.error("[LinkedIn Outreach] Draft generation failed:", error);
-    res.status(500).json({ success: false, error: String(error) });
+    return draft;
   }
-});
 
-/**
- * 3.5. Extract recruiter/prospect profile details from PDF or Image file
- * POST /outreach/linkedin/extract-file
- */
-linkedinOutreachRouter.post("/outreach/linkedin/extract-file", async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { fileData, mimeType } = req.body;
-
-    if (!fileData || !mimeType) {
-      res.status(400).json({ success: false, message: "Missing base64 fileData or mimeType." });
-      return;
-    }
-
-    // Clean base64 string if it contains prefix data:...;base64,
+  static async extractProfileFromFile(fileData: string, mimeType: string) {
     let base64Data = fileData;
     if (fileData.includes("base64,")) {
       base64Data = fileData.split("base64,")[1];
     }
-
-    console.log("[LinkedIn Outreach] Calling Gemini to extract profile details from file...");
-    const extracted = await geminiService.extractProfileFromFile(base64Data, mimeType);
-
-    res.status(200).json({
-      success: true,
-      message: "Successfully extracted profile details from file.",
-      data: extracted
-    });
-  } catch (error) {
-    console.error("[LinkedIn Outreach] File extraction failed:", error);
-    res.status(500).json({
-      success: false,
-      message: error instanceof Error ? error.message : String(error)
-    });
+    return await geminiService.extractProfileFromFile(base64Data, mimeType);
   }
-});
 
-/**
- * 4. Send Approved DMs/Notes sequentially with randomized 5-10s delays
- * POST /outreach/linkedin/send
- */
-linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { messageIds } = req.body;
-    if (!messageIds || !Array.isArray(messageIds) || messageIds.length === 0) {
-      res.status(400).json({ success: false, message: "Missing or invalid messageIds array." });
-      return;
-    }
-
+  static async sendLinkedinMessages(messageIds: string[]) {
     const messages = await prisma.outboundMessage.findMany({
       where: {
         id: { in: messageIds },
@@ -265,17 +148,10 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
     });
 
     if (messages.length === 0) {
-      res.status(404).json({ success: false, message: "No valid pending LinkedIn messages found." });
-      return;
+      throw new Error("No valid pending LinkedIn messages found.");
     }
 
-    // Acknowledge processing immediately to unblock frontend HTTP timeouts
-    res.status(202).json({
-      success: true,
-      message: `Sequentially dispatching ${messages.length} LinkedIn DMs in the background.`
-    });
-
-    // Background Playwright DM Dispatcher
+    // Run Playwright Automation sequentially in the background
     (async () => {
       const sessionPath = getLinkedinSessionPath();
       const sessionFileExists = hasLinkedinSession();
@@ -294,7 +170,6 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
       for (let i = 0; i < messages.length; i++) {
         const msg = messages[i];
         try {
-          // Check profile url is active
           if (!msg.profile.linkedinUrl) {
             throw new Error("Recruiter target has no LinkedIn profile URL registered.");
           }
@@ -335,11 +210,9 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
               timeout: 45000
             });
 
-            // Settle dynamic SPA content (wait for profile main container skeleton or card to render)
             try {
               await page.waitForSelector('main, .scaffold-layout__main, .pv-profile-card, .ph5', { timeout: 15000 });
               console.log("[LinkedIn Outreach] Profile page mounted successfully. Allowing assets to settle...");
-              // Safe settle delay: 4-8 seconds
               await page.waitForTimeout(4000 + Math.random() * 4000);
             } catch (e) {
               console.warn("[LinkedIn Outreach] Profile scaffold layout timed out. Using basic settle fallback.");
@@ -353,8 +226,7 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
 
             let messaged = false;
 
-            // Flow A: Direct Message Button (if already connected or open profile)
-            const messageBtn = await locateProfileCardButton(page, "Message", [
+            const messageBtn = await LinkedinOutreachService.locateProfileCardButton(page, "Message", [
               'main#workspace > div > div > section a:has-text("Message")',
               'main#workspace > div > div > section button:has-text("Message")',
               'main a:has-text("Message")',
@@ -367,16 +239,13 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
             if (messageBtn) {
               console.log("[LinkedIn Outreach] Direct Message button visible. Initiating chat window...");
               await messageBtn.click({ force: true });
-              // Safe delay after clicking Message: 3-5 seconds
               await page.waitForTimeout(3000 + Math.random() * 2000);
 
-              // Check if a Premium InMail paywall dialog or promotional modal appeared
               const inmailModal = page.locator('div[role="dialog"]:has-text("InMail"), .premium-upsell-link, button:has-text("InMail")').first();
               const isPremiumLocked = await inmailModal.isVisible();
 
               if (isPremiumLocked) {
                 console.log("[LinkedIn Outreach] Premium InMail paywall detected. Dismissing and pivoting to Connection invitation note...");
-                // Dismiss the dialog using standard close actions
                 const dismissBtn = page.locator('button[aria-label="Dismiss"], button[aria-label="Close"], button.artdeco-modal__dismiss').first();
                 if (await dismissBtn.isVisible()) {
                   await dismissBtn.click({ force: true });
@@ -386,19 +255,12 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
                 const chatInput = page.locator('div.msg-form__contenteditable[contenteditable="true"], div[role="textbox"], .msg-form__placeholder').first();
                 if (await chatInput.isVisible()) {
                   await chatInput.focus();
-                  // Safe typing delay before starting: 1-2 seconds
                   await page.waitForTimeout(1000 + Math.random() * 1000);
-
-                  // Type with realistic human pacing: 60-120 ms per character
                   await chatInput.type(msg.content, { delay: 60 + Math.random() * 60, timeout: 120000 });
-                  
-                  // Safe typing delay after completing: 2-4 seconds
                   await page.waitForTimeout(2000 + Math.random() * 2000);
 
                   const sendBtn = page.locator('button.msg-form__send-button, button[type="submit"]:has-text("Send")').first();
                   await sendBtn.click({ force: true });
-                  
-                  // Safe delay after sending: 3-5 seconds
                   await page.waitForTimeout(3000 + Math.random() * 2000);
                   messaged = true;
                   console.log("[LinkedIn Outreach] Direct message dispatched successfully!");
@@ -406,11 +268,10 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
               }
             }
 
-            // Flow B: Connect Button Invitation Note (standard networking path)
             if (!messaged) {
               console.log("[LinkedIn Outreach] Direct Message not possible. Attempting Connection Invitation note...");
               
-              let connectBtn = await locateProfileCardButton(page, "Connect", [
+              let connectBtn = await LinkedinOutreachService.locateProfileCardButton(page, "Connect", [
                 'main#workspace > div > div > section button:has-text("Connect")',
                 'main#workspace > div > div > section a:has-text("Connect")',
                 'main button:has-text("Connect")',
@@ -420,7 +281,7 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
               ]);
 
               if (!connectBtn || !(await connectBtn.isVisible())) {
-                const moreBtn = await locateProfileCardButton(page, "More Actions", [
+                const moreBtn = await LinkedinOutreachService.locateProfileCardButton(page, "More Actions", [
                   'main#workspace > div > div > section button[aria-label*="more actions"]',
                   'main#workspace > div > div > section button:has-text("More")',
                   'main button[aria-label*="more actions"]',
@@ -432,52 +293,38 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
 
                 if (moreBtn && await moreBtn.isVisible()) {
                   await moreBtn.click({ force: true });
-                  // Safe delay: 1-2.5 seconds
                   await page.waitForTimeout(1000 + Math.random() * 1500);
-                  
                   connectBtn = page.locator('span:has-text("Connect"), div[role="button"]:has-text("Connect"), button:has-text("Connect"), button[aria-label*="Connect"]').first();
                 }
               }
 
               if (connectBtn && await connectBtn.isVisible()) {
                 await connectBtn.click({ force: true });
-                // Safe delay: 3-5 seconds
                 await page.waitForTimeout(3000 + Math.random() * 2000);
 
-                // Handle standard prompt: "Customize your invitation"
                 const addNoteBtn = page.locator('button[aria-label="Add a note"], button:has-text("Add a note"), button.artdeco-button--secondary:has-text("note")').first();
                 if (await addNoteBtn.isVisible()) {
                   await addNoteBtn.click({ force: true });
-                  // Safe delay: 1.5-3 seconds
                   await page.waitForTimeout(1500 + Math.random() * 1500);
 
                   const noteArea = page.locator('textarea[name="message"], textarea#custom-message, textarea').first();
                   if (await noteArea.isVisible()) {
                     await noteArea.focus();
-                    // Safe typing delay before starting: 1-2 seconds
                     await page.waitForTimeout(1000 + Math.random() * 1000);
-
-                    // Type with realistic human pacing: 60-120 ms per character
                     await noteArea.type(msg.content, { delay: 60 + Math.random() * 60, timeout: 120000 });
-                    
-                    // Safe typing delay after completing: 2-4 seconds
                     await page.waitForTimeout(2000 + Math.random() * 2000);
 
                     const sendInvitationBtn = page.locator('button[aria-label="Send now"], button:has-text("Send"), button.artdeco-button--primary:has-text("Send")').first();
                     await sendInvitationBtn.click({ force: true });
-                    
-                    // Safe delay after sending connect: 3-5 seconds
                     await page.waitForTimeout(3000 + Math.random() * 2000);
                     messaged = true;
                     console.log("[LinkedIn Outreach] Connection request invitation sent with personalized note!");
                   }
                 } else {
-                  // Direct connection send without note (if restricted)
                   console.log("[LinkedIn Outreach] Add a note restricted. Sending direct invitation...");
                   const sendInvitationBtn = page.locator('button[aria-label="Send now"], button:has-text("Send now"), button:has-text("Send")').first();
                   if (await sendInvitationBtn.isVisible()) {
                     await sendInvitationBtn.click({ force: true });
-                    // Safe delay: 3-5 seconds
                     await page.waitForTimeout(3000 + Math.random() * 2000);
                     messaged = true;
                   }
@@ -512,7 +359,7 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
             }
             if (isCDP) {
               if (browser) {
-                await browser.close(); // Disconnects session safely
+                await browser.close();
               }
             } else {
               if (context) await context.close();
@@ -527,7 +374,6 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
           });
         }
 
-        // Apply a randomized 45-75 second human-like delay between consecutive DM dispatches to protect account
         if (i < messages.length - 1) {
           const delay = 45000 + Math.random() * 30000;
           console.log(`[LinkedIn Outreach] Applying account protection campaign delay: ${Math.round(delay / 1000)}s before next DM...`);
@@ -537,8 +383,6 @@ linkedinOutreachRouter.post("/outreach/linkedin/send", requireSendAuth, async (r
       console.log("[LinkedIn Outreach] Sequential background DM outreach campaign completed.");
     })().catch((err) => console.error("Outbox background executor error:", err));
 
-  } catch (error) {
-    console.error("[LinkedIn Outreach] Send setup failed:", error);
-    res.status(500).json({ success: false, error: String(error) });
+    return messages.length;
   }
-});
+}
