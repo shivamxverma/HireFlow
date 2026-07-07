@@ -9,7 +9,7 @@ import { RawJob } from "./types.js";
 export function parseWellfoundJobs(html: string): RawJob[] {
   const $ = cheerio.load(html);
   const rawJobs: RawJob[] = [];
-  const seenCards = new Set<cheerio.Element>();
+  const seenCards = new Set<any>();
   const isRealJobHref = (href: string) =>
     href.includes("/jobs/") &&
     !href.endsWith("/jobs/home") &&
