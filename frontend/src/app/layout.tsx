@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
-import { AuthInterceptor } from "@/components/auth-interceptor";
 
 export const metadata: Metadata = {
   title: "Job Board",
@@ -16,7 +15,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthInterceptor />
         <Navbar />
         {children}
       </body>

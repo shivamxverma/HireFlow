@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Compass, User, Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Compass, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,53 +15,6 @@ import {
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  
-  const [session, setSession] = useState<{
-    authenticated: boolean;
-    user: { name: string; email: string; avatar?: string } | null;
-  }>({
-    authenticated: false,
-    user: null,
-  });
-  const [loading, setLoading] = useState(true);
-
-  const fetchSession = async () => {
-    try {
-      const res = await fetch("/api/auth/session");
-      const json = await res.json();
-      if (json.success) {
-        setSession({
-          authenticated: json.authenticated,
-          user: json.user,
-        });
-      }
-    } catch (err) {
-      console.error("[Navbar Session Fetch Failed]", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSession();
-  }, [pathname]); // Refresh session status on path change
-
-  const handleSignOut = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth/logout", { method: "POST" });
-      if (res.ok) {
-        setSession({ authenticated: false, user: null });
-        router.refresh();
-        router.push("/");
-      }
-    } catch (err) {
-      console.error("[Navbar Sign Out Failed]", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const coreLinks = [
     { name: "Discover", href: "/", icon: Compass },
@@ -143,45 +96,11 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* User Authentication Status Section */}
-        <div className="flex items-center gap-4">
-          {loading ? (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-          ) : session.authenticated && session.user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 p-1.5 hover:bg-secondary/70 rounded-lg transition-colors cursor-pointer focus:outline-hidden">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black font-semibold text-xs shadow-xs border border-neutral-800 dark:border-neutral-200">
-                    {getInitials(session.user.name)}
-                  </div>
-                  <span className="text-xs font-semibold hidden sm:inline-block text-foreground">
-                    {session.user.name.split(" ")[0]}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-1 border-border p-1.5 shadow-md">
-                <DropdownMenuLabel className="font-normal px-2 py-1.5">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-xs font-medium text-foreground leading-none">{session.user.name}</p>
-                    <p className="text-[10px] text-muted-foreground leading-none">{session.user.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-border/60 my-1" />
-                <DropdownMenuItem asChild className="text-xs cursor-pointer">
-                  <Link href="/settings/profile">
-                    <User className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span>View Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link href="/login">
-              <button className="inline-flex items-center justify-center rounded-lg bg-foreground text-background px-4 py-1.5 text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-xs">
-                Sign In
-              </button>
-            </Link>
-          )}
+        <div className="flex items-center gap-2 p-1.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black font-semibold text-xs shadow-xs border border-neutral-800 dark:border-neutral-200">
+            {getInitials("Shivam Verma")}
+          </div>
+          <span className="text-xs font-semibold hidden sm:inline-block text-foreground">Shivam</span>
         </div>
       </div>
     </nav>

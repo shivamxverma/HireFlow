@@ -23,15 +23,12 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.4.0",
     "@prisma/client": "^6.2.1",
-    "bcryptjs": "^3.0.3",
     "bullmq": "^5.77.6",
     "cheerio": "^1.2.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "google-auth-library": "^10.6.2",
     "ioredis": "^5.11.0",
-    "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.10",
     "openai": "^6.39.1",
     "pdf-parse": "^2.4.5",
@@ -42,10 +39,8 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
     "@types/nodemailer": "^8.0.0",
     "prisma": "^6.2.1",
