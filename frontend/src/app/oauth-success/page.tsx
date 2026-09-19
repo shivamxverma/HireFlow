@@ -54,8 +54,6 @@ function OAuthSuccessContent() {
         const syncData = await syncRes.json();
 
         if (syncRes.ok && syncData.success) {
-          // 3. Keep full compatibility with automated email/outreach scripts by setting outreach_api_key in localStorage
-          localStorage.setItem("outreach_api_key", token);
           
           setStatus("success");
           setMessage("Secure session synchronized successfully! Redirecting...");

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, Mail, Linkedin, User, Menu, MessageSquare } from "lucide-react";
+import { Compass, User, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -52,7 +52,6 @@ export function Navbar() {
     try {
       const res = await fetch("/api/auth/logout", { method: "POST" });
       if (res.ok) {
-        localStorage.removeItem("outreach_api_key"); // clear cache key
         setSession({ authenticated: false, user: null });
         router.refresh();
         router.push("/");
@@ -66,12 +65,6 @@ export function Navbar() {
 
   const coreLinks = [
     { name: "Discover", href: "/", icon: Compass },
-  ];
-
-  const channelsLinks = [
-    { name: "Telegram", href: "/telegram", icon: MessageSquare },
-    { name: "Gmail", href: "/gmail", icon: Mail },
-    { name: "LinkedIn", href: "/linkedin", icon: Linkedin },
   ];
 
   // Helper to extract initials
@@ -113,23 +106,6 @@ export function Navbar() {
                   );
                 })}
                 
-                <DropdownMenuSeparator className="bg-border/60 my-1" />
-                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 py-1">
-                  Outreach Channels
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-border/60 my-1" />
-                
-                {channelsLinks.map((link) => {
-                  const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
-                  return (
-                    <DropdownMenuItem key={link.name} asChild className={`text-xs cursor-pointer ${isActive ? "bg-secondary font-medium" : ""}`}>
-                      <Link href={link.href}>
-                        <link.icon className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span>{link.name}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -164,27 +140,6 @@ export function Navbar() {
               );
             })}
             
-            {/* Elegant thin vertical divider */}
-            <div className="h-4 w-px bg-border/80 mx-1" />
-            
-            {/* Channel Links */}
-            {channelsLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`px-3 py-1 text-[11px] font-medium transition-all rounded-md flex items-center gap-1.5 ${
-                    isActive
-                      ? "bg-background text-foreground shadow-xs border border-border/80"
-                      : "text-muted-foreground hover:text-foreground hover:bg-background/40"
-                  }`}
-                >
-                  <link.icon className={`w-3.5 h-3.5 ${isActive ? "text-foreground" : "text-muted-foreground/85"}`} aria-hidden="true" />
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
           </div>
         </div>
 

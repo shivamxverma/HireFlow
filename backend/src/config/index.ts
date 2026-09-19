@@ -15,6 +15,7 @@ const configSchema = yup.object({
   TELEGRAM_API_ID: yup.number().integer().default(0),
   TELEGRAM_API_HASH: yup.string().default(""),
   TELEGRAM_SESSION: yup.string().default(""),
+  TELEGRAM_ENABLED: yup.string().oneOf(["true", "false"]).default("false"),
   EMAIL_USER: yup.string().optional(),
   EMAIL_PASS: yup.string().optional(),
   AZURE_OPENAI_ENDPOINT: yup.string().optional(),
@@ -38,7 +39,10 @@ const configSchema = yup.object({
   GEMINI_API_KEY: yup.string().optional(),
 });
 
-let validatedEnv: any;
+const validatedEnv = configSchema.validateSync(process.env, {
+  abortEarly: false,
+  stripUnknown: true,
+});
 
 const env = {
   PORT: validatedEnv.PORT,
@@ -52,6 +56,7 @@ const env = {
   TELEGRAM_API_ID: validatedEnv.TELEGRAM_API_ID,
   TELEGRAM_API_HASH: validatedEnv.TELEGRAM_API_HASH,
   TELEGRAM_SESSION: validatedEnv.TELEGRAM_SESSION,
+  TELEGRAM_ENABLED: validatedEnv.TELEGRAM_ENABLED,
   EMAIL_USER: validatedEnv.EMAIL_USER,
   EMAIL_PASS: validatedEnv.EMAIL_PASS,
   AZURE_OPENAI_ENDPOINT: validatedEnv.AZURE_OPENAI_ENDPOINT,

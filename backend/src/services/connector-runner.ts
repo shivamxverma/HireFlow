@@ -1,13 +1,7 @@
-import { searchLinkedinJobs } from "../connectors/linkedin/index.js";
 import { searchYcJobs } from "../connectors/yc/index.js";
 import { searchWellfoundJobs } from "../connectors/wellfound/index.js";
-import { searchTelegramJobs } from "../connectors/telegram/index.js";
 import { ingestJobs } from "./ingestion.service.js";
 import type { Job } from "../connectors/types.js";
-
-type ConnectorRunOptions = {
-  includeTelegram?: boolean;
-};
 
 /**
  * Connector Runner
@@ -17,10 +11,7 @@ type ConnectorRunOptions = {
  * 3. Consolidate results into a unified array.
  * 4. Trigger the Ingestion Service to store and update listings in PostgreSQL.
  */
-export async function runAllConnectors(
-  options: ConnectorRunOptions = {},
-): Promise<{ totalFetched: number; upserted: number; failed: number }> {
-  const { includeTelegram = true } = options;
+export async function runAllConnectors(): Promise<{ totalFetched: number; upserted: number; failed: number }> {
   console.log("[Connector Runner] Executing active job aggregation connectors...");
 
   const allJobs: Job[] = [];
@@ -49,33 +40,6 @@ export async function runAllConnectors(
     console.log(`[Connector Runner] Wellfound Jobs Connector successfully returned ${wellfoundJobs.length} normalized listings.`);
   } catch (error) {
     console.error("[Connector Runner] Wellfound Jobs Connector execution failed:", error);
-  }
-
-  // 3. Run LinkedIn Jobs Connector
-  try {
-    console.log("[Connector Runner] Launching LinkedIn Jobs Connector...");
-    const linkedinJobs = await searchLinkedinJobs({
-      keywords: '"Software Engineer" OR "Backend Developer" OR "Full Stack Developer" OR "Software Developer" OR "AI Engineer"',
-      location: "India",
-      workplaceType: "remote",
-    });
-    allJobs.push(...linkedinJobs);
-    console.log(`[Connector Runner] LinkedIn Jobs Connector successfully returned ${linkedinJobs.length} normalized listings.`);
-  } catch (error) {
-    console.error("[Connector Runner] LinkedIn Jobs Connector execution failed (check session cookies or site changes):", error);
-  }
-
-  if (includeTelegram) {
-    try {
-      console.log("[Connector Runner] Launching Telegram Jobs Connector...");
-      const telegramJobs = await searchTelegramJobs();
-      allJobs.push(...telegramJobs);
-      console.log(`[Connector Runner] Telegram Jobs Connector successfully returned ${telegramJobs.length} normalized listings.`);
-    } catch (error) {
-      console.error("[Connector Runner] Telegram Jobs Connector execution failed:", error);
-    }
-  } else {
-    console.log("[Connector Runner] Skipping Telegram connector in direct crawl mode. Telegram stays on the queue-based ingestion path.");
   }
 
   console.log(`\n[Connector Runner] Finished scanning. Consolidated list contains ${allJobs.length} jobs.`);

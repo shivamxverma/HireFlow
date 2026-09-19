@@ -6,8 +6,6 @@ import type { DiscoveryItem } from "@/lib/job-discovery";
 
 type JobCardProps = {
   job: DiscoveryItem;
-  isSelected: boolean;
-  onSelect: (job: DiscoveryItem) => void;
 };
 
 function getFreshnessClass(freshness: DiscoveryItem["freshness"]) {
@@ -26,16 +24,10 @@ function getFreshnessClass(freshness: DiscoveryItem["freshness"]) {
   return "border-border bg-secondary/70 text-muted-foreground";
 }
 
-export function JobCard({ job, isSelected, onSelect }: JobCardProps) {
+export function JobCard({ job }: JobCardProps) {
   return (
-    <article
-      className={`group rounded-3xl border p-5 transition-all duration-200 ${
-        isSelected
-          ? "border-foreground/20 bg-card shadow-lg"
-          : "border-border/70 bg-white/85 shadow-sm hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-md"
-      }`}
-    >
-      <button className="flex w-full flex-col gap-4 text-left" onClick={() => onSelect(job)} type="button">
+    <article className="group rounded-3xl border border-border/70 bg-white/85 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-md">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -82,17 +74,9 @@ export function JobCard({ job, isSelected, onSelect }: JobCardProps) {
             </span>
           ))}
         </div>
-      </button>
+      </div>
 
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/70 pt-4">
-        <button
-          className="text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-          onClick={() => onSelect(job)}
-          type="button"
-        >
-          View details
-        </button>
-
         {job.applyUrl ? (
           <a
             className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90"

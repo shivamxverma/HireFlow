@@ -21,31 +21,11 @@ export class JobService {
   }
 
   static async getAllJobs() {
-    const jobs = await prisma.job.findMany({
+    return prisma.job.findMany({
       orderBy: [
         { updatedAt: "desc" },
         { createdAt: "desc" },
       ],
-      include: {
-        applications: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
-    });
-
-    return jobs.map((job) => {
-      const activeApp = job.applications?.[0];
-      const effectiveStatus = activeApp?.status === "APPLIED" ? "Applied" : job.status;
-      const effectiveAppliedAt = activeApp?.status === "APPLIED" ? activeApp.updatedAt : job.appliedAt;
-
-      return {
-        ...job,
-        status: effectiveStatus,
-        createdAt: job.createdAt.toISOString(),
-        updatedAt: job.updatedAt.toISOString(),
-        appliedAt: effectiveAppliedAt ? effectiveAppliedAt.toISOString() : null,
-      };
     });
   }
 

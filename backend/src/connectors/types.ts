@@ -8,8 +8,6 @@ export interface Job {
   applyUrl?: string | null;
   experienceLevel?: string;
   fingerprint?: string;
-  telegramMessageId?: string;
-  telegramChannelId?: string;
   notes?: string;
 }
 

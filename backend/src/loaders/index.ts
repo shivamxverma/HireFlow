@@ -1,7 +1,5 @@
 import { Express } from "express";
 import { verifyDatabaseConnection } from "./postgres.js";
-import { initTelegram } from "./telegram.js";
-import { initWorkers } from "./workers.js";
 import { initExpress } from "./express.js";
 import { triggerFetchJob } from "../scheduler/fetch.scheduler.js";
 
@@ -11,16 +9,10 @@ export default async function loaders({ expressApp }: { expressApp: Express }): 
   // 1. Verify DB Connection
   await verifyDatabaseConnection();
 
-  // 2. Initialize Telegram listener
-  await initTelegram();
-
-  // 3. Initialize background workers
-  initWorkers();
-
-  // 4. Initialize Express setups
+  // 2. Initialize the job discovery API.
   initExpress({ expressApp });
 
-  // 5. Trigger one-time platform crawl on startup
+  // 3. Trigger one-time platform crawl on startup
   console.log("[Bootstrap] Running one-time platform crawl on startup.");
   try {
     await triggerFetchJob();

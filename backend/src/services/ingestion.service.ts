@@ -5,7 +5,7 @@ import { isAllowedRole } from "../shared/role-filter.js";
 
 /**
  * Ingestion Service
- * Handles upserting standardized job listings from various sources (LinkedIn, YC, Wellfound).
+ * Handles upserting standardized job listings from the supported discovery sources.
  * Keeps record of when listings were last seen so that inactive/stale listings can be cleaned up later.
  */
 export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; failed: number }> {
@@ -15,12 +15,12 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
   let failed = 0;
 
   for (const job of jobs) {
-    if (job.source !== "telegram" && !isIndiaJob(job.location)) {
+    if (!isIndiaJob(job.location)) {
       console.log(`[Ingestion Service] Skipping job listing "${job.title}" at "${job.company}" because location "${job.location}" is not in India.`);
       continue;
     }
 
-    if (job.source !== "telegram" && !isAllowedRole(job.title)) {
+    if (!isAllowedRole(job.title)) {
       console.log(`[Ingestion Service] Skipping job listing "${job.title}" at "${job.company}" because title does not match allowed roles.`);
       continue;
     }
@@ -42,8 +42,6 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
           externalId: job.externalId,
           lastSeenAt: new Date(),
           fingerprint: job.fingerprint ?? null,
-          telegramMessageId: job.telegramMessageId ?? null,
-          telegramChannelId: job.telegramChannelId ?? null,
           notes: job.notes ?? null,
         },
         create: {
@@ -56,8 +54,6 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
           externalId: job.externalId,
           lastSeenAt: new Date(),
           fingerprint: job.fingerprint ?? null,
-          telegramMessageId: job.telegramMessageId ?? null,
-          telegramChannelId: job.telegramChannelId ?? null,
           notes: job.notes ?? null,
         },
       });

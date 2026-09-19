@@ -1,11 +1,9 @@
 import type { Job } from "@/types/job";
 
-type DiscoverySourceFilter = "all" | "linkedin" | "telegram" | "yc" | "wellfound";
+type DiscoverySourceFilter = "all" | "yc" | "wellfound";
 type DiscoveryFreshnessFilter = "all" | "24h" | "72h" | "7d";
 
 const SOURCE_WEIGHTS: Record<string, number> = {
-  linkedin: 30,
-  telegram: 28,
   wellfound: 12,
   yc: 10,
   manual: 0,
@@ -118,14 +116,6 @@ function getFreshnessMeta(hours: number) {
 
 function buildReasons(job: Job, channelName: string | null, freshnessLabel: string, title: string, description: string) {
   const reasons: string[] = [];
-
-  if (job.source === "linkedin") {
-    reasons.push("Direct LinkedIn listing");
-  }
-
-  if (job.source === "telegram" && channelName) {
-    reasons.push(`Telegram signal from ${channelName}`);
-  }
 
   reasons.push(freshnessLabel);
 
@@ -245,8 +235,6 @@ export function buildDiscoveryFeed(jobs: Job[], options: DiscoveryOptions = {}) 
   return jobs
     .map(scoreJob)
     .filter((job) =>
-      job.source === "linkedin" ||
-      job.source === "telegram" ||
       job.source === "yc" ||
       job.source === "wellfound",
     )
@@ -264,8 +252,6 @@ export function buildDiscoveryFeed(jobs: Job[], options: DiscoveryOptions = {}) 
 
 export function getDiscoveryStats(items: DiscoveryItem[]) {
   const hot = items.filter((job) => job.freshness === "hot").length;
-  const linkedin = items.filter((job) => job.source === "linkedin").length;
-  const telegram = items.filter((job) => job.source === "telegram").length;
   const yc = items.filter((job) => job.source === "yc").length;
   const wellfound = items.filter((job) => job.source === "wellfound").length;
   const avgScore = items.length
@@ -275,8 +261,6 @@ export function getDiscoveryStats(items: DiscoveryItem[]) {
   return {
     total: items.length,
     hot,
-    linkedin,
-    telegram,
     yc,
     wellfound,
     avgScore,

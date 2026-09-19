@@ -9,17 +9,12 @@
     "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "mcp": "tsx src/mcp-server.ts",
     "test:connector": "tsx src/connectors/wellfound/test-connector.ts",
     "test:yc": "tsx src/connectors/yc/test-connector.ts",
-    "test:linkedin": "tsx src/connectors/linkedin/test-connector.ts",
     "save-session": "tsx src/connectors/wellfound/save-session.ts",
-    "save-session:linkedin": "tsx src/connectors/linkedin/save-session.ts",
-    "import-cookies:linkedin": "tsx src/connectors/linkedin/import-cookies.ts",
     "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts",
     "clear:jobs": "tsx src/scripts/clear-job-data.ts",
-    "telegram:login": "tsx src/scripts/telegram-login.ts",
-    "test:telegram": "tsx src/scripts/test-telegram-extraction.ts"
+    "delete:all-jobs": "tsx src/scripts/delete-all-jobs.ts"
   },
   "keywords": [],
   "author": "",
