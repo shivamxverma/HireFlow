@@ -4,7 +4,7 @@ import * as yup from "yup";
 dotenv.config();
 
 const configSchema = yup.object({
-  PORT: yup.string().default("3000"),
+  PORT: yup.number().default(3000),
   NODE_ENV: yup.string().oneOf(["development", "production", "test"]).default("development"),
   ACCESS_TOKEN_SECRET: yup.string().default("hireflow_jwt_access_secret_2026_x18"),
   REFRESH_TOKEN_SECRET: yup.string().default("hireflow_jwt_refresh_secret_2026_y99"),

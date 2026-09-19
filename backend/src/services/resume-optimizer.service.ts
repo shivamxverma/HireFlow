@@ -43,15 +43,11 @@ export class ResumeOptimizerService {
   private modelName: string;
 
   constructor() {
-    const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "process.env.AZURE_OPENAI_ENDPOINT";
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
     const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-5.4";
-    const apiKey = process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY || "process.env.AZURE_OPENAI_API_KEY";
+    const apiKey = process.env.AZURE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
 
     this.modelName = deploymentName;
-
-    console.log(`[Resume Optimizer] Initializing OpenAI Client in Azure Responses Mode...`);
-    console.log(`[Resume Optimizer] Endpoint: ${endpoint}`);
-    console.log(`[Resume Optimizer] Deployment: ${deploymentName}`);
 
     this.openai = new OpenAI({
       baseURL: endpoint,

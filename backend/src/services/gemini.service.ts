@@ -37,10 +37,6 @@ export class GeminiService {
     this.storageDir = path.resolve(process.cwd(), "storage");
     this.modelName = deploymentName;
 
-    console.log(`[Gemini Service] Initializing OpenAI Client in Azure Responses Mode...`);
-    console.log(`[Gemini Service] Endpoint: ${endpoint}`);
-    console.log(`[Gemini Service] Deployment: ${deploymentName}`);
-
     this.openai = new OpenAI({
       baseURL: endpoint,
       apiKey: apiKey,
